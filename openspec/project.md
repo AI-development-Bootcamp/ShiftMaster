@@ -62,6 +62,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 - Separate Redux stores for client and admin (no shared state)
 - RESTful API design
 - JWT-based authentication
+- Layered server architecture: Routes → Controllers → Services → Models → Database
 
 ### Directory Structure
 ```
@@ -91,6 +92,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
   /src/
     /routes/
     /controllers/
+    /services/        # Business logic layer
     /middleware/
     /models/
     /utils/

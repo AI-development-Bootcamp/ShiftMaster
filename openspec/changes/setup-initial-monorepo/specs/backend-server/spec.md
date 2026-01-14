@@ -14,11 +14,22 @@ The server SHALL be built with Express and TypeScript.
 - **THEN** TypeScript compiles to JavaScript for Node.js
 
 ### Requirement: Directory Structure
-The server SHALL organize code into routes, controllers, middleware, models, and utils directories.
+The server SHALL organize code into routes, controllers, services, middleware, models, and utils directories.
 
 #### Scenario: Standard structure
 - **WHEN** viewing /server/src
-- **THEN** routes/, controllers/, middleware/, models/, and utils/ directories exist
+- **THEN** routes/, controllers/, services/, middleware/, models/, and utils/ directories exist
+
+### Requirement: Service Layer Pattern
+The server SHALL implement a service layer containing business logic, separating it from HTTP concerns in controllers.
+
+#### Scenario: Business logic isolation
+- **WHEN** a controller needs to perform business operations
+- **THEN** it delegates to a service class
+
+#### Scenario: Service reusability
+- **WHEN** multiple controllers need the same business logic
+- **THEN** they share the same service methods
 
 ### Requirement: CORS Configuration
 The server SHALL configure CORS middleware to allow requests from frontend applications.

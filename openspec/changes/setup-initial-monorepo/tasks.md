@@ -43,14 +43,15 @@
 - [ ] 5.1 Create /server directory structure
 - [ ] 5.2 Create server/package.json with Express and TypeScript dependencies
 - [ ] 5.3 Create server/tsconfig.json for Node.js
-- [ ] 5.4 Set up directory structure (routes, controllers, middleware, models, utils)
-- [ ] 5.5 Create basic Express app with TypeScript
-- [ ] 5.6 Configure CORS middleware
-- [ ] 5.7 Add basic error handling middleware
-- [ ] 5.8 Create health check endpoint
-- [ ] 5.9 Configure nodemon for development
-- [ ] 5.10 Set up Swagger for API documentation
-- [ ] 5.11 Configure Vitest for server tests
+- [ ] 5.4 Set up directory structure (routes, controllers, services, middleware, models, utils)
+- [ ] 5.5 Create /services directory for business logic layer
+- [ ] 5.6 Create basic Express app with TypeScript
+- [ ] 5.7 Configure CORS middleware
+- [ ] 5.8 Add basic error handling middleware
+- [ ] 5.9 Create health check endpoint
+- [ ] 5.10 Configure nodemon for development
+- [ ] 5.11 Set up Swagger for API documentation
+- [ ] 5.12 Configure Vitest for server tests
 
 ## 6. Development Workflow
 - [ ] 6.1 Add root-level development scripts (dev, build, test, lint)
