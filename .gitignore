@@ -12,7 +12,7 @@
 node_modules/
 .pnp
 .pnp.js
-package-lock.json
+# package-lock.json should be committed for reproducible builds and CI caching
 
 # Testing
 coverage/
