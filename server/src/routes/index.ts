@@ -1,15 +1,14 @@
 import { Router } from 'express';
 import healthRouter from './health.js';
 
-const apiRouter = Router();
+const router = Router();
 
-// Mount all route modules - each router defines its own path
-apiRouter.use(healthRouter);
+// Health check route
+router.use('/health', healthRouter);
 
-// Future routes can be added here:
-// apiRouter.use(authRouter);    // authRouter defines /auth routes
-// apiRouter.use(usersRouter);   // usersRouter defines /users routes
-// apiRouter.use(clientsRouter); // clientsRouter defines /clients routes
+// Add more route modules here
+// router.use('/auth', authRouter);
+// router.use('/users', usersRouter);
 // etc.
 
-export default apiRouter;
+export default router;

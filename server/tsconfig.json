@@ -1,18 +1,21 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
-    "module": "ESNext",
-    "moduleResolution": "node",
-    "target": "ES2022",
     "outDir": "./dist",
     "rootDir": "./src",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ES2020",
+    "lib": ["ES2020"],
+    "types": ["node"],
     "esModuleInterop": true,
-    "resolveJsonModule": true,
-    "paths": {
-      "@/*": ["./src/*"],
-      "@shared/*": ["../shared/src/*"]
-    }
+    "allowSyntheticDefaultImports": true
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
 }

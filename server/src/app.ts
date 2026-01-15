@@ -2,9 +2,6 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
-// Swagger imports handled dynamically to avoid production crash
-// import swaggerUi from 'swagger-ui-express';
-// import { swaggerSpec } from './utils/swagger.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import apiRouter from './routes/index.js';
 
@@ -49,20 +46,16 @@ if (process.env.NODE_ENV !== 'test') {
 }
 
 // API Documentation
-// API Documentation
 const swaggerRouter = express.Router();
 app.use('/api-docs', swaggerRouter);
 
 if (process.env.NODE_ENV !== 'production') {
   Promise.all([import('swagger-ui-express'), import('./utils/swagger.js')])
     .then(([swaggerUi, swaggerUtils]) => {
-      // swaggerUi.serve is an array of middleware, spread it if necessary or pass directly
-      // swagger-ui-express types might expect app.use, but router.use works similarly
       swaggerRouter.use(
         swaggerUi.default.serve,
         swaggerUi.default.setup(swaggerUtils.swaggerSpec)
       );
-      // console.log('Swagger UI initialized at /api-docs');
     })
     .catch((err) => {
       console.error('Failed to initialize Swagger UI:', err);
