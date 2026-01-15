@@ -24,6 +24,13 @@
   --color-bg-secondary: #F2F2F7;
   --color-bg-dark: #000000;
 
+  /* ===== Navigation Sidebar Colors ===== */
+  --color-nav-bg: #141e3e;
+  --color-nav-text: #a0aec0;
+  --color-nav-text-active: #ffffff;
+  --color-nav-hover: rgba(255, 255, 255, 0.08);
+  --color-nav-active-indicator: #ed764c;
+
   /* ===== Border Colors ===== */
   --color-border: #e5e7eb;
   --color-border-dark: #d1d5db;

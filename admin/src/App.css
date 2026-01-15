@@ -9,3 +9,22 @@
   padding: var(--spacing-md);
   box-sizing: border-box;
 }
+
+/* Main content area - offset for sidebar */
+.main-content {
+  margin-right: calc(100% / 6);
+  min-height: 100vh;
+  background-color: var(--color-bg-secondary);
+}
+
+@media (max-width: 1200px) {
+  .main-content {
+    margin-right: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-right: 200px;
+  }
+}
