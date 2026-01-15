@@ -10,6 +10,7 @@
     "build": "tsc",
     "test": "vitest",
     "test:ui": "vitest --ui",
+    "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -17,6 +18,10 @@
   },
   "devDependencies": {
     "@types/node": "^20.11.5",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
     "typescript": "^5.3.3",
     "vitest": "^3.2.4"
   }
