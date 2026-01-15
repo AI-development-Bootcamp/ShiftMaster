@@ -153,25 +153,296 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 ## Domain Context
 
-Shift management system with the following core concepts:
+Time reporting system with the following core concepts:
 
-- Users (employees, managers, admins)
-- Shifts (scheduling, assignments)
-- Availability and shift requests
-- Departments/locations
+- **Users** (employees, managers, admins) - System users with role-based access
+- **Clients** - External organizations that projects belong to
+- **Projects** - Work initiatives with managers, dates, and time format rules
+- **Tasks** - Specific work items within projects
+- **Entries** - Daily work or absence records (one per user per day)
+- **Entry Assignments** - Task-level work lines within an entry
+- **Admin Task Assignments** - Admin-assigned user-to-task relationships
+- **Month Locks** - Admin controls to prevent editing of historical data
 
 ## Important Constraints
+
+**Application Constraints:**
 
 - Client app must be mobile-first (responsive design)
 - Admin and client apps have completely separate UIs
 - No Docker for local development (run services directly)
 - Authentication uses JWT (users receive passwords, no password change required initially)
 
+**Data Model Constraints:**
+
+- One entry per user per calendar day (enforced by unique constraint)
+- Time format is enforced at project level:
+  - `start_end` projects require start_time and end_time for entry_assignments
+  - `sum` projects require duration_minutes for entry_assignments
+- Users can only report time on tasks they are assigned to (via admin_task_assignments)
+- Absence entries (except vacation_partial) cannot have work assignments
+- Vacation date ranges create multiple entry rows (one per day)
+- Locked months prevent all entry and entry_assignment modifications
+- Soft deletes are used for users, clients, and projects (active flag)
+- Email addresses must be unique across all users
+
 ## External Dependencies
 
 - Supabase for PostgreSQL database and authentication
 - Vercel for deployment
 - GitHub for version control and CI/CD
+
+## Database Schema
+
+### Data Types and Enums
+
+**user_role:**
+
+- `admin` - Administrator with full system access
+- `regular` - Regular employee user
+
+**project_time_format_type:**
+
+- `sum` - Time reported as total duration in minutes
+- `start_end` - Time reported with start and end times
+
+**entry_kind:**
+
+- `work` - Work entry with task assignments
+- `absence` - Absence entry (sick leave, vacation, etc.)
+
+**absence_type:**
+
+- `sick` - Sick leave
+- `vacation` - Full day vacation
+- `vacation_partial` - Partial day vacation (may include work assignments)
+- `reserve` - Reserve duty
+- `other` - Other absence type
+
+**work_location:**
+
+- `Office` - Work performed at office
+- `Client` - Work performed at client location
+- `Home` - Work performed from home
+
+### Database Tables
+
+#### users
+
+Employees and administrators.
+
+| Field         | Type        | Constraints      |
+| ------------- | ----------- | ---------------- |
+| user_id       | BIGINT      | Primary Key      |
+| full_name     | TEXT        | Required         |
+| email         | TEXT        | Required, Unique |
+| password_hash | TEXT        | Required         |
+| role          | user_role   | Required         |
+| active        | BOOLEAN     | Soft delete flag |
+| created_at    | TIMESTAMPTZ |                  |
+
+**Relations:**
+
+- One user has many entries
+- One user (as manager) has many projects
+- One admin user has many month_locks
+- One admin user has many admin_task_assignments
+
+---
+
+#### clients
+
+External organizations.
+
+| Field        | Type        | Constraints      |
+| ------------ | ----------- | ---------------- |
+| client_id    | BIGINT      | Primary Key      |
+| name         | TEXT        | Required         |
+| contact_info | TEXT        | Optional         |
+| active       | BOOLEAN     | Soft delete flag |
+| created_at   | TIMESTAMPTZ |                  |
+
+**Relations:**
+
+- One client has many projects
+
+---
+
+#### projects
+
+Work initiatives with managers and time format rules.
+
+| Field            | Type                     | Constraints                     |
+| ---------------- | ------------------------ | ------------------------------- |
+| project_id       | BIGINT                   | Primary Key                     |
+| client_id        | BIGINT                   | Foreign Key → clients, Required |
+| manager_user_id  | BIGINT                   | Foreign Key → users, Required   |
+| name             | TEXT                     | Required                        |
+| description      | TEXT                     | Optional                        |
+| start_date       | DATE                     | Required                        |
+| end_date         | DATE                     | Optional, must be ≥ start_date  |
+| time_format_type | project_time_format_type | Required                        |
+| active           | BOOLEAN                  | Soft delete flag                |
+| created_at       | TIMESTAMPTZ              |                                 |
+
+**Relations:**
+
+- Many projects belong to one client
+- Many projects belong to one user (manager)
+- One project has many tasks
+
+---
+
+#### tasks
+
+Specific work items within projects.
+
+| Field       | Type        | Constraints                      |
+| ----------- | ----------- | -------------------------------- |
+| task_id     | BIGINT      | Primary Key                      |
+| project_id  | BIGINT      | Foreign Key → projects, Required |
+| name        | TEXT        | Required                         |
+| description | TEXT        | Optional                         |
+| start_date  | DATE        | Optional                         |
+| end_date    | DATE        | Optional, must be ≥ start_date   |
+| created_at  | TIMESTAMPTZ |                                  |
+
+**Relations:**
+
+- Many tasks belong to one project
+- One task has many entry_assignments
+- One task has many admin_task_assignments
+
+---
+
+#### admin_task_assignments
+
+Admin-assigned user-to-task relationships.
+
+| Field                    | Type        | Constraints                        |
+| ------------------------ | ----------- | ---------------------------------- |
+| admin_task_assignment_id | BIGINT      | Primary Key                        |
+| user_id                  | BIGINT      | Foreign Key → users, Required      |
+| task_id                  | BIGINT      | Foreign Key → tasks, Required      |
+| assigned_by              | BIGINT      | Foreign Key → users, Must be admin |
+| assigned_at              | TIMESTAMPTZ |                                    |
+| active                   | BOOLEAN     | Default: true                      |
+| revoked_at               | TIMESTAMPTZ | Optional                           |
+
+**Relations:**
+
+- Many assignments belong to one user
+- Many assignments belong to one task
+- Many assignments created by one admin user
+
+**Constraints:**
+
+- UNIQUE (user_id, task_id) - Prevents duplicate assignments
+- Only admin users may create/update these records
+
+---
+
+#### entries
+
+Unified table for work and absence entries (one row = one calendar day).
+
+| Field            | Type         | Constraints                    |
+| ---------------- | ------------ | ------------------------------ |
+| entry_id         | BIGINT       | Primary Key                    |
+| user_id          | BIGINT       | Foreign Key → users, Required  |
+| entry_kind       | entry_kind   | Required (work/absence)        |
+| work_date        | DATE         | Required (single day only)     |
+| start_time       | TIME         | Optional                       |
+| end_time         | TIME         | Optional                       |
+| description      | TEXT         | Optional                       |
+| absence_type     | absence_type | Required if entry_kind=absence |
+| attachment_path  | TEXT         | Optional                       |
+| created_at       | TIMESTAMPTZ  |                                |
+| updated_at       | TIMESTAMPTZ  |                                |
+| last_modified_by | BIGINT       | Foreign Key → users, Optional  |
+| last_modified_at | TIMESTAMPTZ  |                                |
+
+**Relations:**
+
+- Many entries belong to one user
+- One entry has many entry_assignments
+
+**Important Business Rules:**
+
+- **One entry per user per day** - Recommended unique constraint: (user_id, work_date)
+- **Vacation ranges** - When a date range is selected, backend creates multiple entries (one per day)
+- **vacation_partial** entries may have work assignments
+- Other absence types must not have work assignments
+- If month is locked → entry is read-only
+
+---
+
+#### entry_assignments
+
+Task-level work lines within an entry.
+
+| Field               | Type          | Constraints                     |
+| ------------------- | ------------- | ------------------------------- |
+| entry_assignment_id | BIGINT        | Primary Key                     |
+| entry_id            | BIGINT        | Foreign Key → entries, Required |
+| task_id             | BIGINT        | Foreign Key → tasks, Required   |
+| location            | work_location | Required                        |
+| start_time          | TIME          | For start_end format            |
+| end_time            | TIME          | For start_end format            |
+| duration_minutes    | INT           | For sum format                  |
+| created_at          | TIMESTAMPTZ   |                                 |
+| updated_at          | TIMESTAMPTZ   |                                 |
+
+**Relations:**
+
+- Many assignments belong to one entry
+- Many assignments belong to one task
+
+**Constraints:**
+
+- Entry's user must have an **active admin_task_assignment** for the task
+- Time fields enforced by project.time_format_type:
+  - If project uses `start_end`: start_time and end_time required, duration_minutes null
+  - If project uses `sum`: duration_minutes required, start_time and end_time null
+- Not allowed if entry is absence (except vacation_partial)
+- Not allowed if month is locked
+
+---
+
+#### month_locks
+
+Admin controls to prevent editing of historical data.
+
+| Field       | Type        | Constraints                        |
+| ----------- | ----------- | ---------------------------------- |
+| lock_id     | BIGINT      | Primary Key                        |
+| year        | INT         | Required                           |
+| month       | INT         | Required (1-12)                    |
+| locked_at   | TIMESTAMPTZ |                                    |
+| locked_by   | BIGINT      | Foreign Key → users, Must be admin |
+| unlocked_at | TIMESTAMPTZ | Optional                           |
+
+**Relations:**
+
+- Many locks created by one admin user
+
+**Constraints:**
+
+- UNIQUE (year, month) - Same year+month cannot exist twice
+- If `unlocked_at` is null → month is locked
+- Locked month → entries & entry_assignments are read-only
+
+---
+
+### Database Design Guarantees
+
+- ✅ Admin-only task assignment with no duplicates
+- ✅ One DB row per user per calendar day
+- ✅ Partial vacation supports mixed work + absence
+- ✅ Strong month locking by unique (year, month)
+- ✅ Clean, predictable reporting model
+- ✅ Time format enforcement at project level
+- ✅ Soft deletes for users, clients, and projects
 
 ## API Documentation
 
@@ -1800,6 +2071,15 @@ Authorization: Bearer <token>
 
 Create a new time entry (work entry).
 
+**Validation Rules:**
+
+- User must have an active admin_task_assignment for each task in assignments
+- Time format must match project's time_format_type:
+  - For `start_end` projects: start_time and end_time required, duration_minutes ignored
+  - For `sum` projects: duration_minutes required, start_time and end_time ignored
+- Only one entry per user per day (duplicate work_date will update existing entry)
+- Month must not be locked for the entry's work_date
+
 **Request Headers:**
 
 ```
@@ -1871,6 +2151,35 @@ Authorization: Bearer <token>
     "details": {
       "year": 2024,
       "month": 1
+    }
+  }
+}
+```
+
+**Additional Error Responses:**
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "User is not assigned to task",
+    "code": "TASK_NOT_ASSIGNED",
+    "details": {
+      "task_id": 1
+    }
+  }
+}
+```
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Time format mismatch: project requires start_end format",
+    "code": "TIME_FORMAT_MISMATCH",
+    "details": {
+      "project_id": 1,
+      "required_format": "start_end"
     }
   }
 }
@@ -2135,6 +2444,14 @@ Authorization: Bearer <token>
 #### POST /api/v1/absences — User / Admin
 
 Create absence entry(ies). For date ranges, creates multiple entries (one per day).
+
+**Validation Rules:**
+
+- Date ranges create multiple entry rows (one per calendar day)
+- Only one entry per user per day (duplicate dates will update existing entries)
+- Month must not be locked for any date in the range
+- `vacation_partial` entries may include work assignments
+- Other absence types cannot have work assignments
 
 **Request Headers:**
 
