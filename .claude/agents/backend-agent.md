@@ -1,3 +1,10 @@
+---
+name: backend-agent
+description: Backend API development for Express server endpoints, business logic, and middleware
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+---
+
 # Backend API Development Agent
 
 ## Purpose

@@ -1,3 +1,10 @@
+---
+name: testing-agent
+description: Writing and maintaining tests across frontend, backend, and integration layers
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+---
+
 # Testing Agent
 
 ## Purpose
