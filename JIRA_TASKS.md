@@ -1,4 +1,5 @@
 # AbraShiftMaster - Jira Task Breakdown
+
 ## For 4 Developers
 
 ---
@@ -6,6 +7,7 @@
 ## EPIC 0: Project Setup & Infrastructure
 
 ### Story 0.1: Monorepo Initial Setup
+
 **Assignee:** Dev 1
 **Story Points:** 8
 **Priority:** Highest
@@ -14,6 +16,7 @@
 Set up the complete monorepo structure with all workspaces, tooling, and basic configurations.
 
 **Tasks:**
+
 - [ ] Create root package.json with npm workspaces configuration
 - [ ] Create tsconfig.base.json with shared TypeScript settings (strict mode enabled)
 - [ ] Create .eslintrc.json with shared linting rules
@@ -23,6 +26,7 @@ Set up the complete monorepo structure with all workspaces, tooling, and basic c
 - [ ] Add root-level scripts: dev, build, test, lint, format
 
 **Acceptance Criteria:**
+
 - All config files created and working
 - `npm install` runs successfully at root
 - ESLint and Prettier work across all workspaces
@@ -31,6 +35,7 @@ Set up the complete monorepo structure with all workspaces, tooling, and basic c
 ---
 
 ### Story 0.2: Shared Package Setup
+
 **Assignee:** Dev 1
 **Story Points:** 5
 **Priority:** Highest
@@ -39,6 +44,7 @@ Set up the complete monorepo structure with all workspaces, tooling, and basic c
 Create the shared workspace with types, utilities, and API client code.
 
 **Tasks:**
+
 - [ ] Create /shared directory with proper structure (api/, utils/, types/)
 - [ ] Create shared/package.json with dependencies (axios/fetch)
 - [ ] Create shared/tsconfig.json extending base config
@@ -48,6 +54,7 @@ Create the shared workspace with types, utilities, and API client code.
 - [ ] Export all types and utilities properly
 
 **Acceptance Criteria:**
+
 - Shared package builds successfully
 - Types are properly exported
 - Other workspaces can import from shared
@@ -56,6 +63,7 @@ Create the shared workspace with types, utilities, and API client code.
 ---
 
 ### Story 0.3: Client Frontend Scaffold
+
 **Assignee:** Dev 2
 **Story Points:** 8
 **Priority:** Highest
@@ -64,6 +72,7 @@ Create the shared workspace with types, utilities, and API client code.
 Initialize the client (mobile PWA) React application with all configurations.
 
 **Tasks:**
+
 - [ ] Initialize Vite + React + TypeScript in /client
 - [ ] Create client/package.json (React, Redux Toolkit, React Router, CSS)
 - [ ] Configure vite.config.ts (port 5173, proxy to backend)
@@ -76,6 +85,7 @@ Initialize the client (mobile PWA) React application with all configurations.
 - [ ] Create basic layout components (Header, Navigation, Footer)
 
 **Acceptance Criteria:**
+
 - Application starts on port 5173
 - Redux store is configured
 - Routing works
@@ -86,6 +96,7 @@ Initialize the client (mobile PWA) React application with all configurations.
 ---
 
 ### Story 0.4: Admin Frontend Scaffold
+
 **Assignee:** Dev 3
 **Story Points:** 8
 **Priority:** Highest
@@ -94,6 +105,7 @@ Initialize the client (mobile PWA) React application with all configurations.
 Initialize the admin (web) React application with all configurations.
 
 **Tasks:**
+
 - [ ] Initialize Vite + React + TypeScript in /admin
 - [ ] Create admin/package.json (React, Redux Toolkit, React Router, CSS)
 - [ ] Configure vite.config.ts (port 5174, proxy to backend)
@@ -106,6 +118,7 @@ Initialize the admin (web) React application with all configurations.
 - [ ] Create basic layout components (AdminHeader, Sidebar, Main)
 
 **Acceptance Criteria:**
+
 - Application starts on port 5174
 - Redux store is configured (separate from client)
 - Routing works
@@ -116,6 +129,7 @@ Initialize the admin (web) React application with all configurations.
 ---
 
 ### Story 0.5: Backend Server Setup
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** Highest
@@ -124,6 +138,7 @@ Initialize the admin (web) React application with all configurations.
 Set up Express backend with TypeScript, middleware, and basic structure.
 
 **Tasks:**
+
 - [ ] Create /server directory with proper structure (routes/, controllers/, services/, middleware/, models/, db/, utils/)
 - [ ] Create server/package.json (Express, TypeScript, cors, helmet, dotenv, jsonwebtoken, @supabase/supabase-js)
 - [ ] Create server/tsconfig.json for Node.js
@@ -137,6 +152,7 @@ Set up Express backend with TypeScript, middleware, and basic structure.
 - [ ] Configure Vitest for server tests
 
 **Acceptance Criteria:**
+
 - Server starts on port 3000
 - Health check endpoint works
 - CORS properly configured
@@ -147,6 +163,7 @@ Set up Express backend with TypeScript, middleware, and basic structure.
 ---
 
 ### Story 0.6: Database Setup & Supabase Integration
+
 **Assignee:** Dev 4
 **Story Points:** 13
 **Priority:** Highest
@@ -155,6 +172,7 @@ Set up Express backend with TypeScript, middleware, and basic structure.
 Set up Supabase connection and create all database tables according to schema.
 
 **Tasks:**
+
 - [ ] Create Supabase project
 - [ ] Create /server/src/db/supabase.ts (Supabase client initialization)
 - [ ] Create migration files for all tables:
@@ -173,6 +191,7 @@ Set up Supabase connection and create all database tables according to schema.
 - [ ] Update .env.example with Supabase credentials
 
 **Acceptance Criteria:**
+
 - All tables created successfully
 - Foreign keys work correctly
 - Unique constraints are enforced
@@ -183,6 +202,7 @@ Set up Supabase connection and create all database tables according to schema.
 ---
 
 ### Story 0.7: Authentication & JWT Setup
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** High
@@ -191,6 +211,7 @@ Set up Supabase connection and create all database tables according to schema.
 Implement JWT-based authentication system.
 
 **Tasks:**
+
 - [ ] Create /server/src/middleware/auth.ts (JWT verification middleware)
 - [ ] Create /server/src/utils/jwt.ts (token generation/verification utilities)
 - [ ] Create /server/src/utils/password.ts (bcrypt hashing utilities)
@@ -202,6 +223,7 @@ Implement JWT-based authentication system.
 - [ ] Write unit tests for auth middleware
 
 **Acceptance Criteria:**
+
 - Login endpoint returns JWT token
 - Passwords are hashed with bcrypt
 - JWT middleware validates tokens correctly
@@ -212,6 +234,7 @@ Implement JWT-based authentication system.
 ---
 
 ### Story 0.8: API Documentation with Swagger
+
 **Assignee:** Dev 1
 **Story Points:** 5
 **Priority:** Medium
@@ -220,6 +243,7 @@ Implement JWT-based authentication system.
 Set up Swagger/OpenAPI documentation for all API endpoints.
 
 **Tasks:**
+
 - [ ] Install swagger-jsdoc and swagger-ui-express
 - [ ] Create /server/src/config/swagger.ts
 - [ ] Configure Swagger UI route (GET /api-docs)
@@ -229,6 +253,7 @@ Set up Swagger/OpenAPI documentation for all API endpoints.
 - [ ] Document error response formats
 
 **Acceptance Criteria:**
+
 - Swagger UI accessible at /api-docs
 - API documentation is clear and accurate
 - All endpoints will be documented as they're built
@@ -239,6 +264,7 @@ Set up Swagger/OpenAPI documentation for all API endpoints.
 ## EPIC 1: Authentication & User Management
 
 ### Story 1.1: Admin - Create User (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 5
 **Priority:** High
@@ -247,6 +273,7 @@ Set up Swagger/OpenAPI documentation for all API endpoints.
 Allow admins to create new users with role and credentials.
 
 **Tasks:**
+
 - [ ] Create POST /api/users endpoint (admin only)
 - [ ] Create UsersController.createUser
 - [ ] Create UsersService.createUser (hash password, check unique email)
@@ -256,6 +283,7 @@ Allow admins to create new users with role and credentials.
 - [ ] Write integration test
 
 **Acceptance Criteria:**
+
 - Admin can create user with all required fields
 - Email must be unique (400 error if duplicate)
 - Password is hashed before storing
@@ -264,6 +292,7 @@ Allow admins to create new users with role and credentials.
 - Non-admin gets 403 error
 
 **API Contract:**
+
 ```
 POST /api/users
 Headers: Authorization: Bearer <admin_token>
@@ -274,6 +303,7 @@ Response: 201 { user_id, full_name, email, role, active, created_at }
 ---
 
 ### Story 1.2: Login Flow (Backend + Frontend)
+
 **Assignee:** Dev 2 (Frontend) + Dev 4 (Backend)
 **Story Points:** 8
 **Priority:** Highest
@@ -282,12 +312,14 @@ Response: 201 { user_id, full_name, email, role, active, created_at }
 Implement complete login flow for both client and admin.
 
 **Backend Tasks (Dev 4):**
+
 - [ ] Verify POST /api/auth/login works correctly
 - [ ] Return user info with token (role, full_name, user_id)
 - [ ] Add rate limiting for login attempts
 - [ ] Add Swagger documentation
 
 **Client Frontend Tasks (Dev 2):**
+
 - [ ] Create /client/src/pages/Login.tsx
 - [ ] Create login form (email, password) with RTL support
 - [ ] Create authSlice in Redux (store token, user info)
@@ -298,11 +330,13 @@ Implement complete login flow for both client and admin.
 - [ ] Add form validation (email format, required fields)
 
 **Admin Frontend Tasks (Dev 2):**
+
 - [ ] Create /admin/src/pages/Login.tsx (similar to client)
 - [ ] Create authSlice in admin Redux store
 - [ ] Same login flow for admin users
 
 **Acceptance Criteria:**
+
 - User can log in with valid credentials
 - Invalid credentials show error message
 - JWT token is stored in localStorage
@@ -314,6 +348,7 @@ Implement complete login flow for both client and admin.
 ---
 
 ### Story 1.3: Protected Routes & Auth Guard
+
 **Assignee:** Dev 2
 **Story Points:** 5
 **Priority:** High
@@ -322,6 +357,7 @@ Implement complete login flow for both client and admin.
 Implement route protection based on authentication status and role.
 
 **Tasks:**
+
 - [ ] Create ProtectedRoute component for client
 - [ ] Create ProtectedRoute component for admin
 - [ ] Check JWT token on app load
@@ -331,6 +367,7 @@ Implement route protection based on authentication status and role.
 - [ ] Create logout functionality (clear token and Redux state)
 
 **Acceptance Criteria:**
+
 - Unauthenticated users redirected to login
 - Token validated on app initialization
 - Logout clears all auth data
@@ -340,6 +377,7 @@ Implement route protection based on authentication status and role.
 ---
 
 ### Story 1.4: Admin - User Management UI
+
 **Assignee:** Dev 3
 **Story Points:** 13
 **Priority:** Medium
@@ -348,6 +386,7 @@ Implement route protection based on authentication status and role.
 Create admin interface for managing users (CRUD operations).
 
 **Tasks:**
+
 - [ ] Create GET /api/users endpoint (admin only) - Backend
 - [ ] Create PUT /api/users/:id endpoint (admin only) - Backend
 - [ ] Create DELETE /api/users/:id endpoint (soft delete, admin only) - Backend
@@ -362,6 +401,7 @@ Create admin interface for managing users (CRUD operations).
 - [ ] Implement usersSlice in admin Redux
 
 **Acceptance Criteria:**
+
 - Admin can view all users
 - Admin can create new user
 - Admin can edit user details
@@ -375,6 +415,7 @@ Create admin interface for managing users (CRUD operations).
 ## EPIC 2: Master Data Management (Clients, Projects, Tasks)
 
 ### Story 2.1: Clients Management (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 5
 **Priority:** High
@@ -383,6 +424,7 @@ Create admin interface for managing users (CRUD operations).
 Create API endpoints for client CRUD operations.
 
 **Tasks:**
+
 - [ ] Create POST /api/clients (admin only)
 - [ ] Create GET /api/clients (admin only, support active filter)
 - [ ] Create GET /api/clients/:id (admin only)
@@ -395,6 +437,7 @@ Create API endpoints for client CRUD operations.
 - [ ] Write unit and integration tests
 
 **Acceptance Criteria:**
+
 - All CRUD endpoints work
 - Name is required
 - Clients are active by default
@@ -405,6 +448,7 @@ Create API endpoints for client CRUD operations.
 ---
 
 ### Story 2.2: Clients Management UI (Admin)
+
 **Assignee:** Dev 3
 **Story Points:** 8
 **Priority:** High
@@ -413,6 +457,7 @@ Create API endpoints for client CRUD operations.
 Create admin UI for managing clients.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/Clients/ClientsList.tsx
 - [ ] Create /admin/src/pages/Clients/CreateClient.tsx
 - [ ] Create /admin/src/pages/Clients/EditClient.tsx
@@ -424,6 +469,7 @@ Create admin UI for managing clients.
 - [ ] Show confirmation dialog before deactivate
 
 **Acceptance Criteria:**
+
 - Admin can view all clients
 - Admin can create client
 - Admin can edit client
@@ -434,6 +480,7 @@ Create admin UI for managing clients.
 ---
 
 ### Story 2.3: Projects Management (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** High
@@ -442,6 +489,7 @@ Create admin UI for managing clients.
 Create API endpoints for project CRUD operations.
 
 **Tasks:**
+
 - [ ] Create POST /api/projects (admin only)
 - [ ] Create GET /api/projects (admin only, support filters: client_id, active)
 - [ ] Create GET /api/projects/:id (admin only)
@@ -455,6 +503,7 @@ Create API endpoints for project CRUD operations.
 - [ ] Write tests
 
 **Acceptance Criteria:**
+
 - All CRUD endpoints work
 - Validation rules enforced
 - Can filter by client
@@ -462,6 +511,7 @@ Create API endpoints for project CRUD operations.
 - Returns project with client and manager details
 
 **API Contract:**
+
 ```
 POST /api/projects
 Body: {
@@ -478,6 +528,7 @@ Body: {
 ---
 
 ### Story 2.4: Projects Management UI (Admin)
+
 **Assignee:** Dev 3
 **Story Points:** 13
 **Priority:** High
@@ -486,6 +537,7 @@ Body: {
 Create admin UI for managing projects.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/Projects/ProjectsList.tsx
 - [ ] Create /admin/src/pages/Projects/CreateProject.tsx
 - [ ] Create /admin/src/pages/Projects/EditProject.tsx
@@ -500,6 +552,7 @@ Create admin UI for managing projects.
 - [ ] Show confirmation before deactivate
 
 **Acceptance Criteria:**
+
 - Admin can view all projects
 - Admin can filter by client
 - Admin can create project with all fields
@@ -510,6 +563,7 @@ Create admin UI for managing projects.
 ---
 
 ### Story 2.5: Tasks Management (Backend)
+
 **Assignee:** Dev 1
 **Story Points:** 5
 **Priority:** High
@@ -518,6 +572,7 @@ Create admin UI for managing projects.
 Create API endpoints for task CRUD operations.
 
 **Tasks:**
+
 - [ ] Create POST /api/tasks (admin only)
 - [ ] Create GET /api/tasks (admin only, support filter: project_id)
 - [ ] Create GET /api/tasks/:id (admin only)
@@ -531,6 +586,7 @@ Create API endpoints for task CRUD operations.
 - [ ] Write tests
 
 **Acceptance Criteria:**
+
 - All CRUD endpoints work
 - Tasks belong to a project
 - Date validation works
@@ -540,6 +596,7 @@ Create API endpoints for task CRUD operations.
 ---
 
 ### Story 2.6: Tasks Management UI (Admin)
+
 **Assignee:** Dev 3
 **Story Points:** 8
 **Priority:** High
@@ -548,6 +605,7 @@ Create API endpoints for task CRUD operations.
 Create admin UI for managing tasks.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/Tasks/TasksList.tsx
 - [ ] Create /admin/src/pages/Tasks/CreateTask.tsx
 - [ ] Create /admin/src/pages/Tasks/EditTask.tsx
@@ -559,6 +617,7 @@ Create admin UI for managing tasks.
 - [ ] Implement tasksSlice in Redux
 
 **Acceptance Criteria:**
+
 - Admin can view all tasks
 - Admin can filter by project
 - Admin can create task
@@ -571,6 +630,7 @@ Create admin UI for managing tasks.
 ## EPIC 3: Task Assignments (Admin assigns tasks to users)
 
 ### Story 3.1: Task Assignment (Backend)
+
 **Assignee:** Dev 1
 **Story Points:** 8
 **Priority:** High
@@ -579,6 +639,7 @@ Create admin UI for managing tasks.
 Allow admins to assign/revoke tasks to users.
 
 **Tasks:**
+
 - [ ] Create POST /api/admin-task-assignments (admin only)
 - [ ] Create GET /api/admin-task-assignments (admin only, filters: user_id, task_id)
 - [ ] Create DELETE /api/admin-task-assignments/:id (revoke, admin only)
@@ -591,6 +652,7 @@ Allow admins to assign/revoke tasks to users.
 - [ ] Write tests (duplicate assignment, revoke)
 
 **Acceptance Criteria:**
+
 - Admin can assign task to user
 - Duplicate assignment returns 400 error
 - Revoke marks assignment inactive
@@ -598,6 +660,7 @@ Allow admins to assign/revoke tasks to users.
 - Only admin can perform these operations
 
 **API Contract:**
+
 ```
 POST /api/admin-task-assignments
 Body: { user_id, task_id }
@@ -614,6 +677,7 @@ Response: {
 ---
 
 ### Story 3.2: Task Assignment UI (Admin)
+
 **Assignee:** Dev 3
 **Story Points:** 13
 **Priority:** High
@@ -622,6 +686,7 @@ Response: {
 Create admin UI for assigning tasks to users.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/Assignments/AssignmentsList.tsx
 - [ ] Create /admin/src/pages/Assignments/CreateAssignment.tsx
 - [ ] Display assignments table (user, task, project, assigned date, status)
@@ -634,6 +699,7 @@ Create admin UI for assigning tasks to users.
 - [ ] Handle duplicate assignment error gracefully
 
 **Acceptance Criteria:**
+
 - Admin can view all assignments
 - Admin can filter by user and project
 - Admin can create assignment
@@ -644,6 +710,7 @@ Create admin UI for assigning tasks to users.
 ---
 
 ### Story 3.3: User - View My Assigned Tasks (Backend + Frontend)
+
 **Assignee:** Dev 2 (Frontend) + Dev 1 (Backend)
 **Story Points:** 5
 **Priority:** High
@@ -652,6 +719,7 @@ Create admin UI for assigning tasks to users.
 Allow users to view their assigned tasks for reporting.
 
 **Backend Tasks (Dev 1):**
+
 - [ ] Create GET /api/my-tasks (authenticated user)
 - [ ] Filter: only active assignments for current user
 - [ ] Filter: exclude inactive projects/clients
@@ -660,6 +728,7 @@ Allow users to view their assigned tasks for reporting.
 - [ ] Add Swagger documentation
 
 **Frontend Tasks (Dev 2):**
+
 - [ ] Create task selector component for client app
 - [ ] Fetch assigned tasks on component load
 - [ ] Display tasks grouped by client > project
@@ -667,6 +736,7 @@ Allow users to view their assigned tasks for reporting.
 - [ ] Store in Redux (myTasksSlice)
 
 **Acceptance Criteria:**
+
 - User sees only assigned tasks
 - Inactive projects/clients excluded
 - Tasks display with client and project context
@@ -678,6 +748,7 @@ Allow users to view their assigned tasks for reporting.
 ## EPIC 4: Daily Entries (Work Reporting)
 
 ### Story 4.1: Create Daily Work Entry (Backend)
+
 **Assignee:** Dev 1
 **Story Points:** 8
 **Priority:** Highest
@@ -686,6 +757,7 @@ Allow users to view their assigned tasks for reporting.
 Create endpoint for users to create daily work entries.
 
 **Tasks:**
+
 - [ ] Create POST /api/entries (authenticated user)
 - [ ] Create EntriesController.createEntry
 - [ ] Create EntriesService.createEntry
@@ -698,6 +770,7 @@ Create endpoint for users to create daily work entries.
 - [ ] Write tests (duplicate day, locked month, validation)
 
 **Acceptance Criteria:**
+
 - User can create one entry per day
 - Duplicate day returns 400 error
 - Locked month returns 403 error
@@ -705,6 +778,7 @@ Create endpoint for users to create daily work entries.
 - Returns created entry
 
 **API Contract:**
+
 ```
 POST /api/entries
 Body: {
@@ -728,6 +802,7 @@ Response: 201 {
 ---
 
 ### Story 4.2: Daily Reporting UI (Client - Basic)
+
 **Assignee:** Dev 2
 **Story Points:** 13
 **Priority:** Highest
@@ -736,6 +811,7 @@ Response: 201 {
 Create mobile-first daily reporting interface for employees.
 
 **Tasks:**
+
 - [ ] Create /client/src/pages/DailyReport.tsx
 - [ ] Create date picker (default: today)
 - [ ] Create time pickers (start, end)
@@ -749,6 +825,7 @@ Create mobile-first daily reporting interface for employees.
 - [ ] Make fully responsive (mobile-first)
 
 **Acceptance Criteria:**
+
 - Mobile-first responsive design
 - Date picker works
 - Time validation (end > start)
@@ -763,6 +840,7 @@ Create mobile-first daily reporting interface for employees.
 ## EPIC 5: Entry Line Items (Task Assignment per Entry)
 
 ### Story 5.1: Add Task Line to Entry (Backend)
+
 **Assignee:** Dev 1
 **Story Points:** 13
 **Priority:** Highest
@@ -771,6 +849,7 @@ Create mobile-first daily reporting interface for employees.
 Allow users to add task line items to their daily entries.
 
 **Tasks:**
+
 - [ ] Create POST /api/entry-assignments (authenticated user)
 - [ ] Create EntryAssignmentsController.create
 - [ ] Create EntryAssignmentsService.create
@@ -786,6 +865,7 @@ Allow users to add task line items to their daily entries.
 - [ ] Write extensive tests (all validation cases)
 
 **Acceptance Criteria:**
+
 - User can add task line to their entry
 - Task must be assigned to user
 - Location required
@@ -795,6 +875,7 @@ Allow users to add task line items to their daily entries.
 - Returns line with task/project/client info
 
 **API Contract:**
+
 ```
 POST /api/entry-assignments
 Body: {
@@ -812,6 +893,7 @@ Body: {
 ---
 
 ### Story 5.2: Multi-Task Daily Report UI (Client)
+
 **Assignee:** Dev 2
 **Story Points:** 21
 **Priority:** Highest
@@ -820,6 +902,7 @@ Body: {
 Enhance daily report to support multiple task lines with time tracking.
 
 **Tasks:**
+
 - [ ] Enhance DailyReport page to show task lines
 - [ ] Create task line form component
 - [ ] Add client dropdown (fetch from assigned tasks)
@@ -839,6 +922,7 @@ Enhance daily report to support multiple task lines with time tracking.
 - [ ] Handle all validation errors
 
 **Acceptance Criteria:**
+
 - Can add multiple task lines to one entry
 - Client > Project > Task cascade works
 - Time format changes based on project
@@ -852,6 +936,7 @@ Enhance daily report to support multiple task lines with time tracking.
 ---
 
 ### Story 5.3: Edit/Delete Task Lines (Backend)
+
 **Assignee:** Dev 1
 **Story Points:** 5
 **Priority:** High
@@ -860,6 +945,7 @@ Enhance daily report to support multiple task lines with time tracking.
 Allow users to edit and delete their task lines.
 
 **Tasks:**
+
 - [ ] Create PUT /api/entry-assignments/:id (authenticated user)
 - [ ] Create DELETE /api/entry-assignments/:id (authenticated user)
 - [ ] Validate: line belongs to user's entry
@@ -869,6 +955,7 @@ Allow users to edit and delete their task lines.
 - [ ] Write tests
 
 **Acceptance Criteria:**
+
 - User can edit their task lines
 - User can delete their task lines
 - Can't edit/delete if month locked
@@ -880,6 +967,7 @@ Allow users to edit and delete their task lines.
 ## EPIC 6: Absence Reporting
 
 ### Story 6.1: Create Absence Entry (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** High
@@ -888,6 +976,7 @@ Allow users to edit and delete their task lines.
 Allow users to create absence entries (sick, vacation, etc.).
 
 **Tasks:**
+
 - [ ] Enhance POST /api/entries to support entry_kind='absence'
 - [ ] Validate: absence_type required when entry_kind=absence
 - [ ] Validate: for non-partial absences, no work line items allowed
@@ -900,6 +989,7 @@ Allow users to create absence entries (sick, vacation, etc.).
 - [ ] Write tests (single absence, range, partial)
 
 **Acceptance Criteria:**
+
 - User can create single absence day
 - User can create vacation range
 - Weekends excluded from range
@@ -908,6 +998,7 @@ Allow users to create absence entries (sick, vacation, etc.).
 - Returns all created entries
 
 **API Contract:**
+
 ```
 POST /api/entries
 Body: {
@@ -929,6 +1020,7 @@ Response: [array of created entries]
 ---
 
 ### Story 6.2: Absence Reporting UI (Client)
+
 **Assignee:** Dev 2
 **Story Points:** 13
 **Priority:** High
@@ -937,6 +1029,7 @@ Response: [array of created entries]
 Create UI for reporting absences.
 
 **Tasks:**
+
 - [ ] Create /client/src/pages/AbsenceReport.tsx
 - [ ] Add absence type selector (sick, vacation, vacation_partial, reserve, other)
 - [ ] Add single date picker
@@ -950,6 +1043,7 @@ Create UI for reporting absences.
 - [ ] Show success message with created days
 
 **Acceptance Criteria:**
+
 - Can select absence type
 - Can create single day absence
 - Can create vacation range
@@ -964,6 +1058,7 @@ Create UI for reporting absences.
 ## EPIC 7: Month Locking (Admin)
 
 ### Story 7.1: Month Lock/Unlock (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 5
 **Priority:** Medium
@@ -972,6 +1067,7 @@ Create UI for reporting absences.
 Allow admins to lock and unlock months.
 
 **Tasks:**
+
 - [ ] Create POST /api/month-locks (admin only)
 - [ ] Create DELETE /api/month-locks/:year/:month (unlock, admin only)
 - [ ] Create GET /api/month-locks (admin only)
@@ -986,6 +1082,7 @@ Allow admins to lock and unlock months.
 - [ ] Write tests
 
 **Acceptance Criteria:**
+
 - Admin can lock month
 - Duplicate lock returns 400
 - Admin can unlock month
@@ -994,6 +1091,7 @@ Allow admins to lock and unlock months.
 - Stores who locked/unlocked
 
 **API Contract:**
+
 ```
 POST /api/month-locks
 Body: { year, month }
@@ -1004,6 +1102,7 @@ DELETE /api/month-locks/:year/:month
 ---
 
 ### Story 7.2: Month Lock UI (Admin)
+
 **Assignee:** Dev 3
 **Story Points:** 8
 **Priority:** Medium
@@ -1012,6 +1111,7 @@ DELETE /api/month-locks/:year/:month
 Create admin UI for locking and unlocking months.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/MonthLocks/MonthLocksList.tsx
 - [ ] Display calendar view or list of months
 - [ ] Show locked/unlocked status
@@ -1023,6 +1123,7 @@ Create admin UI for locking and unlocking months.
 - [ ] Show error if month already locked
 
 **Acceptance Criteria:**
+
 - Admin can view locked months
 - Admin can lock new month
 - Admin can unlock month
@@ -1036,6 +1137,7 @@ Create admin UI for locking and unlocking months.
 ## EPIC 8: Reporting & Views
 
 ### Story 8.1: Monthly View (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** High
@@ -1044,6 +1146,7 @@ Create admin UI for locking and unlocking months.
 Create endpoints for monthly reporting views.
 
 **Tasks:**
+
 - [ ] Create GET /api/entries/my-month (authenticated user)
   - Query params: year, month
   - Return all entries for user in that month
@@ -1057,6 +1160,7 @@ Create endpoints for monthly reporting views.
 - [ ] Write tests
 
 **Acceptance Criteria:**
+
 - User can view their monthly entries
 - Admin can view all users' monthly entries
 - Filters work correctly
@@ -1067,6 +1171,7 @@ Create endpoints for monthly reporting views.
 ---
 
 ### Story 8.2: Monthly View UI (Client)
+
 **Assignee:** Dev 2
 **Story Points:** 13
 **Priority:** High
@@ -1075,6 +1180,7 @@ Create endpoints for monthly reporting views.
 Create monthly calendar view for users.
 
 **Tasks:**
+
 - [ ] Create /client/src/pages/MonthlyView.tsx
 - [ ] Add month/year picker
 - [ ] Create calendar component showing all days
@@ -1087,6 +1193,7 @@ Create monthly calendar view for users.
 - [ ] Implement monthlyViewSlice
 
 **Acceptance Criteria:**
+
 - Calendar shows full month
 - Days color-coded by status
 - Can navigate months
@@ -1099,6 +1206,7 @@ Create monthly calendar view for users.
 ---
 
 ### Story 8.3: Admin Reporting Dashboard
+
 **Assignee:** Dev 3
 **Story Points:** 21
 **Priority:** Medium
@@ -1107,6 +1215,7 @@ Create monthly calendar view for users.
 Create comprehensive admin reporting dashboard.
 
 **Tasks:**
+
 - [ ] Create /admin/src/pages/Reports/MonthlyReport.tsx
 - [ ] Add month/year picker
 - [ ] Add filters: user, client, project, task
@@ -1120,6 +1229,7 @@ Create comprehensive admin reporting dashboard.
 - [ ] Implement reportsSlice
 
 **Acceptance Criteria:**
+
 - Admin can view all monthly entries
 - Filters work correctly
 - Can group by user
@@ -1133,6 +1243,7 @@ Create comprehensive admin reporting dashboard.
 ## EPIC 9: Advanced Features
 
 ### Story 9.1: Timer Functionality (Client)
+
 **Assignee:** Dev 2
 **Story Points:** 13
 **Priority:** Low
@@ -1141,6 +1252,7 @@ Create comprehensive admin reporting dashboard.
 Add timer feature for tracking work time.
 
 **Tasks:**
+
 - [ ] Create timer component with start/stop
 - [ ] Store timer state in localStorage
 - [ ] Show running timer indicator
@@ -1151,6 +1263,7 @@ Add timer feature for tracking work time.
 - [ ] Persist across page refresh
 
 **Acceptance Criteria:**
+
 - Can start timer
 - Timer persists across refresh
 - Shows running indicator
@@ -1161,6 +1274,7 @@ Add timer feature for tracking work time.
 ---
 
 ### Story 9.2: Audit Trail for Admin Edits (Backend)
+
 **Assignee:** Dev 4
 **Story Points:** 8
 **Priority:** Medium
@@ -1169,6 +1283,7 @@ Add timer feature for tracking work time.
 Track all admin edits to user entries.
 
 **Tasks:**
+
 - [ ] Create audit_logs table (entity_type, entity_id, action, changed_by, changed_at, old_value, new_value)
 - [ ] Create audit middleware for entry/assignment updates
 - [ ] Log all admin edits
@@ -1177,6 +1292,7 @@ Track all admin edits to user entries.
 - [ ] Add Swagger documentation
 
 **Acceptance Criteria:**
+
 - All admin edits logged
 - Can view audit trail
 - Shows before/after values
@@ -1185,6 +1301,7 @@ Track all admin edits to user entries.
 ---
 
 ### Story 9.3: Notifications System
+
 **Assignee:** Dev 1
 **Story Points:** 13
 **Priority:** Low
@@ -1193,6 +1310,7 @@ Track all admin edits to user entries.
 Add in-app notifications for important events.
 
 **Tasks:**
+
 - [ ] Create notifications table
 - [ ] Create notification types (month_locked, assignment_added, etc.)
 - [ ] Create GET /api/notifications endpoint
@@ -1202,6 +1320,7 @@ Add in-app notifications for important events.
 - [ ] Add real-time updates (polling or WebSocket)
 
 **Acceptance Criteria:**
+
 - Users receive notifications
 - Can mark as read
 - Shows unread count
@@ -1212,6 +1331,7 @@ Add in-app notifications for important events.
 ## EPIC 10: Testing & Quality
 
 ### Story 10.1: Backend Integration Tests
+
 **Assignee:** Dev 4
 **Story Points:** 13
 **Priority:** Medium
@@ -1220,6 +1340,7 @@ Add in-app notifications for important events.
 Comprehensive integration tests for all API endpoints.
 
 **Tasks:**
+
 - [ ] Set up test database
 - [ ] Write integration tests for auth endpoints
 - [ ] Write integration tests for user endpoints
@@ -1231,6 +1352,7 @@ Comprehensive integration tests for all API endpoints.
 - [ ] Set up CI to run tests
 
 **Acceptance Criteria:**
+
 - All major flows tested
 - 70%+ code coverage
 - Tests run in CI
@@ -1239,6 +1361,7 @@ Comprehensive integration tests for all API endpoints.
 ---
 
 ### Story 10.2: Frontend Unit Tests
+
 **Assignee:** Dev 2 + Dev 3
 **Story Points:** 13
 **Priority:** Medium
@@ -1247,6 +1370,7 @@ Comprehensive integration tests for all API endpoints.
 Unit tests for key components and Redux logic.
 
 **Tasks:**
+
 - [ ] Test Redux slices (actions, reducers)
 - [ ] Test key components (forms, validation)
 - [ ] Test utility functions
@@ -1255,6 +1379,7 @@ Unit tests for key components and Redux logic.
 - [ ] Set up CI to run tests
 
 **Acceptance Criteria:**
+
 - Key components tested
 - Redux logic tested
 - 60%+ coverage
@@ -1265,6 +1390,7 @@ Unit tests for key components and Redux logic.
 ## EPIC 11: Deployment & DevOps
 
 ### Story 11.1: CI/CD Pipeline
+
 **Assignee:** Dev 1
 **Story Points:** 8
 **Priority:** Medium
@@ -1273,6 +1399,7 @@ Unit tests for key components and Redux logic.
 Set up GitHub Actions for CI/CD.
 
 **Tasks:**
+
 - [ ] Create .github/workflows/ci.yml
 - [ ] Run linting on all workspaces
 - [ ] Run tests on all workspaces
@@ -1282,6 +1409,7 @@ Set up GitHub Actions for CI/CD.
 - [ ] Require passing CI before merge
 
 **Acceptance Criteria:**
+
 - CI runs on every PR
 - Linting, tests, build all pass
 - Branch protection enabled
@@ -1290,6 +1418,7 @@ Set up GitHub Actions for CI/CD.
 ---
 
 ### Story 11.2: Vercel Deployment
+
 **Assignee:** Dev 1
 **Story Points:** 8
 **Priority:** High
@@ -1298,6 +1427,7 @@ Set up GitHub Actions for CI/CD.
 Deploy client, admin, and server to Vercel.
 
 **Tasks:**
+
 - [ ] Configure Vercel projects (client, admin, server)
 - [ ] Set up environment variables
 - [ ] Configure build commands
@@ -1307,6 +1437,7 @@ Deploy client, admin, and server to Vercel.
 - [ ] Create deployment documentation
 
 **Acceptance Criteria:**
+
 - All apps deployed to Vercel
 - Environment variables configured
 - Production builds work
@@ -1318,21 +1449,25 @@ Deploy client, admin, and server to Vercel.
 ## Story Point Summary by Developer
 
 ### Dev 1 (Backend + DevOps)
+
 - Total Stories: 10
 - Total Story Points: **89**
 - Focus: Backend API, shared setup, DevOps
 
 ### Dev 2 (Client Frontend)
+
 - Total Stories: 11
 - Total Story Points: **105**
 - Focus: Mobile PWA, user features
 
 ### Dev 3 (Admin Frontend)
+
 - Total Stories: 9
 - Total Story Points: **84**
 - Focus: Admin web app, management UIs
 
 ### Dev 4 (Backend + Database)
+
 - Total Stories: 12
 - Total Story Points: **102**
 - Focus: Backend API, database, authentication
@@ -1342,33 +1477,41 @@ Deploy client, admin, and server to Vercel.
 ## Recommended Sprint Plan (2-week sprints)
 
 ### Sprint 1: Foundation
+
 - Epic 0 (all setup stories)
 - **Goal:** Working monorepo with all apps running
 
 ### Sprint 2: Auth & Master Data Backend
+
 - Epic 1.1-1.3 (Auth backend + login)
 - Epic 2.1, 2.3, 2.5 (Backend for clients, projects, tasks)
 
 ### Sprint 3: Master Data UI
+
 - Epic 1.4 (User management UI)
 - Epic 2.2, 2.4, 2.6 (Master data UIs)
 
 ### Sprint 4: Assignments
+
 - Epic 3 (all assignment stories)
 
 ### Sprint 5: Daily Reporting Core
+
 - Epic 4.1-4.2 (Basic entry creation)
 - Epic 5.1-5.2 (Task lines)
 
 ### Sprint 6: Advanced Entry Features
+
 - Epic 5.3 (Edit/delete lines)
 - Epic 6 (Absence reporting)
 
 ### Sprint 7: Reporting & Views
+
 - Epic 8 (all reporting stories)
 - Epic 7 (month locking)
 
 ### Sprint 8: Polish & Testing
+
 - Epic 9 (advanced features - selected)
 - Epic 10 (testing)
 - Epic 11 (deployment)
@@ -1376,6 +1519,7 @@ Deploy client, admin, and server to Vercel.
 ---
 
 ## Notes
+
 - Hebrew UI required throughout
 - RTL support in all pages
 - Mobile-first for client app
