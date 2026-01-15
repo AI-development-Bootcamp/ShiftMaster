@@ -12,19 +12,19 @@ describe('Shared Health Check', () => {
   });
 
   it('should be able to import shared utilities', async () => {
-    const dateUtils = await import('../src/utils/date');
+    const dateUtils = await import('../utils/date');
     expect(dateUtils).toBeDefined();
     expect(typeof dateUtils.formatDate).toBe('function');
   });
 
   it('should be able to import validation utilities', async () => {
-    const validationUtils = await import('../src/utils/validation');
+    const validationUtils = await import('../utils/validation');
     expect(validationUtils).toBeDefined();
     expect(typeof validationUtils.isValidEmail).toBe('function');
   });
 
   it('should be able to import API client', async () => {
-    const apiClient = await import('../src/api/client');
+    const apiClient = await import('../api/client');
     expect(apiClient).toBeDefined();
     expect(apiClient.ApiClient).toBeDefined();
   });
