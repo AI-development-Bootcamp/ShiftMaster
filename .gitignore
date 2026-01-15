@@ -1,7 +1,8 @@
 # Claude Code configuration - ignore by default
 .claude/*
 
-# But track the shared agent documentation
+# But track the shared project configuration and agent documentation
+!.claude/settings.json
 !.claude/agents/
 !.claude/agents/**
 
