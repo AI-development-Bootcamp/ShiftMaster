@@ -12,12 +12,7 @@ package-lock.json
 
 # Testing
 coverage/
-*.test.js
-*.test.ts
-*.test.tsx
-*.spec.js
-*.spec.ts
-*.spec.tsx
+
 
 # Production
 build/
