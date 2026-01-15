@@ -25,7 +25,7 @@ Employees and admins.
 | email         | TEXT        | UNIQUE   | required        |
 | password_hash | TEXT        |          | required        |
 | role          | user_role   |          | admin / regular |
-| job.          | TEXT        |          |                 |
+| job_title     | TEXT        |          |                 |
 | active        | BOOLEAN     |          | soft delete     |
 | created_at    | TIMESTAMPTZ |          |                 |
 
