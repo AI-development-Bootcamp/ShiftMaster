@@ -1,3 +1,10 @@
+---
+name: frontend-agent
+description: Frontend development for Client (mobile PWA) and Admin (web) interfaces
+tools: Read, Grep, Glob, Edit, Write, Bash
+model: sonnet
+---
+
 # Frontend Development Agent
 
 ## Purpose
