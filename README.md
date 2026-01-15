@@ -1,45 +1,239 @@
 # AbraShiftMaster
 
-A shift management application for Abra Bootcamp.
+A shift management application for Abra Bootcamp, built as a monorepo with separate client, admin, and server applications.
 
-## Project Status
+## 📁 Project Structure
 
-Currently in planning and setup phase.
+```
+abra-shift-master/
+├── client/          # Mobile-first PWA client (React + Vite)
+├── admin/           # Web admin dashboard (React + Vite)
+├── server/          # Backend API (Express + TypeScript)
+├── shared/          # Shared utilities, types, and API client
+└── openspec/        # Project specifications and changes
+```
 
-## Tech Stack
+## 🚀 Tech Stack
 
-**Frontend:**
-- React + Vite + TypeScript
-- State Management: Redux
-- Design: CSS, Mobile-first responsive
+### Frontend
 
-**Backend:**
-- Node.js + TypeScript
+- **Framework:** React 18+ with TypeScript
+- **Build Tool:** Vite
+- **State Management:** Redux Toolkit
+- **Routing:** React Router
+- **Styling:** CSS with RTL (Right-to-Left) support for Hebrew
+- **Testing:** Vitest + Testing Library
 
-**Database:**
-- PostgreSQL via Supabase
+### Backend
 
-**Authentication:**
-- JWT (users receive a password without needing to change it)
+- **Runtime:** Node.js 18+
+- **Framework:** Express with TypeScript
+- **Database:** PostgreSQL via Supabase
+- **API Documentation:** Swagger/OpenAPI
+- **Testing:** Vitest + Supertest
 
-**Testing:**
-- Vitest
-- API Endpoints: Swagger
+### Development Tools
 
-**Deployment:**
-- Vercel
+- **Package Manager:** npm workspaces
+- **Linting:** ESLint
+- **Formatting:** Prettier
+- **Development:** Nodemon for server, Vite HMR for frontends
 
-**Version Control:**
-- GitHub
+## 📋 Prerequisites
 
-**CI/CD:**
-- GitHub Actions
+- Node.js >= 18.0.0
+- npm >= 9.0.0
 
-**Architecture:**
-- Monorepo structure:
-  - 2 Frontends: Client app, Admin app
-  - 1 Backend: Shared API for all clients
+## 🛠️ Installation
 
-## Getting Started
+1. Clone the repository:
 
-Documentation coming soon.
+```bash
+git clone <repository-url>
+cd AbraShiftMaster
+```
+
+2. Install dependencies for all workspaces:
+
+```bash
+npm install
+```
+
+## 🏃 Development
+
+### Start all applications concurrently:
+
+```bash
+npm run dev
+```
+
+This will start:
+
+- Client app on http://localhost:5173
+- Admin app on http://localhost:5174
+- Server API on http://localhost:3000
+
+### Start individual applications:
+
+```bash
+# Client only
+npm run dev:client
+
+# Admin only
+npm run dev:admin
+
+# Server only
+npm run dev:server
+```
+
+## 🏗️ Building
+
+### Build all workspaces:
+
+```bash
+npm run build
+```
+
+### Build individual workspaces:
+
+```bash
+npm run build:client
+npm run build:admin
+npm run build:server
+```
+
+## 🧪 Testing
+
+### Run all tests:
+
+```bash
+npm test
+```
+
+### Run tests for specific workspace:
+
+```bash
+npm run test:client
+npm run test:admin
+npm run test:server
+```
+
+## 🔍 Code Quality
+
+### Type checking:
+
+```bash
+# Check all workspaces
+npm run type-check
+
+# Check specific workspace
+npm run type-check:client
+npm run type-check:admin
+npm run type-check:server
+```
+
+### Linting:
+
+```bash
+# Run ESLint
+npm run lint
+
+# Auto-fix issues
+npm run lint:fix
+```
+
+### Formatting:
+
+```bash
+# Format all files
+npm run format
+
+# Check formatting
+npm run format:check
+```
+
+## 📚 API Documentation
+
+When the server is running, API documentation is available at:
+http://localhost:3000/api-docs
+
+## 🌍 Environment Variables
+
+Create a `.env` file in the root directory based on `.env.example`:
+
+```env
+# Server
+PORT=3000
+NODE_ENV=development
+
+# Supabase
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+## 📦 Workspaces
+
+### Client (`@abra-shift-master/client`)
+
+Mobile-first Progressive Web App for end users.
+
+- Port: 5173
+- Routes: Configured with React Router
+- State: Redux store
+
+### Admin (`@abra-shift-master/admin`)
+
+Web-based admin dashboard for system management.
+
+- Port: 5174
+- Routes: Configured with React Router
+- State: Separate Redux store from client
+
+### Server (`@abra-shift-master/server`)
+
+RESTful API backend with Express and TypeScript.
+
+- Port: 3000
+- Database: Supabase (PostgreSQL)
+- Authentication: JWT
+- Documentation: Swagger UI
+
+### Shared (`@abra-shift-master/shared`)
+
+Common utilities, types, and API client used across workspaces.
+
+- API client wrapper (Axios)
+- TypeScript type definitions
+- Utility functions
+- Validation helpers
+
+## 🔧 Troubleshooting
+
+### Port already in use
+
+If you encounter port conflicts, you can change the ports in:
+
+- Client: `client/vite.config.ts`
+- Admin: `admin/vite.config.ts`
+- Server: `.env` file (PORT variable)
+
+### TypeScript errors
+
+Run type-check to identify issues:
+
+```bash
+npm run type-check
+```
+
+### Dependency issues
+
+Clear all node_modules and reinstall:
+
+```bash
+npm run clean
+npm install
+```
+
+## 📝 License
+
+This project is part of the Abra Bootcamp program.
