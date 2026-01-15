@@ -6,15 +6,17 @@ export * from './models';
 
 // Common API response types
 export interface ApiResponse<T> {
+  success: true;
   data: T;
-  message?: string;
-  success: boolean;
 }
 
-export interface ApiError {
-  message: string;
-  code?: string;
-  errors?: Record<string, string[]>;
+export interface ApiErrorResponse {
+  success: false;
+  error: {
+    message: string;
+    code?: string;
+    details?: unknown;
+  };
 }
 
 export interface PaginatedResponse<T> {

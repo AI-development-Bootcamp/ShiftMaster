@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
-import { ApiError, ApiResponse } from '../types';
+import { ApiErrorResponse, ApiResponse } from '../types';
 
 export class ApiClient {
   private client: AxiosInstance;
@@ -32,7 +32,7 @@ export class ApiClient {
     // Response interceptor - handle common errors
     this.client.interceptors.response.use(
       (response) => response,
-      (error: AxiosError<ApiError>) => {
+      (error: AxiosError<ApiErrorResponse>) => {
         if (error.response?.status === 401) {
           // Handle unauthorized - clear token
           this.clearAuthToken();
