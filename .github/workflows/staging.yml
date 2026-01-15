@@ -3,10 +3,10 @@ name: Staging CI
 on:
   push:
     branches:
-      - dev
+      - main
   pull_request:
     branches:
-      - dev
+      - main
 
 jobs:
   server:
