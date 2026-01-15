@@ -1,5 +1,9 @@
-# Claude Code configuration
-.claude/
+# Claude Code configuration - ignore by default
+.claude/*
+
+# But track the shared agent documentation
+!.claude/agents/
+!.claude/agents/**
 
 # MCP configuration
 .mcp.json
