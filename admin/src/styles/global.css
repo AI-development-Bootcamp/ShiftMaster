@@ -85,7 +85,7 @@ body {
   max-width: 100%;
 }
 
-/* Mobile-first container */
+/* Container for admin dashboard */
 .container {
   width: 100%;
   margin: 0 auto;
@@ -102,7 +102,14 @@ body {
 /* Desktop */
 @media (min-width: 1024px) {
   .container {
-    max-width: 1024px;
+    max-width: 1200px;
+  }
+}
+
+/* Large Desktop */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
   }
 }
 
@@ -110,19 +117,15 @@ body {
 .text-xs {
   font-size: var(--font-size-xs);
 }
-
 .text-sm {
   font-size: var(--font-size-sm);
 }
-
 .text-base {
   font-size: var(--font-size-base);
 }
-
 .text-lg {
   font-size: var(--font-size-lg);
 }
-
 .text-xl {
   font-size: var(--font-size-xl);
 }

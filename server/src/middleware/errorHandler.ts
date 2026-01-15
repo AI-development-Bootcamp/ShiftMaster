@@ -1,42 +1,57 @@
 import { Request, Response, NextFunction } from 'express';
 
-export interface AppError extends Error {
+export interface ApiError extends Error {
   statusCode?: number;
-  isOperational?: boolean;
+  code?: string;
+  details?: unknown;
 }
 
 export const errorHandler = (
-  err: AppError,
-  req: Request,
+  err: ApiError,
+  _req: Request,
   res: Response,
   _next: NextFunction
-): void => {
+) => {
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
 
-  // Log error for debugging
-  console.error('Error:', {
-    statusCode,
-    message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-  });
+  // Log error in development
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Error:', err);
+  }
 
-  res.status(statusCode).json({
+  const errorResponse: {
+    success: boolean;
+    error: {
+      message: string;
+      code: string;
+      details?: unknown;
+    };
+  } = {
     success: false,
     error: {
       message,
-      ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+      code: err.code || 'INTERNAL_SERVER_ERROR',
     },
-  });
+  };
+
+  if (err.details) {
+    errorResponse.error.details = err.details;
+  }
+
+  res.status(statusCode).json(errorResponse);
 };
 
-export const notFoundHandler = (req: Request, res: Response): void => {
+export const notFoundHandler = (
+  _req: Request,
+  res: Response,
+  _next: NextFunction
+) => {
   res.status(404).json({
     success: false,
     error: {
-      message: `Route ${req.method} ${req.path} not found`,
+      message: 'Route not found',
+      code: 'NOT_FOUND',
     },
   });
 };

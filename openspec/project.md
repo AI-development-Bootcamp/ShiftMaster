@@ -53,7 +53,9 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 **CI/CD:**
 
-- GitHub Actions (to be set up later)
+- GitHub Actions
+  - Staging workflow (main branch): Tests and linting only
+  - Production workflow (production branch): Tests, linting, and deployment
 
 ## Project Conventions
 
@@ -90,7 +92,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /constants/       # App constants
     /styles/
     /utils/
-    /test/
+    /tests/
   package.json
   vite.config.ts
   tsconfig.json
@@ -105,7 +107,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /constants/       # App constants
     /styles/
     /utils/
-    /test/
+    /tests/
   package.json
   vite.config.ts
   tsconfig.json
@@ -119,7 +121,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /models/
     /db/              # Database access and Supabase client
     /utils/
-    /test/
+    /tests/
   package.json
   tsconfig.json
 
@@ -128,7 +130,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /api/             # API client code
     /utils/           # Utility functions
     /types/           # Shared TypeScript types
-    /test/
+    /tests/
   package.json
   tsconfig.json
 ```
@@ -142,10 +144,79 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 ### Git Workflow
 
-- Main branch: `main`
+- dev branch: `dev` (used as staging)
+- Production branch: `production`
 - Feature branches: `feature/description`
+- Fix branches: `hotfix/description`
 - Commit message format: Conventional Commits
 - Pull requests required for all changes
+
+### CI/CD Pipeline
+
+**GitHub Actions Workflows:**
+
+#### Staging Workflow (`.github/workflows/staging.yml`)
+
+**Triggers:**
+
+- Push to `dev` branch
+- Pull requests to `dev` branch
+
+**Jobs:**
+
+- **Server** - Runs linting, type checking, and tests
+- **Client** - Runs linting, type checking, and tests
+- **Admin** - Runs linting, type checking, and tests
+- **Shared** - Runs linting, type checking, and tests
+
+**Steps per job:**
+
+1. Checkout code
+2. Setup Node.js (version 20) with npm cache
+3. Install dependencies (`npm ci`)
+4. Run linter (`npm run lint`)
+5. Run type check (`npm run type-check` or `tsc --noEmit`)
+6. Run tests (`npm test`)
+
+**No deployment** - Staging workflow only validates code quality.
+
+---
+
+#### Production Workflow (`.github/workflows/production.yml`)
+
+**Triggers:**
+
+- Push to `production` branch
+
+**Jobs:**
+
+- **Server** - Runs linting, type checking, tests, build, and deployment
+- **Client** - Runs linting, type checking, tests, build, and deployment
+- **Admin** - Runs linting, type checking, tests, build, and deployment
+
+**Steps per job:**
+
+1. Checkout code
+2. Setup Node.js (version 20) with npm cache
+3. Install dependencies (`npm ci`)
+4. Run linter (`npm run lint`)
+5. Run type check (`npm run type-check` or `tsc --noEmit`)
+6. Run tests (`npm test`)
+7. Build (`npm run build`)
+8. Deploy (placeholder - to be configured)
+
+**Deployment:**
+
+- Deployment steps are currently placeholders
+- To be configured with Vercel CLI or other deployment infrastructure
+- Each project (server, client, admin) deploys independently
+
+**Workflow Structure:**
+
+- All jobs run in parallel for faster CI/CD execution
+- Each job uses its own working directory (`./server`, `./client`, `./admin`)
+- Node.js dependencies are cached for faster builds
+- Environment variable `NODE_ENV=test` is set for test execution
 
 ### Environment Variables
 

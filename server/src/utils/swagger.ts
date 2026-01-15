@@ -1,15 +1,14 @@
 import swaggerJsdoc from 'swagger-jsdoc';
+import type { Options } from 'swagger-jsdoc';
 
-const options: swaggerJsdoc.Options = {
+const options: Options = {
   definition: {
     openapi: '3.0.0',
     info: {
       title: 'AbraShiftMaster API',
       version: '1.0.0',
-      description: 'REST API for AbraShiftMaster shift management system',
-      contact: {
-        name: 'AbraShiftMaster Team',
-      },
+      description:
+        'API documentation for AbraShiftMaster shift management system',
     },
     servers: [
       {
@@ -17,17 +16,8 @@ const options: swaggerJsdoc.Options = {
         description: 'Development server',
       },
     ],
-    components: {
-      securitySchemes: {
-        bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-        },
-      },
-    },
   },
-  apis: ['./src/routes/*.ts', './src/controllers/*.ts', 'src/routes/*.ts', 'src/controllers/*.ts'],
+  apis: ['./src/routes/**/*.ts', './src/controllers/**/*.ts'],
 };
 
 export const swaggerSpec = swaggerJsdoc(options);

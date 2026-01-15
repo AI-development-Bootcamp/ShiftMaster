@@ -1,18 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
+import { env } from '../config/env.js';
 
-dotenv.config();
-
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn(
-    'Warning: Supabase credentials not configured. Database features will be unavailable.'
+if (!env.supabaseUrl || !env.supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase environment variables: SUPABASE_URL and SUPABASE_ANON_KEY are required'
   );
 }
 
-export const supabase =
-  supabaseUrl && supabaseAnonKey
-    ? createClient(supabaseUrl, supabaseAnonKey)
-    : null;
+export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey);

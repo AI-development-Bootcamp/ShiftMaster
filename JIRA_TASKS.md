@@ -869,7 +869,10 @@ Allow users to add task line items to their daily entries.
 - User can add task line to their entry
 - Task must be assigned to user
 - Location required
-- Time format validation works
+- Time format validation works:
+  - For 'sum' projects: duration_minutes is required; start_time/end_time must be null
+  - For 'start_end' projects: start_time and end_time are required; duration_minutes must be null
+  - Returns 400 error if time format doesn't match project type
 - Duplicate task line returns 400
 - Locked month returns 403
 - Returns line with task/project/client info
