@@ -9,7 +9,7 @@
       "@shared/*": ["../shared/src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/**/*.test.tsx", "src/**/*.test.ts"],
   "exclude": [
     "node_modules",
     "dist",

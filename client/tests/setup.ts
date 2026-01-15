@@ -1,4 +1,4 @@
-import { expect, afterEach } from 'vitest';
+import { afterEach } from 'vitest';
 import { cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 
@@ -7,5 +7,3 @@ afterEach(() => {
   cleanup();
 });
 
-// Extend Vitest's expect
-expect.extend({});
