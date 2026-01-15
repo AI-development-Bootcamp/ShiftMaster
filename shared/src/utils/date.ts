@@ -59,7 +59,10 @@ export function getDateRange(start: Date | string, end: Date | string): Date[] {
 /**
  * Get weekdays in date range (excludes weekends)
  */
-export function getWeekdaysInRange(start: Date | string, end: Date | string): Date[] {
+export function getWeekdaysInRange(
+  start: Date | string,
+  end: Date | string
+): Date[] {
   return getDateRange(start, end).filter((date) => !isWeekend(date));
 }
 

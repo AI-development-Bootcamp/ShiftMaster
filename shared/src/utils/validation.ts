@@ -32,7 +32,10 @@ export function isValidDate(date: string): boolean {
 /**
  * Validate end time is after start time
  */
-export function isEndTimeAfterStart(startTime: string, endTime: string): boolean {
+export function isEndTimeAfterStart(
+  startTime: string,
+  endTime: string
+): boolean {
   if (!isValidTime(startTime) || !isValidTime(endTime)) {
     return false;
   }
@@ -49,7 +52,10 @@ export function isEndTimeAfterStart(startTime: string, endTime: string): boolean
 /**
  * Validate end date is after or equal to start date
  */
-export function isEndDateAfterStart(startDate: string, endDate: string): boolean {
+export function isEndDateAfterStart(
+  startDate: string,
+  endDate: string
+): boolean {
   if (!isValidDate(startDate) || !isValidDate(endDate)) {
     return false;
   }

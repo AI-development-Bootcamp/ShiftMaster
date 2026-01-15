@@ -28,11 +28,11 @@ const router = Router();
  *                   type: number
  */
 router.get('/health', (_req: Request, res: Response) => {
-    res.json({
-        status: 'ok',
-        timestamp: new Date().toISOString(),
-        uptime: process.uptime(),
-    });
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
 });
 
 export default router;

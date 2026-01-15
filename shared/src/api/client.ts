@@ -5,8 +5,10 @@ export class ApiClient {
   private client: AxiosInstance;
 
   constructor(baseURL: string = '') {
+    // Use baseURL parameter, or fall back to default
+    // In browser environments, this can be set via the application's env config
     this.client = axios.create({
-      baseURL: baseURL || import.meta.env?.VITE_API_URL || 'http://localhost:3000',
+      baseURL: baseURL || 'http://localhost:3000',
       headers: {
         'Content-Type': 'application/json',
       },

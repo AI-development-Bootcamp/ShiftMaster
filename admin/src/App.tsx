@@ -11,7 +11,10 @@ function App() {
     <BrowserRouter>
       <div className="app" dir="rtl">
         <Routes>
-          <Route path="/" element={<div className="page">מערכת ניהול AbraShiftMaster</div>} />
+          <Route
+            path="/"
+            element={<div className="page">מערכת ניהול AbraShiftMaster</div>}
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
           {/* Add more routes here */}
         </Routes>
@@ -21,4 +24,3 @@ function App() {
 }
 
 export default App;
-
