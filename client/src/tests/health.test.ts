@@ -26,4 +26,11 @@ describe('Client Health Check', () => {
     const { render } = await import('@testing-library/react');
     expect(typeof render).toBe('function');
   });
+
+  it('should have Redux store available', async () => {
+    const { store } = await import('../store');
+    expect(store).toBeDefined();
+    expect(typeof store.getState).toBe('function');
+    expect(typeof store.dispatch).toBe('function');
+  });
 });

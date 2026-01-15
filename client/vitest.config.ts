@@ -7,20 +7,17 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'jsdom',
-    setupFiles: ['./tests/setup.ts'],
+    setupFiles: './src/tests/setup.ts',
     css: true,
-    typecheck: {
-      tsconfig: './tsconfig.json',
-    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
       exclude: [
-        'node_modules/',
-        'tests/',
-        '**/*.d.ts',
-        '**/*.config.*',
-        '**/dist/**',
+        "node_modules/",
+        "src/tests/",
+        "**/*.d.ts",
+        "**/*.config.*",
+        "**/dist/**",
       ],
     },
   },
