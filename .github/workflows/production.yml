@@ -1,0 +1,142 @@
+name: Production CI/CD
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  server:
+    name: Server - Test, Lint & Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: server/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run type-check || npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy Server
+        run: |
+          echo "🚀 Deploying server to production..."
+          echo "TODO: Add deployment steps here"
+          # Example placeholder:
+          # - Setup Vercel CLI
+          # - Deploy to Vercel
+          # - Or deploy to your server infrastructure
+
+  client:
+    name: Client - Test, Lint & Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./client
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run type-check || npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy Client
+        run: |
+          echo "🚀 Deploying client to production..."
+          echo "TODO: Add deployment steps here"
+          # Example placeholder:
+          # - Setup Vercel CLI
+          # - Deploy to Vercel
+          # - Set environment variables
+
+  admin:
+    name: Admin - Test, Lint & Deploy
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./admin
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: admin/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+
+      - name: Run type check
+        run: npm run type-check || npx tsc --noEmit
+
+      - name: Run tests
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy Admin
+        run: |
+          echo "🚀 Deploying admin to production..."
+          echo "TODO: Add deployment steps here"
+          # Example placeholder:
+          # - Setup Vercel CLI
+          # - Deploy to Vercel
+          # - Set environment variables
