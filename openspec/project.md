@@ -71,6 +71,9 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /components/
     /pages/
     /store/           # Redux store
+    /hooks/           # Custom React hooks
+    /assets/          # Static assets (images, icons, fonts)
+    /constants/       # App constants
     /styles/
     /utils/
   package.json
@@ -82,6 +85,9 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /components/
     /pages/
     /store/           # Redux store
+    /hooks/           # Custom React hooks
+    /assets/          # Static assets (images, icons, fonts)
+    /constants/       # App constants
     /styles/
     /utils/
   package.json
@@ -95,6 +101,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /services/        # Business logic layer
     /middleware/
     /models/
+    /db/              # Database access and Supabase client
     /utils/
   package.json
   tsconfig.json
