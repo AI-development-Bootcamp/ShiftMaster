@@ -18,15 +18,15 @@
 - [x] 2.7 Add basic utility functions
 
 ## 3. Client Frontend Setup
-- [ ] 3.1 Initialize Vite + React + TypeScript project in /client
-- [ ] 3.2 Create client/package.json with dependencies
-- [ ] 3.3 Configure client/vite.config.ts (port 5173)
-- [ ] 3.4 Create client/tsconfig.json extending base config
-- [ ] 3.5 Set up directory structure (components, pages, store, hooks, assets, constants, styles, utils)
-- [ ] 3.6 Configure Redux store with Redux Toolkit
-- [ ] 3.7 Create basic App component and routing setup
-- [ ] 3.8 Add mobile-first CSS reset and base styles
-- [ ] 3.9 Configure Vitest for client tests
+- [x] 3.1 Initialize Vite + React + TypeScript project in /client
+- [x] 3.2 Create client/package.json with dependencies
+- [x] 3.3 Configure client/vite.config.ts (port 5173)
+- [x] 3.4 Create client/tsconfig.json extending base config
+- [x] 3.5 Set up directory structure (components, pages, store, hooks, assets, constants, styles, utils)
+- [x] 3.6 Configure Redux store with Redux Toolkit
+- [x] 3.7 Create basic App component and routing setup
+- [x] 3.8 Add mobile-first CSS reset and base styles
+- [x] 3.9 Configure Vitest for client tests
 
 ## 4. Admin Frontend Setup
 - [ ] 4.1 Initialize Vite + React + TypeScript project in /admin
