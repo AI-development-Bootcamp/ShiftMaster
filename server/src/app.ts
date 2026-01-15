@@ -10,7 +10,21 @@ import healthRouter from './routes/health.js';
 const app: Application = express();
 
 // Security middleware
-app.use(helmet());
+// Security middleware
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        'script-src': ["'self'", "'unsafe-inline'"],
+        'style-src': ["'self'", "'unsafe-inline'"],
+        'img-src': ["'self'", 'data:', 'blob:'],
+        'upgrade-insecure-requests': null, // Disable HTTPS upgrade for local dev
+      },
+    },
+    strictTransportSecurity: false, // Disable HSTS for local dev
+  })
+);
 
 // CORS configuration
 app.use(
