@@ -40,19 +40,19 @@
 - [x] 4.9 Configure Vitest for admin tests
 
 ## 5. Server Backend Setup
-- [ ] 5.1 Create /server directory structure
-- [ ] 5.2 Create server/package.json with Express and TypeScript dependencies
-- [ ] 5.3 Create server/tsconfig.json for Node.js
-- [ ] 5.4 Set up directory structure (routes, controllers, services, middleware, models, db, utils)
-- [ ] 5.5 Create /services directory for business logic layer
-- [ ] 5.6 Create /db directory for database access and Supabase client
-- [ ] 5.7 Create basic Express app with TypeScript
-- [ ] 5.8 Configure CORS middleware
-- [ ] 5.9 Add basic error handling middleware
-- [ ] 5.10 Create health check endpoint
-- [ ] 5.11 Configure nodemon for development
-- [ ] 5.12 Set up Swagger for API documentation
-- [ ] 5.13 Configure Vitest for server tests
+- [x] 5.1 Create /server directory structure
+- [x] 5.2 Create server/package.json with Express and TypeScript dependencies
+- [x] 5.3 Create server/tsconfig.json for Node.js
+- [x] 5.4 Set up directory structure (routes, controllers, services, middleware, models, db, utils)
+- [x] 5.5 Create /services directory for business logic layer
+- [x] 5.6 Create /db directory for database access and Supabase client
+- [x] 5.7 Create basic Express app with TypeScript
+- [x] 5.8 Configure CORS middleware
+- [x] 5.9 Add basic error handling middleware
+- [x] 5.10 Create health check endpoint
+- [x] 5.11 Configure nodemon for development
+- [x] 5.12 Set up Swagger for API documentation
+- [x] 5.13 Configure Vitest for server tests
 
 ## 6. Development Workflow
 - [ ] 6.1 Add root-level development scripts (dev, build, test, lint)
