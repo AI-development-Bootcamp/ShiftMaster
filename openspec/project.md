@@ -144,9 +144,10 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 ### Git Workflow
 
-- Main branch: `main` (used as staging)
+- dev branch: `dev` (used as staging)
 - Production branch: `production`
 - Feature branches: `feature/description`
+- Fix branches: `hotfix/description`
 - Commit message format: Conventional Commits
 - Pull requests required for all changes
 
@@ -158,15 +159,15 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 **Triggers:**
 
-- Push to `main` branch
-- Pull requests to `main` branch
+- Push to `dev` branch
+- Pull requests to `dev` branch
 
 **Jobs:**
 
 - **Server** - Runs linting, type checking, and tests
 - **Client** - Runs linting, type checking, and tests
 - **Admin** - Runs linting, type checking, and tests
-- **Shared** - Runs linting, type checking, and tests (if available)
+- **Shared** - Runs linting, type checking, and tests
 
 **Steps per job:**
 

@@ -68,13 +68,27 @@ export function getWeekdaysInRange(
 
 /**
  * Calculate duration in minutes between two times
+ * Returns 0 if endTime is null/empty (overnight shift crossing midnight)
  */
-export function calculateDuration(startTime: string, endTime: string): number {
+export function calculateDuration(
+  startTime: string,
+  endTime: string | null | undefined
+): number {
+  // If end_time is null/empty, it's an overnight shift - return 0
+  if (!endTime || endTime.trim() === '') {
+    return 0;
+  }
+
   const [startHours, startMinutes] = startTime.split(':').map(Number);
   const [endHours, endMinutes] = endTime.split(':').map(Number);
 
   const startTotalMinutes = startHours * 60 + startMinutes;
   const endTotalMinutes = endHours * 60 + endMinutes;
+
+  // If end time is before start time, it's an overnight shift - return 0
+  if (endTotalMinutes < startTotalMinutes) {
+    return 0;
+  }
 
   return endTotalMinutes - startTotalMinutes;
 }
