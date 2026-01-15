@@ -92,7 +92,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /constants/       # App constants
     /styles/
     /utils/
-    /test/
+    /tests/
   package.json
   vite.config.ts
   tsconfig.json
@@ -107,7 +107,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /constants/       # App constants
     /styles/
     /utils/
-    /test/
+    /tests/
   package.json
   vite.config.ts
   tsconfig.json
@@ -121,7 +121,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /models/
     /db/              # Database access and Supabase client
     /utils/
-    /test/
+    /tests/
   package.json
   tsconfig.json
 
@@ -130,7 +130,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
     /api/             # API client code
     /utils/           # Utility functions
     /types/           # Shared TypeScript types
-    /test/
+    /tests/
   package.json
   tsconfig.json
 ```
