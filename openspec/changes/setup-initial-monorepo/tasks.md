@@ -29,15 +29,15 @@
 - [x] 3.9 Configure Vitest for client tests
 
 ## 4. Admin Frontend Setup
-- [ ] 4.1 Initialize Vite + React + TypeScript project in /admin
-- [ ] 4.2 Create admin/package.json with dependencies
-- [ ] 4.3 Configure admin/vite.config.ts (port 5174)
-- [ ] 4.4 Create admin/tsconfig.json extending base config
-- [ ] 4.5 Set up directory structure (components, pages, store, hooks, assets, constants, styles, utils)
-- [ ] 4.6 Configure Redux store with Redux Toolkit (separate from client)
-- [ ] 4.7 Create basic App component and routing setup
-- [ ] 4.8 Add CSS reset and base styles
-- [ ] 4.9 Configure Vitest for admin tests
+- [x] 4.1 Initialize Vite + React + TypeScript project in /admin
+- [x] 4.2 Create admin/package.json with dependencies
+- [x] 4.3 Configure admin/vite.config.ts (port 5174)
+- [x] 4.4 Create admin/tsconfig.json extending base config
+- [x] 4.5 Set up directory structure (components, pages, store, hooks, assets, constants, styles, utils)
+- [x] 4.6 Configure Redux store with Redux Toolkit (separate from client)
+- [x] 4.7 Create basic App component and routing setup
+- [x] 4.8 Add CSS reset and base styles
+- [x] 4.9 Configure Vitest for admin tests
 
 ## 5. Server Backend Setup
 - [ ] 5.1 Create /server directory structure
