@@ -8,17 +8,32 @@
 node_modules/
 .pnp
 .pnp.js
+package-lock.json
 
 # Testing
 coverage/
+*.test.js
+*.test.ts
+*.test.tsx
+*.spec.js
+*.spec.ts
+*.spec.tsx
 
 # Production
 build/
 dist/
+*.tsbuildinfo
+
+# Monorepo specific
+client/dist/
+admin/dist/
+server/dist/
+shared/dist/
 
 # Environment variables
 .env
 .env.local
+.env.example
 .env.development.local
 .env.test.local
 .env.production.local
