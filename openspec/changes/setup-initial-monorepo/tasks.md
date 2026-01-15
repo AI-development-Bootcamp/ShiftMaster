@@ -9,13 +9,13 @@
 - [x] 1.6 Create .env.example with required environment variables
 
 ## 2. Shared Package Setup
-- [ ] 2.1 Create /shared directory structure
-- [ ] 2.2 Create shared/package.json
-- [ ] 2.3 Create shared/tsconfig.json extending base config
-- [ ] 2.4 Create shared/src structure (api/, utils/, types/)
-- [ ] 2.5 Add basic TypeScript type definitions
-- [ ] 2.6 Create API client wrapper (axios/fetch)
-- [ ] 2.7 Add basic utility functions
+- [x] 2.1 Create /shared directory structure
+- [x] 2.2 Create shared/package.json
+- [x] 2.3 Create shared/tsconfig.json extending base config
+- [x] 2.4 Create shared/src structure (api/, utils/, types/)
+- [x] 2.5 Add basic TypeScript type definitions
+- [x] 2.6 Create API client wrapper (axios/fetch)
+- [x] 2.7 Add basic utility functions
 
 ## 3. Client Frontend Setup
 - [ ] 3.1 Initialize Vite + React + TypeScript project in /client
