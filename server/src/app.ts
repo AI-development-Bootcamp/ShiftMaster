@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import apiRouter from './routes/index.js';
+import { env } from './config/env.js';
 
 const app: Application = express();
 
@@ -26,12 +27,7 @@ app.use(
 // CORS configuration
 app.use(
   cors({
-    origin: process.env.CORS_ORIGINS
-      ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
-      : [
-          'http://localhost:5173', // Client app
-          'http://localhost:5174', // Admin app
-        ],
+    origin: env.corsOrigins,
     credentials: true,
   })
 );

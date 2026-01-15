@@ -1,14 +1,15 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosError } from 'axios';
 import { ApiErrorResponse, ApiResponse } from '../types';
+import { env } from '../config/env.js';
 
 export class ApiClient {
   private client: AxiosInstance;
 
   constructor(baseURL: string = '') {
     // Use baseURL parameter, or fall back to default
-    // In browser environments, this can be set via the application's env config
+    // In browser environments, baseURL should be passed from the app's env config
     this.client = axios.create({
-      baseURL: baseURL || 'http://localhost:3000',
+      baseURL: baseURL || env.apiUrl,
       headers: {
         'Content-Type': 'application/json',
       },
@@ -101,5 +102,7 @@ export class ApiClient {
   }
 }
 
-// Export singleton instance
+// Export default singleton instance
+// NOTE: In client/admin apps, use the locally configured apiClient from @/api instead
+// This default instance uses the shared env.apiUrl fallback
 export const apiClient = new ApiClient();

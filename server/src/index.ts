@@ -1,12 +1,11 @@
 import dotenv from 'dotenv';
 import app from './app.js';
+import { env } from './config/env.js';
 
 // Load environment variables
 dotenv.config();
 
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📚 API Documentation: http://localhost:${PORT}/api-docs`);
+app.listen(env.port, () => {
+  console.log(`🚀 Server running on port ${env.port}`);
+  console.log(`📚 API Documentation: http://localhost:${env.port}/api-docs`);
 });
