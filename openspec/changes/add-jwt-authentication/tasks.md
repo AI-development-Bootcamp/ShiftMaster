@@ -9,11 +9,11 @@
 
 ## 2. Middleware
 
-- [ ] 2.1 Create /server/src/middleware/auth.ts with isAuthenticated middleware
-- [ ] 2.2 Add isAdmin middleware to auth.ts for role-based access control
-- [ ] 2.3 Implement proper error responses (401 for missing/invalid token, 403 for insufficient permissions)
-- [ ] 2.4 Write unit tests for isAuthenticated middleware (valid token, missing token, expired token, invalid token)
-- [ ] 2.5 Write unit tests for isAdmin middleware (admin user, regular user, no user)
+- [x] 2.1 Create /server/src/middleware/auth.ts with isAuthenticated middleware
+- [x] 2.2 Add isAdmin middleware to auth.ts for role-based access control
+- [x] 2.3 Implement proper error responses (401 for missing/invalid token, 403 for insufficient permissions)
+- [x] 2.4 Write unit tests for isAuthenticated middleware (valid token, missing token, expired token, invalid token)
+- [x] 2.5 Write unit tests for isAdmin middleware (admin user, regular user, no user)
 
 ## 3. Service Layer
 
