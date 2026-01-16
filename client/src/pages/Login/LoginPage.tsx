@@ -1,28 +1,56 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isValidEmail } from '@abra-shift-master/shared';
 import './LoginPage.css';
+
+// Assets
+import welcomeIllustration from '../../assets/images/welcome-illustration.svg';
 
 // Figma asset URLs (valid for 7 days)
 const assets = {
   background: 'https://www.figma.com/api/mcp/asset/a860dadc-cc01-455b-9d34-b4df99f8b018',
   logo: 'https://www.figma.com/api/mcp/asset/a9f21820-9489-447d-88d0-44e3b66bbdce',
-  illustrationBackground: 'https://www.figma.com/api/mcp/asset/f8d7e664-d0d5-4a30-beb6-ead143fa16f2',
-  illustrationFloor: 'https://www.figma.com/api/mcp/asset/3698edab-f931-407d-ba36-3893a3e1428b',
-  illustrationStopwatch: 'https://www.figma.com/api/mcp/asset/9b1e1802-e72b-4033-9f8a-6297633bf2aa',
-  illustrationCalendar: 'https://www.figma.com/api/mcp/asset/e1f03fb1-8b17-4478-880e-53492960ea5a',
-  illustrationCharacter: 'https://www.figma.com/api/mcp/asset/bd3510d1-e70e-42ca-b1c7-8c86bc5f763f',
-  illustrationPlant: 'https://www.figma.com/api/mcp/asset/7552def4-7eeb-4a3a-91f8-6e8a2b373014',
 };
+
+interface FormErrors {
+  email?: string;
+  password?: string;
+}
 
 function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Validate email
+    if (!email.trim()) {
+      newErrors.email = 'יש להזין אימייל';
+    } else if (!isValidEmail(email)) {
+      newErrors.email = 'פורמט אימייל לא תקין';
+    }
+
+    // Validate password (minimum 6 characters)
+    if (!password) {
+      newErrors.password = 'יש להזין סיסמה';
+    } else if (password.length < 6) {
+      newErrors.password = 'הסיסמה חייבת להכיל לפחות 6 תווים';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // No authentication logic - just navigate to home
-    navigate('/home');
+
+    if (validateForm()) {
+      // No authentication logic - just navigate to home
+      navigate('/home');
+    }
   };
 
   return (
@@ -44,45 +72,12 @@ function LoginPage() {
           className="login-logo"
         />
 
-        {/* Illustration container */}
-        <div className="login-illustration">
-          <img
-            src={assets.illustrationBackground}
-            alt=""
-            className="illustration-bg"
-            aria-hidden="true"
-          />
-          <img
-            src={assets.illustrationFloor}
-            alt=""
-            className="illustration-floor"
-            aria-hidden="true"
-          />
-          <img
-            src={assets.illustrationStopwatch}
-            alt=""
-            className="illustration-stopwatch"
-            aria-hidden="true"
-          />
-          <img
-            src={assets.illustrationCalendar}
-            alt=""
-            className="illustration-calendar"
-            aria-hidden="true"
-          />
-          <img
-            src={assets.illustrationCharacter}
-            alt=""
-            className="illustration-character"
-            aria-hidden="true"
-          />
-          <img
-            src={assets.illustrationPlant}
-            alt=""
-            className="illustration-plant"
-            aria-hidden="true"
-          />
-        </div>
+        {/* Welcome illustration */}
+        <img
+          src={welcomeIllustration}
+          alt="Welcome illustration"
+          className="login-illustration"
+        />
 
         {/* Welcome text */}
         <h1 className="login-title">ברוכים הבאים!</h1>
@@ -100,23 +95,25 @@ function LoginPage() {
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-input-group">
             <input
-              type="email"
-              className="login-input"
+              type="text"
+              className={`login-input ${errors.email ? 'input-error' : ''}`}
               placeholder="אימייל"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               dir="rtl"
             />
+            {errors.email && <p className="login-error">{errors.email}</p>}
           </div>
           <div className="login-input-group">
             <input
               type="password"
-              className="login-input"
+              className={`login-input ${errors.password ? 'input-error' : ''}`}
               placeholder="סיסמה"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               dir="rtl"
             />
+            {errors.password && <p className="login-error">{errors.password}</p>}
           </div>
           <button type="submit" className="login-button">
             התחברות
