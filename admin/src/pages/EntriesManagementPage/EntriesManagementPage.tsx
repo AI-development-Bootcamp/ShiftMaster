@@ -1,4 +1,4 @@
-import './EntriesManagementPage.css';
+import '../../styles/EntriesManagementPage.css';
 
 export function EntriesManagementPage() {
     return (

@@ -1,4 +1,4 @@
-import './AssignmentPage.css';
+import '../../styles/AssignmentPage.css';
 
 export function AssignmentPage() {
     return (

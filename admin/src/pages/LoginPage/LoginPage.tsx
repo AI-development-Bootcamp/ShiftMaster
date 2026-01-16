@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { LoginWelcomeCard } from '../../components/LoginWelcomeCard';
-import './LoginPage.css';
+import '../../styles/LoginPage.css';
 
 export function LoginPage() {
     const navigate = useNavigate();

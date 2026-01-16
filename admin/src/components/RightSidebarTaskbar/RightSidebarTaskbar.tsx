@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import abraLogo from '../../assets/abra_logo.svg';
 import abraLogoTextWhite from '../../assets/abra_logo_text_white.svg';
-import './RightSidebarTaskbar.css';
+import '../../styles/RightSidebarTaskbar.css';
 
 export interface NavItemConfig {
   id: string;

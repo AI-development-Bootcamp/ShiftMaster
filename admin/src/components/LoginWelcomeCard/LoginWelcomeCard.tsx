@@ -2,7 +2,7 @@ import { useState, FormEvent, FocusEvent } from 'react';
 import abraLogo from '../../assets/abra_logo_text.svg';
 import { isValidEmail } from '@abra-shift-master/shared';
 import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES, DEV_CREDENTIALS } from '../../constants';
-import './LoginWelcomeCard.css';
+import '../../styles/LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
   onLogin: (email: string, password: string) => Promise<void>;

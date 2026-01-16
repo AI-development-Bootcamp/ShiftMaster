@@ -12,19 +12,11 @@
 
 /* Main content area - offset for sidebar */
 .main-content {
-  margin-right: calc(100% / 6);
+  margin-right: var(--sidebar-width);
   min-height: 100vh;
   background-color: var(--color-bg-secondary);
+  transition: margin-right var(--transition-base);
+  /* smooth resize */
 }
 
-@media (max-width: 1200px) {
-  .main-content {
-    margin-right: 280px;
-  }
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    margin-right: 200px;
-  }
-}
+/* Obsolete media queries removed as clamp handles it */
