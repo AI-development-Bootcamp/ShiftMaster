@@ -5,12 +5,8 @@ import './LoginPage.css';
 
 // Assets
 import welcomeIllustration from '../../assets/images/welcome-illustration.svg';
-
-// Figma asset URLs (valid for 7 days)
-const assets = {
-  background: 'https://www.figma.com/api/mcp/asset/a860dadc-cc01-455b-9d34-b4df99f8b018',
-  logo: 'https://www.figma.com/api/mcp/asset/a9f21820-9489-447d-88d0-44e3b66bbdce',
-};
+import loginBackground from '../../assets/images/login-background.png';
+import abraLogo from '../../assets/images/abra-logo.svg';
 
 interface FormErrors {
   email?: string;
@@ -57,7 +53,7 @@ function LoginPage() {
     <div className="login-page">
       {/* Background cityscape image */}
       <img
-        src={assets.background}
+        src={loginBackground}
         alt=""
         className="login-background"
         aria-hidden="true"
@@ -67,7 +63,7 @@ function LoginPage() {
       <div className="login-card">
         {/* Abra Logo */}
         <img
-          src={assets.logo}
+          src={abraLogo}
           alt="Abra Logo"
           className="login-logo"
         />
