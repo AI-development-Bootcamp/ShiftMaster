@@ -30,11 +30,7 @@ export function generateToken(
     throw new Error('JWT_SECRET is not configured');
   }
 
-  return jwt.sign(
-    payload,
-    env.jwtSecret,
-    { expiresIn } as jwt.SignOptions
-  );
+  return jwt.sign(payload, env.jwtSecret, { expiresIn } as jwt.SignOptions);
 }
 
 /**
