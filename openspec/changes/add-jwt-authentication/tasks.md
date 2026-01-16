@@ -17,9 +17,9 @@
 
 ## 3. Service Layer
 
-- [ ] 3.1 Create /server/src/services/authService.ts with login logic
-- [ ] 3.2 Implement authenticateUser method (find user by email, verify password, return user data)
-- [ ] 3.3 Add proper error handling (user not found, invalid credentials, inactive user)
+- [x] 3.1 Create /server/src/services/authService.ts with login logic
+- [x] 3.2 Implement authenticateUser method (find user by email, verify password, return user data)
+- [x] 3.3 Add proper error handling (user not found, invalid credentials, inactive user)
 
 ## 4. Controller Layer
 
