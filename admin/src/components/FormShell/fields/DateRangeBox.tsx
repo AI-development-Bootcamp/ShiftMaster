@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { he } from 'date-fns/locale';
 import { DateRangeBoxProps } from '../types';
@@ -22,8 +22,8 @@ export function DateRangeBox({
     const [internalError, setInternalError] = useState<string | undefined>();
 
     // Parse string dates to Date objects
-    const startDate = value.start ? new Date(value.start) : null;
-    const endDate = value.end ? new Date(value.end) : null;
+    const startDate = useMemo(() => value.start ? new Date(value.start) : null, [value.start]);
+    const endDate = useMemo(() => value.end ? new Date(value.end) : null, [value.end]);
 
     // Cross-field validation
     useEffect(() => {
@@ -32,7 +32,7 @@ export function DateRangeBox({
         } else {
             setInternalError(undefined);
         }
-    }, [value.start, value.end]);
+    }, [startDate, endDate]);
 
     const handleStartChange = (date: Date | null) => {
         const formatted = date ? date.toISOString().split('T')[0] : '';
