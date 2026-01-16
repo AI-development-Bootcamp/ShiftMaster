@@ -11,15 +11,20 @@ export interface NavItemConfig {
   icon?: React.ReactNode;
 }
 
-export interface UserProfile {
-  name: string;
-  role: string;
-  avatarUrl?: string;
+import { User } from '@abra-shift-master/shared';
+
+// ... (existing imports)
+
+export interface NavItemConfig {
+  id: string;
+  label: string;
+  path: string;
+  icon?: React.ReactNode;
 }
 
 interface RightSidebarTaskbarProps {
   navItems: NavItemConfig[];
-  user: UserProfile;
+  user: User;
 }
 
 function NavItem({ item }: { item: NavItemConfig }) {
@@ -88,16 +93,19 @@ export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps
       {/* Footer section */}
       <div className="sidebar-footer" role="contentinfo">
         <div className="user-profile">
-          <div className="user-avatar" role="img" aria-label={`תמונת פרופיל של ${user.name}`}>
-            {user.avatarUrl ? (
-              <img src={user.avatarUrl} alt="" />
-            ) : (
-              <img src={abraLogo} alt="" />
-            )}
+          <div className="user-avatar" role="img" aria-label={`תמונת פרופיל של ${user.full_name}`}>
+            {/* TODO: Add avatar URL support to User model if needed, currently not in shared type based on recent view, but let's check. 
+                Wait, shared model User DOES NOT have avatarUrl. It has full_name, role, job_title. 
+                I will use a placeholder or check if I need to add avatar field. 
+                For now I'll use the default logo as avatar or initials. 
+                The previous code used user.avatarUrl. The shared User doesn't have it.
+                I will remove the check for avatarUrl and just use default for now, or use a consistent placeholder.
+             */}
+            <img src={abraLogo} alt="" />
           </div>
           <div className="user-info">
-            <span className="user-name">{user.name}</span>
-            <span className="user-role">{user.role}</span>
+            <span className="user-name">{user.full_name}</span>
+            <span className="user-job-title">{user.job_title}</span>
           </div>
         </div>
       </div>

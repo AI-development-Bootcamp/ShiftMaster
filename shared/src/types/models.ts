@@ -12,6 +12,7 @@ export interface User {
   full_name: string;
   email: string;
   role: UserRole;
+  job_title: string;
   active: boolean;
   created_at: string;
 }

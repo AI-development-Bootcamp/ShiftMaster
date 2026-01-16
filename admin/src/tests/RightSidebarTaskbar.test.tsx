@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import '@testing-library/jest-dom/vitest';
-import { RightSidebarTaskbar } from './RightSidebarTaskbar';
-import type { NavItemConfig, UserProfile } from './RightSidebarTaskbar';
+import { User, UserRole } from '@abra-shift-master/shared';
+import { RightSidebarTaskbar } from '../components/RightSidebarTaskbar/RightSidebarTaskbar';
+import type { NavItemConfig } from '../components/RightSidebarTaskbar/RightSidebarTaskbar';
 
 const mockNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'לוח בקרה', path: '/' },
@@ -11,9 +12,14 @@ const mockNavItems: NavItemConfig[] = [
   { id: 'reports', label: 'דוחות', path: '/reports' },
 ];
 
-const mockUser: UserProfile = {
-  name: 'דניאל מולא',
-  role: 'ראש צוות פיתוח',
+const mockUser: User = {
+  user_id: 1,
+  full_name: 'דניאל מולא',
+  email: 'daniel@abra.com',
+  role: UserRole.ADMIN,
+  job_title: 'ראש צוות פיתוח',
+  active: true,
+  created_at: '2024-01-01T08:00:00Z',
 };
 
 const renderWithRouter = (ui: React.ReactElement, initialEntries = ['/']) => {
@@ -62,8 +68,8 @@ describe('RightSidebarTaskbar', () => {
       <RightSidebarTaskbar navItems={mockNavItems} user={mockUser} />
     );
 
-    expect(screen.getByText(mockUser.name)).toBeInTheDocument();
-    expect(screen.getByText(mockUser.role)).toBeInTheDocument();
+    expect(screen.getByText(mockUser.full_name)).toBeInTheDocument();
+    expect(screen.getByText(mockUser.job_title)).toBeInTheDocument();
   });
 
   it('should have proper ARIA labels', () => {

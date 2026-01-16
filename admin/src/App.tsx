@@ -8,11 +8,7 @@ import { LoginPage } from './pages/LoginPage';
 import { AssignmentPage } from './pages/AssignmentPage';
 import { EntriesManagementPage } from './pages/EntriesManagementPage';
 
-// Mock user for demonstration - will be replaced with auth state
-const mockUser = {
-  name: 'דניאל מוצא',
-  role: 'ראש צוות פיתוח',
-};
+import { mockCurrentUser } from './mocks/users';
 
 function AppContent() {
   const location = useLocation();
@@ -21,7 +17,7 @@ function AppContent() {
   return (
     <div className="app" dir="rtl">
       {!isLoginPage && (
-        <RightSidebarTaskbar navItems={navigationItems} user={mockUser} />
+        <RightSidebarTaskbar navItems={navigationItems} user={mockCurrentUser} />
       )}
       <main className={!isLoginPage ? 'main-content' : 'login-content'}>
         <Routes>

@@ -177,8 +177,8 @@
   font-weight: 700;
 }
 
-.user-role {
-  color: var(--color-nav-text);
+.user-job-title {
+  color: #ffffff;
   font-size: var(--font-size-sm);
   font-weight: 400;
 }

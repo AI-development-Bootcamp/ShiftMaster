@@ -5,7 +5,7 @@ import './LoginPage.css';
 export function LoginPage() {
     const navigate = useNavigate();
 
-    const handleLogin = async (email: string, password: string) => {
+    const handleLogin = async (email: string) => {
         // TODO: Implement actual login logic
         console.log('Login attempt:', email);
         navigate('/assignment');

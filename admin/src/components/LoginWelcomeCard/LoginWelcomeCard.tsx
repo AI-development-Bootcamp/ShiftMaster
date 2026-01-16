@@ -1,7 +1,7 @@
 import { useState, FormEvent, FocusEvent } from 'react';
 import abraLogo from '../../assets/abra_logo_text.svg';
 import { isValidEmail } from '@abra-shift-master/shared';
-import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES } from '../../constants';
+import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES, DEV_CREDENTIALS } from '../../constants';
 import './LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
@@ -170,7 +170,7 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
         {/* Temporary Dev Button */}
         <button
           type="button"
-          onClick={() => onLogin('dev@test.com', 'password')}
+          onClick={() => onLogin(DEV_CREDENTIALS.email, DEV_CREDENTIALS.password)}
           style={{
             marginTop: '1rem',
             background: 'transparent',
