@@ -1,7 +1,7 @@
 import { useState, FormEvent, FocusEvent } from 'react';
 import abraLogo from '../../assets/abra_logo_text.svg';
 import { isValidEmail } from '@abra-shift-master/shared';
-import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES, DEV_CREDENTIALS } from '../../constants';
+import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES } from '../../constants';
 import '../../styles/LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
@@ -165,25 +165,6 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
           disabled={isSubmitDisabled}
         >
           {isLoading ? 'מתחבר...' : 'התחברות'}
-        </button>
-
-        {/* Temporary Dev Button */}
-        <button
-          type="button"
-          onClick={() => onLogin(DEV_CREDENTIALS.email, DEV_CREDENTIALS.password)}
-          style={{
-            marginTop: '1rem',
-            background: 'transparent',
-            border: '1px dashed #666',
-            color: '#666',
-            width: '100%',
-            padding: '8px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '0.8rem'
-          }}
-        >
-          Dev Skip (Bypass Login)
         </button>
       </form>
     </div>
