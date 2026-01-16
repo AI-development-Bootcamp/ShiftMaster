@@ -1,0 +1,32 @@
+/* Home Page - Placeholder */
+
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap');
+
+.home-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f7;
+  padding: 20px;
+}
+
+.home-content {
+  text-align: center;
+}
+
+.home-title {
+  font-family: 'Assistant', sans-serif;
+  font-weight: 600;
+  font-size: 32px;
+  color: #141e3e;
+  margin: 0 0 16px 0;
+}
+
+.home-subtitle {
+  font-family: 'Assistant', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  color: #53575b;
+  margin: 0;
+}

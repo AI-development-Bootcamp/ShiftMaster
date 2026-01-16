@@ -1,0 +1,208 @@
+/* Login Page - Exact 1:1 Figma Copy */
+
+/* Import Assistant font */
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap');
+
+.login-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-color: #f2f2f7;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Background cityscape image */
+.login-background {
+  position: absolute;
+  left: -746px;
+  top: 0;
+  width: 1491px;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Login card */
+.login-card {
+  position: relative;
+  z-index: 1;
+  width: 361px;
+  background: rgba(255, 255, 255, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0);
+  border-radius: 16px;
+  padding: 40px 24px 20px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+  box-shadow:
+    0px 371px 104px rgba(0, 0, 0, 0),
+    0px 238px 95px rgba(0, 0, 0, 0.01),
+    0px 134px 80px rgba(0, 0, 0, 0.05),
+    0px 59px 59px rgba(0, 0, 0, 0.09),
+    0px 15px 33px rgba(0, 0, 0, 0.1);
+}
+
+/* Abra Logo */
+.login-logo {
+  width: 106px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Illustration container */
+.login-illustration {
+  position: relative;
+  width: 323px;
+  height: 216px;
+}
+
+.login-illustration img {
+  position: absolute;
+  object-fit: contain;
+}
+
+/* Illustration layers - positioned to compose the full illustration */
+.illustration-bg {
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+
+.illustration-floor {
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90%;
+  z-index: 2;
+}
+
+.illustration-stopwatch {
+  top: 20%;
+  left: 10%;
+  width: 60px;
+  z-index: 3;
+}
+
+.illustration-calendar {
+  top: 15%;
+  right: 10%;
+  width: 70px;
+  z-index: 3;
+}
+
+.illustration-character {
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120px;
+  z-index: 4;
+}
+
+.illustration-plant {
+  bottom: 5%;
+  right: 5%;
+  width: 40px;
+  z-index: 3;
+}
+
+/* Welcome text */
+.login-title {
+  font-family: 'Assistant', sans-serif;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 32px;
+  color: #141e3e;
+  text-align: right;
+  width: 100%;
+  margin: 0;
+}
+
+/* Description text */
+.login-description {
+  font-family: 'Assistant', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 22px;
+  color: #53575b;
+  text-align: center;
+  margin: 0;
+}
+
+/* Login form */
+.login-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.login-input-group {
+  width: 100%;
+}
+
+.login-input {
+  width: 100%;
+  padding: 16px 20px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 16px;
+  color: #141e3e;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: #9ca3af;
+}
+
+.login-input:focus {
+  border-color: #141e3e;
+}
+
+/* Login button */
+.login-button {
+  width: 100%;
+  background: #141e3e;
+  border: none;
+  border-radius: 8px;
+  padding: 20px 24px;
+  font-family: 'Assistant', sans-serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: #ffffff;
+  text-align: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.login-button:hover {
+  background: #1a2747;
+}
+
+.login-button:active {
+  background: #0f1629;
+}
+
+/* Responsive adjustments for very small screens */
+@media (max-width: 400px) {
+  .login-card {
+    width: calc(100% - 32px);
+    margin: 16px;
+    padding: 32px 16px 16px 16px;
+  }
+
+  .login-illustration {
+    width: 100%;
+    height: 180px;
+  }
+}
