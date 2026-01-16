@@ -2,7 +2,7 @@
  * Unit tests for JWT utility functions
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import type { JwtPayload } from '../../utils/jwt.js';
 
 // Mock the env config to control JWT_SECRET
