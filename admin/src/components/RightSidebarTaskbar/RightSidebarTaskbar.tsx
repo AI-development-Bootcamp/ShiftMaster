@@ -32,7 +32,8 @@ function NavItem({ item }: { item: NavItemConfig }) {
       className={`nav-item ${isActive ? 'nav-item--active' : ''}`}
       aria-current={isActive ? 'page' : undefined}
     >
-      {isActive && <span className="nav-item-indicator" aria-hidden="true" />}
+      {/* Always render indicator to reserve space */}
+      <span className="nav-item-indicator" aria-hidden="true" />
       {item.icon && <span className="nav-item-icon" aria-hidden="true">{item.icon}</span>}
       <span className="nav-item-label">{item.label}</span>
     </NavLink>
@@ -77,6 +78,8 @@ export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps
           className="nav-item logout-button"
           aria-label="התנתקות"
         >
+          {/* Spacer to align with NavItems */}
+          <span className="nav-item-indicator" aria-hidden="true" />
           <span className="nav-item-icon" aria-hidden="true"><LogoutIcon /></span>
           <span className="nav-item-label">התנתקות</span>
         </button>

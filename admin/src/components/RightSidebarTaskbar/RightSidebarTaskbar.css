@@ -11,7 +11,8 @@
   background-color: var(--color-nav-bg);
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) 0;
+  /* Remove horizontal padding from container for full-width items */
   box-sizing: border-box;
   z-index: 100;
 }
@@ -23,6 +24,8 @@
   align-items: center;
   justify-content: center;
   margin-bottom: var(--spacing-xl);
+  padding: 0 var(--spacing-md);
+  /* Add padding back to header content */
 }
 
 .sidebar-logo {
@@ -35,7 +38,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm);
+  /* Increased gap from xs to sm */
   overflow-y: auto;
 }
 
@@ -45,11 +49,17 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding: var(--spacing-xs) var(--spacing-xs);
-  padding-right: 0;
+  padding: var(--spacing-sm) var(--spacing-md);
+  /* Add horizontal padding to item */
+  padding-left: var(--spacing-md);
+  /* Ensure left padding matches right */
+  width: 100%;
+  /* Force full width */
+  box-sizing: border-box;
   color: var(--color-nav-text);
   text-decoration: none;
-  border-radius: var(--radius-md);
+  /* border-radius removed to allow edge-to-edge highlight, or keep if pill design desired but edge-to-edge usually means strictly rectangle or slight internal radius with logic */
+  border-radius: 0;
   transition: background-color var(--transition-fast), color var(--transition-fast);
   cursor: pointer;
   font-weight: 700;
@@ -91,10 +101,16 @@
 .nav-item-indicator {
   width: 4px;
   height: 24px;
-  background-color: var(--color-nav-active-indicator);
+  background-color: transparent;
+  /* Reserved space, invisible by default */
   border-radius: var(--radius-sm);
   margin-left: var(--spacing-sm);
   flex-shrink: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.nav-item--active .nav-item-indicator {
+  background-color: var(--color-nav-active-indicator);
 }
 
 /* Sidebar Actions (Logout) */
@@ -102,6 +118,7 @@
   padding-bottom: var(--spacing-sm);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: var(--spacing-sm);
+  /* Nav items inside here already have padding, so no extra padding needed on container if using nav-item class */
 }
 
 .logout-button {
@@ -110,13 +127,15 @@
   width: 100%;
   font-family: inherit;
   font-size: inherit;
+  /* Inherits .nav-item padding/styles */
 }
 
 /* Footer Section */
 .sidebar-footer {
   min-height: 70px;
   padding-top: var(--spacing-sm);
-  /* border-top removed as we use sidebar-actions border now, or we keep both for separation */
+  padding-right: var(--spacing-md);
+  padding-left: var(--spacing-md);
 }
 
 .user-profile {
@@ -125,6 +144,7 @@
   align-items: center;
   gap: var(--spacing-md);
   text-align: right;
+  /* Ensure profile stays contained if it gets tight */
 }
 
 .user-avatar {
