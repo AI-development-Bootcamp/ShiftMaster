@@ -82,9 +82,7 @@ describe('POST /auth/login', () => {
     expect(response.status).toBe(400);
     expect(response.body.success).toBe(false);
     expect(response.body.error.code).toBe('VALIDATION_ERROR');
-    expect(response.body.error.details.email).toContain(
-      'Invalid email format'
-    );
+    expect(response.body.error.details.email).toContain('Invalid email format');
   });
 
   it('should return 400 for missing password', async () => {

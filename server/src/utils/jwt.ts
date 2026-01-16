@@ -19,12 +19,12 @@ export interface DecodedToken extends JwtPayload {
 /**
  * Generate a JWT token for a user
  * @param payload - User data to encode in the token
- * @param expiresIn - Token expiration time (default: 24h)
+ * @param expiresIn - Token expiration time (default: from env.jwtExpiry, fallback to 24h)
  * @returns Signed JWT token
  */
 export function generateToken(
   payload: JwtPayload,
-  expiresIn: string = '24h'
+  expiresIn: string = env.jwtExpiry
 ): string {
   if (!env.jwtSecret) {
     throw new Error('JWT_SECRET is not configured');

@@ -35,9 +35,9 @@
 
 ## 6. Configuration
 
-- [ ] 6.1 Update /server/src/config/env.ts to validate JWT_SECRET is present
-- [ ] 6.2 Add JWT expiry configuration (default 24h)
-- [ ] 6.3 Document JWT_SECRET in .env.example
+- [x] 6.1 Update /server/src/config/env.ts to validate JWT_SECRET is present
+- [x] 6.2 Add JWT expiry configuration (default 24h)
+- [x] 6.3 Document JWT_SECRET in .env.example
 
 ## 7. Integration Testing
 
