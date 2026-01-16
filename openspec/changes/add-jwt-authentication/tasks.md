@@ -41,12 +41,12 @@
 
 ## 7. Integration Testing
 
-- [ ] 7.1 Write integration tests for POST /api/auth/login (success, invalid credentials, missing fields)
-- [ ] 7.2 Write integration tests for protected routes using auth middleware
-- [ ] 7.3 Test role-based access with isAdmin middleware
+- [x] 7.1 Write integration tests for POST /api/auth/login (success, invalid credentials, missing fields)
+- [x] 7.2 Write integration tests for protected routes using auth middleware
+- [x] 7.3 Test role-based access with isAdmin middleware
 
 ## 8. Dependencies
 
-- [ ] 8.1 Install bcrypt (or bcryptjs for Node.js compatibility)
-- [ ] 8.2 Install jsonwebtoken
-- [ ] 8.3 Install @types/bcrypt and @types/jsonwebtoken as dev dependencies
+- [x] 8.1 Install bcrypt (or bcryptjs for Node.js compatibility)
+- [x] 8.2 Install jsonwebtoken
+- [x] 8.3 Install @types/bcrypt and @types/jsonwebtoken as dev dependencies
