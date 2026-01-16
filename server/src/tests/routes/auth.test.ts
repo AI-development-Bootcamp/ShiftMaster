@@ -5,9 +5,16 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
-import authRouter from '../../routes/auth.js';
-import * as authService from '../../services/authService.js';
-import * as jwtUtil from '../../utils/jwt.js';
+
+// Mock env config first
+vi.mock('../../config/index.js', () => ({
+  env: {
+    jwtSecret: 'test-secret-key-for-jwt-testing',
+    jwtExpiry: '24h',
+    supabaseUrl: 'https://test.supabase.co',
+    supabaseAnonKey: 'test-anon-key',
+  },
+}));
 
 // Mock dependencies
 vi.mock('../../db/supabase.js', () => ({
@@ -17,6 +24,10 @@ vi.mock('../../db/supabase.js', () => ({
 }));
 vi.mock('../../services/authService.js');
 vi.mock('../../utils/jwt.js');
+
+import authRouter from '../../routes/auth.js';
+import * as authService from '../../services/authService.js';
+import * as jwtUtil from '../../utils/jwt.js';
 
 // Create test app
 const app = express();

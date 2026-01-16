@@ -11,6 +11,7 @@ vi.mock('../../config/index.js', () => ({
   env: {
     jwtSecret:
       'test-secret-key-for-jwt-testing-at-least-256-bits-long-string-here',
+    jwtExpiry: '24h',
   },
 }));
 

@@ -12,6 +12,7 @@ const TEST_JWT_SECRET =
 vi.mock('../../config/index.js', () => ({
   env: {
     jwtSecret: TEST_JWT_SECRET,
+    jwtExpiry: '24h',
   },
 }));
 
