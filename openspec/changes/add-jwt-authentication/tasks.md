@@ -29,9 +29,9 @@
 
 ## 5. Routes
 
-- [ ] 5.1 Create /server/src/routes/auth.ts with POST /login route
-- [ ] 5.2 Register auth routes in /server/src/routes/index.ts at /api/auth prefix
-- [ ] 5.3 Add Swagger/JSDoc documentation for login endpoint
+- [x] 5.1 Create /server/src/routes/auth.ts with POST /login route
+- [x] 5.2 Register auth routes in /server/src/routes/index.ts at /api/auth prefix
+- [x] 5.3 Add Swagger/JSDoc documentation for login endpoint
 
 ## 6. Configuration
 
