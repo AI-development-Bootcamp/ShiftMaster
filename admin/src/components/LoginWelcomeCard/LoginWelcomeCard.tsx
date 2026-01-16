@@ -112,9 +112,8 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
           <input
             id="email"
             type="email"
-            className={`login-card__input login-card__input--ltr ${
-              touched.email && errors.email ? 'login-card__input--error' : ''
-            }`}
+            className={`login-card__input login-card__input--ltr ${touched.email && errors.email ? 'login-card__input--error' : ''
+              }`}
             placeholder="name@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -137,9 +136,8 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
           <input
             id="password"
             type="password"
-            className={`login-card__input ${
-              touched.password && errors.password ? 'login-card__input--error' : ''
-            }`}
+            className={`login-card__input ${touched.password && errors.password ? 'login-card__input--error' : ''
+              }`}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             onBlur={handlePasswordBlur}
@@ -165,6 +163,25 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
           disabled={isSubmitDisabled}
         >
           {isLoading ? 'מתחבר...' : 'התחברות'}
+        </button>
+
+        {/* Temporary Dev Button */}
+        <button
+          type="button"
+          onClick={() => onLogin('dev@test.com', 'password')}
+          style={{
+            marginTop: '1rem',
+            background: 'transparent',
+            border: '1px dashed #666',
+            color: '#666',
+            width: '100%',
+            padding: '8px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '0.8rem'
+          }}
+        >
+          Dev Skip (Bypass Login)
         </button>
       </form>
     </div>

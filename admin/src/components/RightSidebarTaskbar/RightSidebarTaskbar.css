@@ -11,7 +11,7 @@
   background-color: var(--color-nav-bg);
   display: flex;
   flex-direction: column;
-  padding: var(--spacing-lg);
+  padding: var(--spacing-md);
   box-sizing: border-box;
   z-index: 100;
 }
@@ -79,6 +79,7 @@
 .nav-item:hover:not(.nav-item--active) {
   background-color: var(--color-nav-hover);
 }
+
 /* Active State */
 .nav-item--active {
   color: var(--color-nav-text-active);
@@ -96,11 +97,26 @@
   flex-shrink: 0;
 }
 
+/* Sidebar Actions (Logout) */
+.sidebar-actions {
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--spacing-sm);
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+}
+
 /* Footer Section */
 .sidebar-footer {
   min-height: 70px;
-  padding-top: var(--spacing-md);
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: var(--spacing-sm);
+  /* border-top removed as we use sidebar-actions border now, or we keep both for separation */
 }
 
 .user-profile {

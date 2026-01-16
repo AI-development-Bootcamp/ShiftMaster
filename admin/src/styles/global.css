@@ -37,6 +37,7 @@
   --color-border-focus: #0052D6;
 
   /* Spacing */
+  --spacing-xxs: 0.1;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
@@ -133,15 +134,19 @@ body {
 .text-xs {
   font-size: var(--font-size-xs);
 }
+
 .text-sm {
   font-size: var(--font-size-sm);
 }
+
 .text-base {
   font-size: var(--font-size-base);
 }
+
 .text-lg {
   font-size: var(--font-size-lg);
 }
+
 .text-xl {
   font-size: var(--font-size-xl);
 }

@@ -1,1 +1,1 @@
-export { LoginWelcomeCard, default } from './LoginWelcomeCard';
+export { LoginWelcomeCard } from './LoginWelcomeCard';
