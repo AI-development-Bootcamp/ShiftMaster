@@ -2,10 +2,10 @@
 
 ## 1. Utilities
 
-- [ ] 1.1 Create /server/src/utils/jwt.ts with generateToken and verifyToken functions
-- [ ] 1.2 Create /server/src/utils/password.ts with hashPassword and comparePassword functions (bcrypt)
-- [ ] 1.3 Write unit tests for jwt.ts (token generation, verification, expiry, invalid tokens)
-- [ ] 1.4 Write unit tests for password.ts (hashing, comparison, salt rounds)
+- [x] 1.1 Create /server/src/utils/jwt.ts with generateToken and verifyToken functions
+- [x] 1.2 Create /server/src/utils/password.ts with hashPassword and comparePassword functions (bcrypt)
+- [x] 1.3 Write unit tests for jwt.ts (token generation, verification, expiry, invalid tokens)
+- [x] 1.4 Write unit tests for password.ts (hashing, comparison, salt rounds)
 
 ## 2. Middleware
 
