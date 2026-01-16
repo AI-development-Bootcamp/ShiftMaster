@@ -1,18 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import request from 'supertest';
 
-// Mock env to prevent import errors
-vi.mock('../config/env.js', () => ({
-  env: {
-    jwtSecret: 'test-secret',
-    jwtExpiry: '24h',
-    supabaseUrl: 'https://test.supabase.co',
-    supabaseAnonKey: 'test-key',
-    corsOrigins: ['http://localhost:3000'],
-    port: 3000,
-  },
-}));
-
+// Mock supabase for testing
 vi.mock('../db/supabase.js', () => ({
   supabase: { from: vi.fn() },
 }));

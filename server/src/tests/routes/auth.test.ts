@@ -6,16 +6,6 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import express from 'express';
 
-// Mock env config first
-vi.mock('../../config/index.js', () => ({
-  env: {
-    jwtSecret: 'test-secret-key-for-jwt-testing',
-    jwtExpiry: '24h',
-    supabaseUrl: 'https://test.supabase.co',
-    supabaseAnonKey: 'test-anon-key',
-  },
-}));
-
 // Mock dependencies
 vi.mock('../../db/supabase.js', () => ({
   supabase: {

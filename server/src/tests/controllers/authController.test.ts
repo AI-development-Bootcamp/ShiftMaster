@@ -5,16 +5,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { Request, Response } from 'express';
 
-// Mock env config first
-vi.mock('../../config/index.js', () => ({
-  env: {
-    jwtSecret: 'test-secret-key-for-jwt-testing',
-    jwtExpiry: '24h',
-    supabaseUrl: 'https://test.supabase.co',
-    supabaseAnonKey: 'test-anon-key',
-  },
-}));
-
 // Mock dependencies before importing modules that use them
 vi.mock('../../db/supabase.js', () => ({
   supabase: {
