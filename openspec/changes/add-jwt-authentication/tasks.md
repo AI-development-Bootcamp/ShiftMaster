@@ -23,9 +23,9 @@
 
 ## 4. Controller Layer
 
-- [ ] 4.1 Create /server/src/controllers/authController.ts with login handler
-- [ ] 4.2 Implement POST /login controller (validate input, call service, generate JWT, return token + user)
-- [ ] 4.3 Add input validation using zod (email format, password required)
+- [x] 4.1 Create /server/src/controllers/authController.ts with login handler
+- [x] 4.2 Implement POST /login controller (validate input, call service, generate JWT, return token + user)
+- [x] 4.3 Add input validation using zod (email format, password required)
 
 ## 5. Routes
 
