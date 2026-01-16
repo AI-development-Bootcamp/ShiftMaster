@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { User } from '@abra-shift-master/shared';
 import abraLogo from '../../assets/abra_logo.svg';
 import abraLogoTextWhite from '../../assets/abra_logo_text_white.svg';
 import '../../styles/RightSidebarTaskbar.css';
@@ -11,16 +12,7 @@ export interface NavItemConfig {
   icon?: React.ReactNode;
 }
 
-import { User } from '@abra-shift-master/shared';
-
 // ... (existing imports)
-
-export interface NavItemConfig {
-  id: string;
-  label: string;
-  path: string;
-  icon?: React.ReactNode;
-}
 
 interface RightSidebarTaskbarProps {
   navItems: NavItemConfig[];

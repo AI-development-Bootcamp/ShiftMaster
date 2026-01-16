@@ -6,6 +6,7 @@ import '../../styles/LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
   onLogin: (email: string, password: string) => Promise<void>;
+  error?: string | null;
 }
 
 interface FormErrors {
@@ -14,10 +15,14 @@ interface FormErrors {
   general?: string;
 }
 
-export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
+export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+
+  // Effect to sync external error to local state if needed, or just specific error render
+  // For simplicity, we can merge external error into general error rendering
+
   const [touched, setTouched] = useState<{ email: boolean; password: boolean }>({
     email: false,
     password: false,
@@ -82,7 +87,8 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
 
     try {
       await onLogin(email, password);
-    } catch (error) {
+    } catch (localError) {
+      // Logic handled in parent, but this catch ensures we don't crash
       setErrors({
         general: VALIDATION_MESSAGES.auth.invalidCredentials,
       });
@@ -92,6 +98,9 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
   };
 
   const isSubmitDisabled = isLoading || !email || !password;
+
+  // Display external error if it exists and no local error overrides it
+  const displayGeneralError = errors.general || error;
 
   return (
     <div className="login-card">
@@ -151,10 +160,10 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
           )}
         </div>
 
-        {errors.general && (
+        {displayGeneralError && (
           <div className="login-card__general-error-container">
             <div className="login-card__general-error" role="alert">
-              {errors.general}
+              {displayGeneralError}
             </div>
           </div>
         )}

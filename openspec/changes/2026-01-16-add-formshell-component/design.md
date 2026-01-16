@@ -3,6 +3,34 @@
 ## Overview
 FormShell is a compound component system for rendering modal forms from a declarative schema.
 
+## Context
+The Admin panel requires frequent form creation for various entities (Users, Clients, Projects, Tasks). Currently, creating forms involves repetitive JSX, state management, and styling, leading to inconsistency and slower development. **FormShell** aims to solve this by providing a unified, schema-driven form builder.
+
+## Goals
+*   **Consistency**: Ensure all forms look and behave identically (modals, validation, accessibility).
+*   **Speed**: Allow developers to create new forms by defining a JSON schema rather than writing component code.
+*   **Maintainability**: Centralize form logic (validation, submission) in one place.
+
+## Non-Goals
+*   Replacing all complex, multi-step wizards or highly custom UI flows that don't fit the standard modal pattern.
+
+## Decisions
+*   **Schema-Driven Approach**: We chose JSON-like schemas for flexibility and ease of configuration over component composition for simple forms.
+*   **React DatePicker**: Selected `react-datepicker` for its maturity and RTL support over building a custom date picker from scratch.
+*   **CSS Objects**: Using CSS Modules/Variables for styling to maintain separation of concerns and theming support.
+
+## Risks & Trade-offs
+*   **Flexibility vs. Simplicity**: Schema approaches can become restrictive if complex custom layouts are needed. We mitigate this by allowing custom field types but sticking to a standard vertical layout.
+*   **Performance**: Large forms might re-render frequently. We rely on React's diffing and careful state management in `FormShell`.
+
+## Migration Plan
+1.  Implement `FormShell` core components (`admin/src/components/FormShell`).
+2.  Refactor existing mock forms (e.g., `EmployeesManagmentPage`) to use `FormShell`.
+3.  Document the new pattern in `admin/src/components/forms/README.md`.
+
+## Open Questions
+*   Should we support multi-column layouts in the future? (Currently out of scope).
+
 ## Component Hierarchy
 
 ```

@@ -29,6 +29,25 @@ Currently, no reusable form infrastructure exists. Each new form would require b
 - Auto-save functionality
 - Integration with external form libraries (Formik, React Hook Form)
 
+## Why
+Building forms in the Admin panel is currently repetitive and error-prone, leading to inconsistent UI/UX. We need a standardized solution to streamline form creation, ensure accessibility, and maintain design consistency across the application.
+
+## What Changes
+*   **[NEW]** `FormShell` Component: A reusable modal form container (`admin/src/components/FormShell`).
+*   **[NEW]** Field Components:
+    *   `TextBox` (Text input)
+    *   `LargeTextBox` (Textarea)
+    *   `DropdownBox` (Custom Select)
+    *   `DateBox` & `DateRangeBox` (Date pickers)
+    *   `PasswordBox` (Password input with toggle)
+*   **[NEW]** Schema System: `admin/src/components/forms` directory for defining form structures in TypeScript/JSON.
+*   **[REF]** `EmployeesManagmentPage`: Updated to use the new `FormShell` for its "Create" actions.
+
+## Impact
+*   **Developers**: drastically reduced boilerplate for new forms; centralized logic for validation and style.
+*   **Users**: Consistent experience across all forms (keyboard navigation, error states, visual design).
+*   **Maintenance**: Updates to form styles or logic (e.g., a new validation rule) apply globally.
+
 ## Technical Approach
 See `design.md` for architecture details.
 
