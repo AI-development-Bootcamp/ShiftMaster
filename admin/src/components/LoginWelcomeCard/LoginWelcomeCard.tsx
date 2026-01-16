@@ -152,8 +152,10 @@ export function LoginWelcomeCard({ onLogin }: LoginWelcomeCardProps) {
         </div>
 
         {errors.general && (
-          <div className="login-card__general-error" role="alert">
-            {errors.general}
+          <div className="login-card__general-error-container">
+            <div className="login-card__general-error" role="alert">
+              {errors.general}
+            </div>
           </div>
         )}
 
