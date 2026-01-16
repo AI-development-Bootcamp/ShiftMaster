@@ -229,9 +229,13 @@ describe('FormShell', () => {
                 />
             );
 
-            // Select admin role
-            const roleSelect = screen.getByLabelText(/תפקיד/);
-            fireEvent.change(roleSelect, { target: { value: 'admin' } });
+            // Open dropdown
+            const roleTrigger = screen.getByRole('button', { name: 'תפקיד' });
+            fireEvent.click(roleTrigger);
+
+            // Select admin option
+            const adminOption = screen.getByRole('option', { name: 'מנהל מערכת' });
+            fireEvent.click(adminOption);
 
             await waitFor(() => {
                 expect(screen.getByLabelText(/תואר תפקיד/)).toBeInTheDocument();
@@ -249,9 +253,12 @@ describe('FormShell', () => {
                 />
             );
 
-            // Select admin and fill job_title
-            const roleSelect = screen.getByLabelText(/תפקיד/);
-            fireEvent.change(roleSelect, { target: { value: 'admin' } });
+            // Select admin
+            const roleTrigger = screen.getByRole('button', { name: 'תפקיד' });
+            fireEvent.click(roleTrigger);
+
+            const adminOption = screen.getByRole('option', { name: 'מנהל מערכת' });
+            fireEvent.click(adminOption);
 
             await waitFor(() => {
                 expect(screen.getByLabelText(/תואר תפקיד/)).toBeInTheDocument();
@@ -260,8 +267,10 @@ describe('FormShell', () => {
             const jobTitleInput = screen.getByLabelText(/תואר תפקיד/);
             fireEvent.change(jobTitleInput, { target: { value: 'ראש צוות' } });
 
-            // Change to regular - job_title should be hidden
-            fireEvent.change(roleSelect, { target: { value: 'regular' } });
+            // Change to regular
+            fireEvent.click(roleTrigger);
+            const regularOption = screen.getByRole('option', { name: 'עובד רגיל' });
+            fireEvent.click(regularOption);
 
             await waitFor(() => {
                 expect(screen.queryByLabelText(/תואר תפקיד/)).not.toBeInTheDocument();
