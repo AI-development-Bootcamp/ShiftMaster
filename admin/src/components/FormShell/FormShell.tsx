@@ -69,6 +69,16 @@ export function FormShell({
         firstFocusable?.focus();
     }, []);
 
+    // Cleanup timeout on unmount
+    useEffect(() => {
+        return () => {
+            if (clickTimeoutRef.current) {
+                clearTimeout(clickTimeoutRef.current);
+                clickTimeoutRef.current = null;
+            }
+        };
+    }, []);
+
     // Escape key to close
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {

@@ -13,6 +13,7 @@ interface FormErrors {
   email?: string;
   password?: string;
   general?: string;
+  code?: string;
 }
 
 export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
@@ -90,10 +91,12 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
       if (result instanceof Promise) {
         await result;
       }
-    } catch (localError) {
+    } catch (localError: any) {
       // Logic handled in parent, but this catch ensures we don't crash
+      const code = localError?.code || localError?.status || 'AUTH_ERROR';
       setErrors({
         general: VALIDATION_MESSAGES.auth.invalidCredentials,
+        code,
       });
     } finally {
       setIsLoading(false);
@@ -104,6 +107,7 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
 
   // Display external error if it exists and no local error overrides it
   const displayGeneralError = errors.general || error;
+  const displayErrorCode = errors.code;
 
   return (
     <div className="login-card">
@@ -165,7 +169,11 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
 
         {displayGeneralError && (
           <div className="login-card__general-error-container">
-            <div className="login-card__general-error" role="alert">
+            <div
+              className="login-card__general-error"
+              role="alert"
+              data-error-code={displayErrorCode}
+            >
               {displayGeneralError}
             </div>
           </div>
