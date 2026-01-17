@@ -1,0 +1,65 @@
+/* Time Entry Item Component */
+
+.time-entry-item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+  direction: rtl;
+}
+
+.time-entry-item:last-child {
+  border-bottom: none;
+}
+
+.edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  transition: color 0.2s ease;
+  margin-left: auto;
+}
+
+.edit-btn:hover {
+  color: #3b82f6;
+}
+
+.edit-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.entry-hours {
+  font-size: 14px;
+  font-weight: 600;
+  color: #141e3e;
+  min-width: 50px;
+  text-align: center;
+}
+
+.entry-time-range {
+  font-size: 14px;
+  font-weight: 500;
+  color: #14b8a6;
+  min-width: 80px;
+  text-align: center;
+  direction: ltr;
+}
+
+.entry-project {
+  font-size: 14px;
+  font-weight: 500;
+  color: #141e3e;
+  flex: 1;
+  text-align: right;
+}
