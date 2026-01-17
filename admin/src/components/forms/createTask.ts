@@ -1,4 +1,5 @@
 import { FormFieldSchema } from '../FormShell';
+import { FIELD_TYPES } from '../../constants/forms';
 
 export const createTaskForm = {
     title: 'יצירת משימה חדשה',
@@ -7,14 +8,14 @@ export const createTaskForm = {
     fields: [
         {
             id: 'taskTitle',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'כותרת המשימה',
             placeholder: 'מה צריך לעשות?',
             required: true,
         },
         {
             id: 'projectId',
-            type: 'dropdownBox',
+            type: FIELD_TYPES.DROPDOWN_BOX,
             label: 'פרויקט משוייך',
             placeholder: 'בחר פרויקט',
             options: [
@@ -25,7 +26,7 @@ export const createTaskForm = {
         },
         {
             id: 'assignedTo',
-            type: 'dropdownBox',
+            type: FIELD_TYPES.DROPDOWN_BOX,
             label: 'מוקצה ל:',
             placeholder: 'בחר עובד',
             options: [
@@ -36,13 +37,13 @@ export const createTaskForm = {
         },
         {
             id: 'dueDate',
-            type: 'dateBox',
+            type: FIELD_TYPES.DATE_BOX,
             label: 'תאריך יעד',
             required: true,
         },
         {
             id: 'description',
-            type: 'largeTextBox',
+            type: FIELD_TYPES.LARGE_TEXT_BOX,
             label: 'תיאור המשימה',
             placeholder: 'הוראות ביצוע...',
             rows: 4,

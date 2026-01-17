@@ -5,6 +5,7 @@ import { FormHeader } from './FormHeader';
 import { FormFooter } from './FormFooter';
 import { CollapsibleSection } from './CollapsibleSection';
 import { TextBox, LargeTextBox, DropdownBox, DateBox, DateRangeBox } from './fields';
+import { FIELD_TYPES } from '../../constants/forms';
 import '../../styles/FormShell.css';
 import '../../styles/FormFields.css';
 
@@ -30,7 +31,7 @@ function shouldFieldBeVisible(
 function initializeValues(fields: FormFieldSchema[]): FormValues {
     const values: FormValues = {};
     fields.forEach((field) => {
-        if (field.type === 'dateRangeBox') {
+        if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
             values[field.id] = { start: '', end: '' };
         } else {
             values[field.id] = '';
@@ -119,7 +120,7 @@ export function FormShell({
             // Clear values of fields that become hidden
             fields.forEach((field) => {
                 if (field.dependsOn && !shouldFieldBeVisible(field, newValues)) {
-                    if (field.type === 'dateRangeBox') {
+                    if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                         newValues[field.id] = { start: '', end: '' };
                     } else {
                         newValues[field.id] = '';
@@ -148,7 +149,7 @@ export function FormShell({
             if (field.required) {
                 const value = values[field.id];
 
-                if (field.type === 'dateRangeBox') {
+                if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                     const rangeValue = value as DateRangeValue;
                     if (!rangeValue.start || !rangeValue.end) {
                         newErrors[field.id] = 'שדה חובה';
@@ -166,7 +167,7 @@ export function FormShell({
                     newErrors[field.id] = 'שדה חובה';
                     isValid = false;
                 }
-            } else if (field.type === 'dateRangeBox') {
+            } else if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                 // Determine if partial range needs validation even if not required
                 // (Optional: if one is filled, the other might be needed, or just validate logic if both exist)
                 const rangeValue = values[field.id] as DateRangeValue;
@@ -200,7 +201,7 @@ export function FormShell({
 
         const fieldElement = (() => {
             switch (field.type) {
-                case 'textBox':
+                case FIELD_TYPES.TEXT_BOX:
                     return (
                         <TextBox
                             id={field.id}
@@ -214,7 +215,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'passwordBox':
+                case FIELD_TYPES.PASSWORD_BOX:
                     return (
                         <TextBox
                             id={field.id}
@@ -229,7 +230,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'largeTextBox':
+                case FIELD_TYPES.LARGE_TEXT_BOX:
                     return (
                         <LargeTextBox
                             id={field.id}
@@ -244,7 +245,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dropdownBox':
+                case FIELD_TYPES.DROPDOWN_BOX:
                     return (
                         <DropdownBox
                             id={field.id}
@@ -258,7 +259,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dateBox':
+                case FIELD_TYPES.DATE_BOX:
                     return (
                         <DateBox
                             id={field.id}
@@ -271,7 +272,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dateRangeBox':
+                case FIELD_TYPES.DATE_RANGE_BOX:
                     return (
                         <DateRangeBox
                             id={field.id}

@@ -1,4 +1,5 @@
 import { FormFieldSchema } from '../FormShell';
+import { FIELD_TYPES } from '../../constants/forms';
 
 export const createClientForm = {
     title: 'טופס יצירת לקוח',
@@ -7,14 +8,14 @@ export const createClientForm = {
     fields: [
         {
             id: 'clientName',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'שם הלקוח',
             placeholder: 'הכנס את שם הלקוח',
             required: true,
         },
         {
             id: 'contactDetails',
-            type: 'largeTextBox',
+            type: FIELD_TYPES.LARGE_TEXT_BOX,
             label: 'פרטי איש קשר',
             placeholder: 'הכנס פרטים מלאים',
         },

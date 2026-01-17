@@ -7,13 +7,12 @@ import { ReactNode } from 'react';
 /**
  * Available field types for FormShell
  */
-export type FormFieldType =
-    | 'textBox'
-    | 'passwordBox'
-    | 'largeTextBox'
-    | 'dropdownBox'
-    | 'dateBox'
-    | 'dateRangeBox';
+import { FIELD_TYPES } from '../../constants/forms';
+
+/**
+ * Available field types for FormShell
+ */
+export type FormFieldType = typeof FIELD_TYPES[keyof typeof FIELD_TYPES];
 
 /**
  * Dropdown option structure

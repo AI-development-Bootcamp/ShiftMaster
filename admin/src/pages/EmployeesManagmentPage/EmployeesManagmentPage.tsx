@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { FormShell, FormValues } from '../../components/FormShell';
 import { createClientForm, createUserForm, createProjectForm, createTaskForm } from '../../components/forms';
+import { FORM_KEYS } from '../../constants/forms';
 import '../../styles/EmployeesManagmentPage.css';
 
-type ActiveForm = 'client' | 'user' | 'project' | 'task' | null;
+type ActiveForm = typeof FORM_KEYS[keyof typeof FORM_KEYS] | null;
 
 export function EmployeesManagmentPage() {
     const [activeForm, setActiveForm] = useState<ActiveForm>(null);
@@ -14,10 +15,10 @@ export function EmployeesManagmentPage() {
     };
 
     const forms = {
-        client: createClientForm,
-        user: createUserForm,
-        project: createProjectForm,
-        task: createTaskForm,
+        [FORM_KEYS.CLIENT]: createClientForm,
+        [FORM_KEYS.USER]: createUserForm,
+        [FORM_KEYS.PROJECT]: createProjectForm,
+        [FORM_KEYS.TASK]: createTaskForm,
     };
 
     const renderButton = (type: ActiveForm, label: string) => (
@@ -47,10 +48,10 @@ export function EmployeesManagmentPage() {
                 </div>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-                    {renderButton('client', '+ לקוח חדש')}
-                    {renderButton('user', '+ עובד חדש')}
-                    {renderButton('project', '+ פרויקט חדש')}
-                    {renderButton('task', '+ משימה חדשה')}
+                    {renderButton(FORM_KEYS.CLIENT, '+ לקוח חדש')}
+                    {renderButton(FORM_KEYS.USER, '+ עובד חדש')}
+                    {renderButton(FORM_KEYS.PROJECT, '+ פרויקט חדש')}
+                    {renderButton(FORM_KEYS.TASK, '+ משימה חדשה')}
                 </div>
             </div>
 
