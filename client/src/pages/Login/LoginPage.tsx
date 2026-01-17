@@ -96,7 +96,7 @@ function LoginPage() {
         </p>
 
         {/* Login form */}
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
             <label htmlFor="email-input" className="visually-hidden">אימייל</label>
             <input
