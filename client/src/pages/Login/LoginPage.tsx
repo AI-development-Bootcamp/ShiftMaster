@@ -21,11 +21,12 @@ function LoginPage() {
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
+    const trimmedEmail = email.trim();
 
     // Validate email
-    if (!email.trim()) {
+    if (!trimmedEmail) {
       newErrors.email = 'יש להזין אימייל';
-    } else if (!isValidEmail(email)) {
+    } else if (!isValidEmail(trimmedEmail)) {
       newErrors.email = 'פורמט אימייל לא תקין';
     }
 
@@ -37,7 +38,14 @@ function LoginPage() {
     }
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    const isValid = Object.keys(newErrors).length === 0;
+
+    // Normalize email state with trimmed value on success
+    if (isValid) {
+      setEmail(trimmedEmail);
+    }
+
+    return isValid;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -90,26 +98,44 @@ function LoginPage() {
         {/* Login form */}
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="login-input-group">
+            <label htmlFor="email-input" className="visually-hidden">אימייל</label>
             <input
-              type="text"
+              id="email-input"
+              type="email"
               className={`login-input ${errors.email ? 'input-error' : ''}`}
               placeholder="אימייל"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               dir="rtl"
+              autoComplete="email"
+              aria-invalid={!!errors.email}
+              aria-describedby={errors.email ? 'email-error' : undefined}
             />
-            {errors.email && <p className="login-error">{errors.email}</p>}
+            {errors.email && (
+              <p id="email-error" className="login-error" role="alert">
+                {errors.email}
+              </p>
+            )}
           </div>
           <div className="login-input-group">
+            <label htmlFor="password-input" className="visually-hidden">סיסמה</label>
             <input
+              id="password-input"
               type="password"
               className={`login-input ${errors.password ? 'input-error' : ''}`}
               placeholder="סיסמה"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               dir="rtl"
+              autoComplete="current-password"
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? 'password-error' : undefined}
             />
-            {errors.password && <p className="login-error">{errors.password}</p>}
+            {errors.password && (
+              <p id="password-error" className="login-error" role="alert">
+                {errors.password}
+              </p>
+            )}
           </div>
           <button type="submit" className="login-button">
             התחברות
