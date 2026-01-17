@@ -2,7 +2,7 @@ import { useState } from 'react';
 import './HomePage.css';
 
 function HomePage() {
-  const [currentMonth, setCurrentMonth] = useState('אוקטובר');
+  const [currentMonth, _setCurrentMonth] = useState('אוקטובר');
 
   const handlePrevMonth = () => {
     // TODO: Implement month navigation
