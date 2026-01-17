@@ -13,6 +13,13 @@ interface FormErrors {
   password?: string;
 }
 
+/**
+ * Render the login page UI with email and password inputs, client-side validation, and navigation to `/home` on successful submission.
+ *
+ * The component displays localized (Hebrew) labels, error messages, and accessible attributes for form fields. It performs client-side validation: email must be present and correctly formatted; password must be present and at least 6 characters. On successful validation the email is trimmed and the app navigates to `/home`.
+ *
+ * @returns The rendered login page as a `JSX.Element`
+ */
 function LoginPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
