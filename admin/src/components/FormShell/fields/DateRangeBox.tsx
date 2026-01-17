@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { he } from 'date-fns/locale';
+import { formatDate, parseLocalDate } from '@abra-shift-master/shared';
 import { DateRangeBoxProps } from '../types';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -8,7 +9,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('he', he);
 
 /**
- * DateRangeBox - Start and end date picker with cross-field validation
+ * DateRangeBox component for selecting a start and end date range.
+ * Includes cross-field validation to ensure end date is after start date.
+ *
+ * @param {DateRangeBoxProps} props - Component props including label, value range, and error state.
+ * @returns {JSX.Element} The rendered date range picker fields.
  */
 export function DateRangeBox({
     id,
@@ -21,9 +26,9 @@ export function DateRangeBox({
 }: DateRangeBoxProps) {
     const [internalError, setInternalError] = useState<string | undefined>();
 
-    // Parse string dates to Date objects
-    const startDate = useMemo(() => value.start ? new Date(value.start) : null, [value.start]);
-    const endDate = useMemo(() => value.end ? new Date(value.end) : null, [value.end]);
+    // Parse string dates to Date objects using shared utility
+    const startDate = useMemo(() => parseLocalDate(value.start), [value.start]);
+    const endDate = useMemo(() => parseLocalDate(value.end), [value.end]);
 
     // Cross-field validation
     useEffect(() => {
@@ -35,24 +40,12 @@ export function DateRangeBox({
     }, [startDate, endDate]);
 
     const handleStartChange = (date: Date | null) => {
-        let formatted = '';
-        if (date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            formatted = `${year}-${month}-${day}`;
-        }
+        const formatted = date ? formatDate(date) : '';
         onChange({ ...value, start: formatted });
     };
 
     const handleEndChange = (date: Date | null) => {
-        let formatted = '';
-        if (date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            formatted = `${year}-${month}-${day}`;
-        }
+        const formatted = date ? formatDate(date) : '';
         onChange({ ...value, end: formatted });
     };
 

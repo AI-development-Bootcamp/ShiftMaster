@@ -12,8 +12,6 @@ export interface NavItemConfig {
   icon?: React.ReactNode;
 }
 
-// ... (existing imports)
-
 interface RightSidebarTaskbarProps {
   navItems: NavItemConfig[];
   user: User;

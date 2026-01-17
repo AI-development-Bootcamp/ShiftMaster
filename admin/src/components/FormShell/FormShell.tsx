@@ -39,7 +39,11 @@ function initializeValues(fields: FormFieldSchema[]): FormValues {
 }
 
 /**
- * FormShell - Main modal form container
+ * FormShell is the main container for modal forms.
+ * It handles state management, validation, submission logic, and accessibility (focus trap).
+ *
+ * @param {FormShellProps} props - Component configuration including fields schema, callbacks, and title.
+ * @returns {JSX.Element} The fully rendered modal form.
  */
 export function FormShell({
     title,
@@ -203,6 +207,7 @@ export function FormShell({
                             value={fieldValue as string}
                             required={field.required}
                             maxLength={field.maxLength}
+                            rows={field.rows}
                             error={fieldError}
                             disabled={isSubmitting}
                             onChange={(v) => handleFieldChange(field.id, v)}

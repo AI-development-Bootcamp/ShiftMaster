@@ -1,5 +1,7 @@
 import DatePicker, { registerLocale } from 'react-datepicker';
 import { he } from 'date-fns/locale';
+import { formatDate, parseLocalDate } from '@abra-shift-master/shared';
+import { useMemo } from 'react';
 import { DateBoxProps } from '../types';
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -7,7 +9,11 @@ import 'react-datepicker/dist/react-datepicker.css';
 registerLocale('he', he);
 
 /**
- * DateBox - Single date picker with Hebrew calendar
+ * DateBox component for single date selection.
+ * Uses `react-datepicker` with Hebrew locale and specific styling.
+ *
+ * @param {DateBoxProps} props - Component props including label, value, and error state.
+ * @returns {JSX.Element} The rendered date picker field.
  */
 export function DateBox({
     id,
@@ -19,15 +25,12 @@ export function DateBox({
     disabled,
     onChange,
 }: DateBoxProps) {
-    // Parse string date to Date object
-    const selectedDate = value ? new Date(value) : null;
+    // Parse string date to Date object using shared utility
+    const selectedDate = useMemo(() => parseLocalDate(value), [value]);
 
     const handleChange = (date: Date | null) => {
         if (date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            onChange(`${year}-${month}-${day}`);
+            onChange(formatDate(date));
         } else {
             onChange('');
         }

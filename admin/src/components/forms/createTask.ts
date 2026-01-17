@@ -47,5 +47,5 @@ export const createTaskForm = {
             placeholder: 'הוראות ביצוע...',
             rows: 4,
         },
-    ] as FormFieldSchema[],
+    ] satisfies FormFieldSchema[],
 };

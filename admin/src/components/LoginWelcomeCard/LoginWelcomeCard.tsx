@@ -5,7 +5,7 @@ import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES } from '../../constants';
 import '../../styles/LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
-  onLogin: (email: string, password: string) => Promise<void>;
+  onLogin: (email: string, password: string) => void | Promise<void>;
   error?: string | null;
 }
 
@@ -86,7 +86,10 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
     setErrors({});
 
     try {
-      await onLogin(email, password);
+      const result = onLogin(email, password);
+      if (result instanceof Promise) {
+        await result;
+      }
     } catch (localError) {
       // Logic handled in parent, but this catch ensures we don't crash
       setErrors({

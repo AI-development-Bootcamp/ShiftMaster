@@ -18,5 +18,5 @@ export const createClientForm = {
             label: 'פרטי איש קשר',
             placeholder: 'הכנס פרטים מלאים',
         },
-    ] as FormFieldSchema[],
+    ] satisfies FormFieldSchema[],
 };

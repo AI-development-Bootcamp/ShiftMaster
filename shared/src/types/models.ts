@@ -7,6 +7,9 @@ import {
 } from './enums';
 
 // User model
+/**
+ * Represents a user in the system.
+ */
 export interface User {
   user_id: number;
   full_name: string;
@@ -18,6 +21,9 @@ export interface User {
 }
 
 // Client model
+/**
+ * Represents a client entity.
+ */
 export interface Client {
   client_id: number;
   name: string;
@@ -27,6 +33,9 @@ export interface Client {
 }
 
 // Project model
+/**
+ * Represents a project associated with a client.
+ */
 export interface Project {
   project_id: number;
   client_id: number;
@@ -41,6 +50,9 @@ export interface Project {
 }
 
 // Task model
+/**
+ * Represents a task within a project.
+ */
 export interface Task {
   task_id: number;
   project_id: number;
@@ -52,6 +64,9 @@ export interface Task {
 }
 
 // Admin Task Assignment model
+/**
+ * Represents an assignment of a task to a user by an admin.
+ */
 export interface AdminTaskAssignment {
   admin_task_assignment_id: number;
   user_id: number;
@@ -63,6 +78,9 @@ export interface AdminTaskAssignment {
 }
 
 // Entry model
+/**
+ * Represents a work entry or absence record.
+ */
 export interface Entry {
   entry_id: number;
   user_id: number;
@@ -80,6 +98,9 @@ export interface Entry {
 }
 
 // Entry Assignment model
+/**
+ * Represents a specific assignment of time within an entry to a task.
+ */
 export interface EntryAssignment {
   entry_assignment_id: number;
   entry_id: number;
@@ -93,6 +114,9 @@ export interface EntryAssignment {
 }
 
 // Month Lock model
+/**
+ * Represents a lock on a specific month to prevent further edits.
+ */
 export interface MonthLock {
   lock_id: number;
   year: number;

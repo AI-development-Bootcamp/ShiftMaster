@@ -36,5 +36,5 @@ export const createProjectForm = {
             placeholder: 'פרטים נוספים אודות הפרויקט',
             rows: 3,
         },
-    ] as FormFieldSchema[],
+    ] satisfies FormFieldSchema[],
 };

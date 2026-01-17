@@ -7,9 +7,9 @@ FormShell is a compound component system for rendering modal forms from a declar
 The Admin panel requires frequent form creation for various entities (Users, Clients, Projects, Tasks). Currently, creating forms involves repetitive JSX, state management, and styling, leading to inconsistency and slower development. **FormShell** aims to solve this by providing a unified, schema-driven form builder.
 
 ## Goals
-*   **Consistency**: Ensure all forms look and behave identically (modals, validation, accessibility).
-*   **Speed**: Allow developers to create new forms by defining a JSON schema rather than writing component code.
-*   **Maintainability**: Centralize form logic (validation, submission) in one place.
+* **Consistency**: Ensure all forms look and behave identically (modals, validation, accessibility).
+* **Speed**: Allow developers to create new forms by defining a JSON schema rather than writing component code.
+* **Maintainability**: Centralize form logic (validation, submission) in one place.
 
 ## Non-Goals
 *   Replacing all complex, multi-step wizards or highly custom UI flows that don't fit the standard modal pattern.

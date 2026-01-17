@@ -2,7 +2,11 @@ import { useState, useRef, useEffect } from 'react';
 import { DropdownBoxProps } from '../types';
 
 /**
- * DropdownBox - Custom select dropdown with styled options
+ * DropdownBox component for selecting an option from a list.
+ * Features a custom UI with click-outside closing and arrow indication.
+ *
+ * @param {DropdownBoxProps} props - Component props including options, selected value, and error state.
+ * @returns {JSX.Element} The rendered custom dropdown field.
  */
 export function DropdownBox({
     id,

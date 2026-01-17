@@ -43,6 +43,7 @@ export interface FormFieldSchema {
     options?: DropdownOption[];  // For dropdownBox
     required?: boolean;
     maxLength?: number;
+    rows?: number;                 // For largeTextBox
     dependsOn?: FieldDependency;   // Conditional visibility
     collapsible?: boolean;         // Can be collapsed when visible
     defaultCollapsed?: boolean;    // Start collapsed

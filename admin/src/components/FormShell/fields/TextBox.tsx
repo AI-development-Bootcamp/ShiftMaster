@@ -2,7 +2,11 @@ import { useState } from 'react';
 import { TextBoxProps } from '../types';
 
 /**
- * TextBox - Single line text input field
+ * TextBox component for single-line text input.
+ * Supports password visibility toggle and validation states.
+ *
+ * @param {TextBoxProps} props - Component props including label, value, type, and error state.
+ * @returns {JSX.Element} The rendered text input field.
  */
 export function TextBox({
     id,
