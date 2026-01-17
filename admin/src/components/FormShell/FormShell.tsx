@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { parseLocalDate } from '@abra-shift-master/shared';
 import { FormShellProps, FormFieldSchema, FormValues, FormErrors, DateRangeValue } from './types';
 import { FormHeader } from './FormHeader';
 import { FormFooter } from './FormFooter';
@@ -152,10 +153,30 @@ export function FormShell({
                     if (!rangeValue.start || !rangeValue.end) {
                         newErrors[field.id] = 'שדה חובה';
                         isValid = false;
+                    } else {
+                        const startDate = parseLocalDate(rangeValue.start);
+                        const endDate = parseLocalDate(rangeValue.end);
+
+                        if (startDate && endDate && endDate < startDate) {
+                            newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                            isValid = false;
+                        }
                     }
                 } else if (!value || (typeof value === 'string' && !value.trim())) {
                     newErrors[field.id] = 'שדה חובה';
                     isValid = false;
+                }
+            } else if (field.type === 'dateRangeBox') {
+                // Determine if partial range needs validation even if not required
+                // (Optional: if one is filled, the other might be needed, or just validate logic if both exist)
+                const rangeValue = values[field.id] as DateRangeValue;
+                if (rangeValue.start && rangeValue.end) {
+                    const startDate = parseLocalDate(rangeValue.start);
+                    const endDate = parseLocalDate(rangeValue.end);
+                    if (startDate && endDate && endDate < startDate) {
+                        newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                        isValid = false;
+                    }
                 }
             }
         });

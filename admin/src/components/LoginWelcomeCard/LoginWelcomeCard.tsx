@@ -91,16 +91,28 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
       if (result instanceof Promise) {
         await result;
       }
-    } catch (localError: any) {
+    } catch (localError: unknown) {
       // Logic handled in parent, but this catch ensures we don't crash
-      const code = localError?.code || localError?.status || 'AUTH_ERROR';
       setErrors({
         general: VALIDATION_MESSAGES.auth.invalidCredentials,
-        code,
+        code: getErrorCode(localError),
       });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const getErrorCode = (error: unknown): string | undefined => {
+    if (typeof error === 'object' && error !== null) {
+      const errObj = error as Record<string, unknown>;
+      if (typeof errObj.code === 'string') {
+        return errObj.code;
+      }
+      if (typeof errObj.status === 'string') {
+        return errObj.status;
+      }
+    }
+    return undefined;
   };
 
   const isSubmitDisabled = isLoading || !email || !password;
