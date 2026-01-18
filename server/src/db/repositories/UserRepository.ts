@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IUserRepository } from '../types/repositories.js';
 import { User, NewUser, UpdateUser } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class UserRepository extends BaseRepository<User, NewUser, UpdateUser> implements IUserRepository {
-    constructor() {
-        super('users', 'user_id');
+    constructor(client?: SupabaseClient) {
+        super('users', 'user_id', client);
     }
 
     async findByEmail(email: string): Promise<User | null> {

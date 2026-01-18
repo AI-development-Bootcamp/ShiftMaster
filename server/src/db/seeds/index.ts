@@ -1,3 +1,5 @@
+import dotenv from 'dotenv';
+dotenv.config();
 
 import bcrypt from 'bcryptjs';
 import { users } from './users.seed.js';
@@ -6,12 +8,19 @@ import { projects } from './projects.seed.js';
 import { tasks } from './tasks.seed.js';
 import { logDbOperation, logDbError } from '../utils/logger.js';
 import {
-    userRepository,
-    clientRepository,
-    projectRepository,
-    taskRepository
+    UserRepository,
+    ClientRepository,
+    ProjectRepository,
+    TaskRepository
 } from '../repositories/index.js';
+import { supabaseAdmin } from '../supabase.js';
 import { User, Client, Project } from '../types/entities.js';
+
+// Initialize repositories with Admin client to bypass RLS
+const userRepository = new UserRepository(supabaseAdmin);
+const clientRepository = new ClientRepository(supabaseAdmin);
+const projectRepository = new ProjectRepository(supabaseAdmin);
+const taskRepository = new TaskRepository(supabaseAdmin);
 
 async function seed() {
     logDbOperation('Starting database seed...');

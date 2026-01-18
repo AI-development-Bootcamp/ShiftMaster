@@ -3,9 +3,11 @@ import { ITaskRepository } from '../types/repositories.js';
 import { Task, NewTask, UpdateTask } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
+import { SupabaseClient } from '@supabase/supabase-js';
+
 export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> implements ITaskRepository {
-    constructor() {
-        super('tasks', 'task_id');
+    constructor(client?: SupabaseClient) {
+        super('tasks', 'task_id', client);
     }
 
     async findByProjectId(projectId: number): Promise<Task[]> {

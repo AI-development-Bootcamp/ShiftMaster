@@ -68,8 +68,8 @@
 
 ## 8. Documentation
 
-- [ ] 8.1 Document repository pattern in code comments
-- [ ] 8.2 Update server README with database setup instructions
-- [ ] 8.3 Document migration process
-- [ ] 8.4 Document seed data usage
+- [x] 8.1 Document repository pattern in code comments (Done via JSDoc in implementation)
+- [x] 8.2 Update server README with database setup instructions
+- [x] 8.3 Document migration process
+- [x] 8.4 Document seed data usage
 - [ ] 8.5 Add database ERD to documentation (optional)

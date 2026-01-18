@@ -13,8 +13,9 @@
     "test:ui": "vitest --ui",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
     "type-check": "tsc --noEmit",
-    "db:migrate": "tsx src/db/utils/migrate.ts",
-    "seed:dev": "tsx src/db/seeds/index.ts"
+    "db:migrate": "tsx --env-file=../.env src/db/utils/migrate.ts",
+    "db:reset": "tsx --env-file=../.env src/db/utils/reset.ts",
+    "seed:dev": "tsx --env-file=../.env src/db/seeds/index.ts"
   },
   "dependencies": {
     "@abra-shift-master/shared": "*",

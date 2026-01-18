@@ -3,9 +3,11 @@ import { IProjectRepository } from '../types/repositories.js';
 import { Project, NewProject, UpdateProject } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
+import { SupabaseClient } from '@supabase/supabase-js';
+
 export class ProjectRepository extends BaseRepository<Project, NewProject, UpdateProject> implements IProjectRepository {
-    constructor() {
-        super('projects', 'project_id');
+    constructor(client?: SupabaseClient) {
+        super('projects', 'project_id', client);
     }
 
     async findByClientId(clientId: number): Promise<Project[]> {

@@ -3,9 +3,11 @@ import { IClientRepository } from '../types/repositories.js';
 import { Client, NewClient, UpdateClient } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
+import { SupabaseClient } from '@supabase/supabase-js';
+
 export class ClientRepository extends BaseRepository<Client, NewClient, UpdateClient> implements IClientRepository {
-    constructor() {
-        super('clients', 'client_id');
+    constructor(client?: SupabaseClient) {
+        super('clients', 'client_id', client);
     }
 
     async findActive(): Promise<Client[]> {
