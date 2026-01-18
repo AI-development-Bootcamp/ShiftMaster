@@ -1,0 +1,71 @@
+# Dependencies
+node_modules
+npm-debug.log
+package-lock.json
+
+# Build outputs
+dist
+build
+
+# Development files
+.env
+.env.local
+.env.*.local
+
+# Testing
+coverage
+.nyc_output
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+vitest.config.ts
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+!README.md
+
+# Logs
+logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp
+temp
+*.tmp
+
+# Test files
+tests
+**/tests/**
+**/__tests__/**
+
+# Source maps (not needed in production)
+*.map
+
+# TypeScript config (already copied explicitly)
+# tsconfig.json
+
+# Nodemon config (dev only)
+nodemon.json
+
+# CI/CD
+.github
+
+# Other workspaces (only copy what's needed)
+client
+admin

@@ -1,9 +1,9 @@
 ## 1. Backend Containerization
 
-- [ ] 1.1 Create Dockerfile in server/ directory
-- [ ] 1.2 Configure multi-stage build (build stage + production stage)
-- [ ] 1.3 Set up .dockerignore file to exclude unnecessary files
-- [ ] 1.4 Test Docker build locally (`docker build -t shiftmaster-server .`)
+- [x] 1.1 Create Dockerfile in server/ directory
+- [x] 1.2 Configure multi-stage build (build stage + production stage)
+- [x] 1.3 Set up .dockerignore file to exclude unnecessary files
+- [ ] 1.4 Test Docker build locally (`docker build --file server/Dockerfile -t shiftmaster-server .`)
 - [ ] 1.5 Verify Docker image runs correctly (`docker run -p 3000:3000 shiftmaster-server`)
 - [ ] 1.6 Test with environment variables passed to container
 
