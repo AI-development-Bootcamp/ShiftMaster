@@ -1,9 +1,8 @@
-import dotenv from 'dotenv';
+// Load environment variables FIRST, before any modules that depend on them
+import 'dotenv/config';
+
 import app from './app.js';
 import { env, validateEnv } from './config/env.js';
-
-// Load environment variables
-dotenv.config();
 
 // Validate required environment variables before starting server
 try {
