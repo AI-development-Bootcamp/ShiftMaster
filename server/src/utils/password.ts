@@ -17,7 +17,14 @@ const SALT_ROUNDS = 10;
  * @returns Hashed password
  */
 export async function hashPassword(password: string): Promise<string> {
-  return bcrypt.hash(password, SALT_ROUNDS);
+  try {
+    return await bcrypt.hash(password, SALT_ROUNDS);
+  } catch (error) {
+    const err = new Error('Failed to hash password') as Error & { code?: string; cause?: unknown };
+    err.code = 'E_HASH_PASSWORD';
+    err.cause = error;
+    throw err;
+  }
 }
 
 /**
@@ -30,5 +37,12 @@ export async function comparePassword(
   password: string,
   hash: string
 ): Promise<boolean> {
-  return bcrypt.compare(password, hash);
+  try {
+    return await bcrypt.compare(password, hash);
+  } catch (error) {
+    const err = new Error('Failed to compare password') as Error & { code?: string; cause?: unknown };
+    err.code = 'E_COMPARE_PASSWORD';
+    err.cause = error;
+    throw err;
+  }
 }
