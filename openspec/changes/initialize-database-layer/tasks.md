@@ -25,6 +25,8 @@
 - [x] 3.1 Create query logger utility (`db/utils/logger.ts`)
 - [x] 3.2 Create database health check function (`db/utils/health.ts`)
 - [x] 3.3 Export utilities from `db/utils/index.ts`
+- [ ] 3.4 Create migration runner script (`db/utils/migrate.ts`)
+- [ ] 3.5 Add npm script to run migrations: `npm run db:migrate`
 
 ## 4. TypeScript Types
 

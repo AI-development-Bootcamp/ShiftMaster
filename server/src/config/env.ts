@@ -4,10 +4,10 @@
 
 export const env = {
   port: parseInt(process.env.PORT || '3000', 10),
-  supabaseUrl: process.env.DATABASE_URL ? extractSupabaseUrl(process.env.DATABASE_URL) : '',
+  supabaseUrl: process.env.SUPABASE_URL ? extractSupabaseUrl(process.env.SUPABASE_URL) : '',
   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
   supabaseSecretKey: process.env.SUPABASE_SECRET_KEY || '',
-  databaseUrl: process.env.DATABASE_URL || '',
+  databaseUrl: process.env.SUPABASE_URL || '',
   jwtSecret: process.env.JWT_SECRET || '',
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
@@ -15,7 +15,7 @@ export const env = {
 };
 
 /**
- * Extract Supabase URL from DATABASE_URL
+ * Extract Supabase URL from SUPABASE_URL
  * Converts: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
  * To: https://xxxxx.supabase.co
  */

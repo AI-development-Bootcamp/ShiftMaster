@@ -169,7 +169,7 @@ VITE_API_URL=http://localhost:3000/api/v1
 JWT_SECRET=your-secret-key-change-in-production
 
 # Supabase Configuration
-DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+SUPABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
 SUPABASE_ANON_KEY=your-anon-key-here
 SUPABASE_SECRET_KEY=your-service-role-key-here
 
@@ -187,7 +187,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:5174
 
 | Variable | Description | Required | Usage |
 |----------|-------------|----------|-------|
-| `DATABASE_URL` | PostgreSQL connection string from Supabase | ✅ Yes | Database operations, auto-extracts Supabase URL |
+| `SUPABASE_URL` | PostgreSQL connection string from Supabase | ✅ Yes | Database operations, auto-extracts Supabase URL |
 | `SUPABASE_ANON_KEY` | Public API key for client-side operations | ✅ Yes | Frontend & regular backend operations |
 | `SUPABASE_SECRET_KEY` | Service role key for admin operations | ✅ Yes | Migrations, seed data, admin operations (server-only) |
 | `JWT_SECRET` | Secret key for JWT token signing/verification | ✅ Yes | Authentication |
@@ -201,7 +201,7 @@ CORS_ORIGINS=http://localhost:5173,http://localhost:5174
 1. Go to your Supabase project dashboard
 2. Navigate to **Settings → API**
 3. Copy the following values:
-   - **Project URL** → Use in `DATABASE_URL` (format: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
+   - **Project URL** → Use in `SUPABASE_URL` (format: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
    - **anon public** key → `SUPABASE_ANON_KEY`
    - **service_role** key → `SUPABASE_SECRET_KEY` (⚠️ Keep this secret! Server-only)
 

@@ -222,7 +222,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 - `VITE_API_URL` - Backend API URL for frontends
 - `JWT_SECRET` - Secret key for JWT signing
-- `DATABASE_URL` - Supabase PostgreSQL connection string
+- `SUPABASE_URL` - Supabase PostgreSQL connection string
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 
