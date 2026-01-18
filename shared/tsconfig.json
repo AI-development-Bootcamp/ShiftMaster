@@ -8,7 +8,8 @@
     "declarationMap": true,
     "emitDeclarationOnly": false,
     "noEmit": false,
-    "allowImportingTsExtensions": false
+    "allowImportingTsExtensions": false,
+    "moduleResolution": "node"
   },
   "include": [
     "src/**/*"

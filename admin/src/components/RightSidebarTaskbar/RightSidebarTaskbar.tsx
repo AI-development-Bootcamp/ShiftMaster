@@ -4,6 +4,7 @@ import { User } from '@abra-shift-master/shared';
 import abraLogo from '../../assets/abra_logo.svg';
 import abraLogoTextWhite from '../../assets/abra_logo_text_white.svg';
 import '../../styles/RightSidebarTaskbar.css';
+import { LogoutIcon } from '../../constants/icons';
 
 export interface NavItemConfig {
   id: string;
@@ -35,14 +36,7 @@ function NavItem({ item }: { item: NavItemConfig }) {
   );
 }
 
-// Logout Icon
-const LogoutIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-    <polyline points="16 17 21 12 16 7" />
-    <line x1="21" y1="12" x2="9" y2="12" />
-  </svg>
-);
+
 
 export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps) {
   const navigate = useNavigate(); // Now using useNavigate
