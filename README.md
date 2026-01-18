@@ -159,7 +159,9 @@ http://localhost:3000/api-docs
 
 ## 🌍 Environment Variables
 
-Create a `.env` file in the root directory based on `.env.example`:
+### Server
+
+Create a `.env` file in the `server` directory. See `server/ENV_SETUP.md` for details:
 
 ```env
 # Server
@@ -169,7 +171,41 @@ NODE_ENV=development
 # Supabase
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# JWT
+JWT_SECRET=your-secret-key-here-change-this-in-production
+JWT_EXPIRY=24h
 ```
+
+### Client
+
+Create a `.env` file in the `client` directory. See `client/ENV_SETUP.md` for details:
+
+```env
+# API URL for backend server
+VITE_API_URL=http://localhost:3000
+
+# Render deployment hook URL (optional, used for CI/CD)
+VITE_RENDER_DEPLOY_URL_CLIENT=
+```
+
+### Admin
+
+Create a `.env` file in the `admin` directory. See `admin/ENV_SETUP.md` for details:
+
+```env
+# API URL for backend server
+VITE_API_URL=http://localhost:3000
+
+# Render deployment hook URL (optional, used for CI/CD)
+VITE_RENDER_DEPLOY_URL_ADMIN=
+```
+
+**Important Notes:**
+- All frontend environment variables must have the `VITE_` prefix
+- Environment variable keys should be in alphabetical order (for dotenv-linter compliance)
+- All .env files must end with a trailing newline
+- Never commit .env files to version control
 
 ## 📦 Workspaces
 
