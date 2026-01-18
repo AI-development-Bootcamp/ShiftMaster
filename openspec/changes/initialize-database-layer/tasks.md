@@ -36,16 +36,16 @@
 
 ## 5. Repository Pattern Implementation
 
-- [ ] 5.1 Create base repository class (`db/repositories/BaseRepository.ts`)
-- [ ] 5.2 Implement UserRepository (`db/repositories/UserRepository.ts`)
-- [ ] 5.3 Implement ClientRepository (`db/repositories/ClientRepository.ts`)
-- [ ] 5.4 Implement ProjectRepository (`db/repositories/ProjectRepository.ts`)
-- [ ] 5.5 Implement TaskRepository (`db/repositories/TaskRepository.ts`)
-- [ ] 5.6 Implement AdminTaskAssignmentRepository (`db/repositories/AdminTaskAssignmentRepository.ts`)
-- [ ] 5.7 Implement EntryRepository (`db/repositories/EntryRepository.ts`)
-- [ ] 5.8 Implement EntryAssignmentRepository (`db/repositories/EntryAssignmentRepository.ts`)
-- [ ] 5.9 Implement MonthLockRepository (`db/repositories/MonthLockRepository.ts`)
-- [ ] 5.10 Create repository factory/registry (`db/repositories/index.ts`)
+- [x] 5.1 Create base repository class (`db/repositories/BaseRepository.ts`)
+- [x] 5.2 Implement UserRepository (`db/repositories/UserRepository.ts`)
+- [x] 5.3 Implement ClientRepository (`db/repositories/ClientRepository.ts`)
+- [x] 5.4 Implement ProjectRepository (`db/repositories/ProjectRepository.ts`)
+- [x] 5.5 Implement TaskRepository (`db/repositories/TaskRepository.ts`)
+- [x] 5.6 Implement AdminTaskAssignmentRepository (`db/repositories/AdminTaskAssignmentRepository.ts`)
+- [x] 5.7 Implement EntryRepository (`db/repositories/EntryRepository.ts`)
+- [x] 5.8 Implement EntryAssignmentRepository (`db/repositories/EntryAssignmentRepository.ts`)
+- [x] 5.9 Implement MonthLockRepository (`db/repositories/MonthLockRepository.ts`)
+- [x] 5.10 Create repository factory/registry (`db/repositories/index.ts`)
 
 ## 6. Seed Data
 

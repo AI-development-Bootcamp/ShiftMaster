@@ -1,0 +1,33 @@
+import { BaseRepository } from './BaseRepository.js';
+import { IMonthLockRepository } from '../types/repositories.js';
+import { MonthLock, NewMonthLock, UpdateMonthLock } from '../types/entities.js';
+import { logDbError } from '../utils/logger.js';
+
+export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock, UpdateMonthLock> implements IMonthLockRepository {
+    constructor() {
+        super('month_locks', 'lock_id');
+    }
+
+    async findByYearAndMonth(year: number, month: number): Promise<MonthLock | null> {
+        const { data, error } = await this.client
+            .from(this.table)
+            .select('*')
+            .eq('year', year)
+            .eq('month', month)
+            .is('unlocked_at', null) // Only consider currently active locks
+            .single();
+
+        if (error) {
+            if (error.code === 'PGRST116') return null;
+            logDbError('MonthLockRepository.findByYearAndMonth', error);
+            throw error;
+        }
+
+        return data as MonthLock;
+    }
+
+    async isMonthLocked(year: number, month: number): Promise<boolean> {
+        const lock = await this.findByYearAndMonth(year, month);
+        return !!lock;
+    }
+}
