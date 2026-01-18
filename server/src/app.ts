@@ -59,16 +59,17 @@ export const swaggerInitPromise = Promise.all([
     console.log('📚 Swagger UI initialized at /api-docs');
   })
   .catch((err) => {
-    // Only log error if swagger packages are missing (shouldn't happen in production)
+    // Handle missing swagger packages gracefully (expected in some scenarios)
     if (err.code === 'ERR_MODULE_NOT_FOUND') {
       console.warn(
         '⚠️  Swagger UI packages not found. API docs will not be available.'
       );
-    } else {
-      console.error('Failed to initialize Swagger UI:', err);
+      // Resolve promise so server can start without Swagger
+      return;
     }
-    // Resolve promise even on error so server can start
-    // Swagger will just be unavailable
+    // Re-throw unexpected errors so server startup fails
+    console.error('Failed to initialize Swagger UI:', err);
+    throw err;
   });
 
 // API Routes - All routes are automatically prefixed with /api/v1
