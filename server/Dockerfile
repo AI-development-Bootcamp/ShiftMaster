@@ -27,11 +27,8 @@ WORKDIR /app/shared
 RUN npm run build
 
 # Build server workspace
-# Create build-specific tsconfig that overrides conflicting options from base config
 WORKDIR /app/server
-RUN echo '{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false,"outDir":"dist","rootDir":"src","moduleResolution":"node","allowImportingTsExtensions":false}}' > tsconfig.build.json && \
-    (npx tsc --project tsconfig.build.json || (echo "TypeScript compilation failed!" && cat tsconfig.build.json && rm tsconfig.build.json && exit 1)) && \
-    rm tsconfig.build.json
+RUN npm run build || (echo "TypeScript compilation failed!" && exit 1)
 
 # Verify build output with better error messages
 RUN if [ ! -d dist ]; then \
