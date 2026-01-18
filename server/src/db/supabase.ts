@@ -1,6 +1,13 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../config/env.js';
 
+/**
+ * Supabase client instance
+ *
+ * Environment variables are validated at server startup via validateEnv().
+ * In test environment, uses stub values automatically.
+ */
+export const supabase = createClient(env.supabaseUrl, env.supabaseAnonKey);
 // For testing environments, allow partial configuration to avoid import-time crashes
 // The tests will mock the usage of these clients anyway.
 const isTest = process.env.NODE_ENV === 'test';
