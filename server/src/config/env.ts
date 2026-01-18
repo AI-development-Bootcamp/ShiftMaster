@@ -4,13 +4,43 @@
 
 const isTest = process.env.NODE_ENV === 'test';
 
+/**
+ * Extract Supabase API URL from SUPABASE_URL
+ * Handles both formats:
+ * - If already https:// URL, returns as-is
+ * - If postgresql:// connection string, extracts the API URL
+ *   Converts: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
+ *   To: https://xxxxx.supabase.co
+ */
+function extractSupabaseUrl(urlOrConnectionString: string): string {
+  // If it's already an https URL, return as-is
+  if (urlOrConnectionString.startsWith('https://')) {
+    return urlOrConnectionString;
+  }
+  // Extract from postgresql connection string
+  const match = urlOrConnectionString.match(/db\.([^.]+)\.supabase\.co/);
+  return match ? `https://${match[1]}.supabase.co` : '';
+}
+
+/**
+ * Get the Supabase API URL from environment
+ */
+function getSupabaseUrl(): string {
+  const rawUrl = process.env.SUPABASE_URL;
+  if (!rawUrl) {
+    return isTest ? 'https://test.supabase.co' : '';
+  }
+  return extractSupabaseUrl(rawUrl);
+}
+
 export const env = {
   port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
-  supabaseUrl:
-    process.env.SUPABASE_URL || (isTest ? 'https://test.supabase.co' : ''),
+  supabaseUrl: getSupabaseUrl(),
   supabaseAnonKey:
     process.env.SUPABASE_ANON_KEY || (isTest ? 'test-anon-key' : ''),
+  supabaseSecretKey:
+    process.env.SUPABASE_SECRET_KEY || (isTest ? 'test-secret-key' : ''),
   jwtSecret:
     process.env.JWT_SECRET ||
     (isTest ? 'test-jwt-secret-do-not-use-in-production' : ''),
@@ -54,14 +84,12 @@ export function validateEnv(): void {
       'JWT_SECRET must be at least 32 characters long for production use'
     );
   }
+
+  // Validate that SUPABASE_URL was successfully parsed
+  if (!env.supabaseUrl) {
+    throw new Error(
+      'Could not parse SUPABASE_URL. Please provide a valid Supabase URL or PostgreSQL connection string.'
+    );
+  }
 }
 
-/**
- * Extract Supabase URL from SUPABASE_URL
- * Converts: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
- * To: https://xxxxx.supabase.co
- */
-function extractSupabaseUrl(databaseUrl: string): string {
-  const match = databaseUrl.match(/db\.([^.]+)\.supabase\.co/);
-  return match ? `https://${match[1]}.supabase.co` : '';
-}
