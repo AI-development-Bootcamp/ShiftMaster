@@ -1,5 +1,9 @@
-# Claude Code configuration
-.claude/
+# Claude Code configuration - ignore by default
+.claude/*
+
+# But track the shared agent documentation
+!.claude/agents/
+!.claude/agents/**
 
 # MCP configuration
 .mcp.json
@@ -8,13 +12,22 @@
 node_modules/
 .pnp
 .pnp.js
+# package-lock.json should be committed for reproducible builds and CI caching
 
 # Testing
 coverage/
 
+
 # Production
 build/
 dist/
+*.tsbuildinfo
+
+# Monorepo specific
+client/dist/
+admin/dist/
+server/dist/
+shared/dist/
 
 # Environment variables
 .env
