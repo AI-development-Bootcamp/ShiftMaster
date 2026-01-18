@@ -28,51 +28,8 @@ RUN npm run build
 
 # Build server workspace
 WORKDIR /app/server
-RUN echo "=== Building server workspace ===" && \
-    echo "Current directory: $(pwd)" && \
-    echo "Source files found:" && \
-    find src -name "*.ts" | head -10 && \
-    echo "Running TypeScript compilation..." && \
-    npx tsc --project tsconfig.json --listEmittedFiles 2>&1 && \
-    echo "=== TypeScript compilation finished ===" && \
-    echo "Checking for dist directory..." && \
-    if [ -d dist ]; then \
-      echo "dist directory exists" && \
-      echo "Files in dist:" && \
-      find dist -type f | head -20; \
-    else \
-      echo "ERROR: dist directory does not exist!" && \
-      echo "Current directory contents:" && \
-      ls -la && \
-      echo "Checking if files were emitted elsewhere..." && \
-      find . -name "*.js" -not -path "./node_modules/*" | head -10 && \
-      exit 1; \
-    fi && \
-    if [ ! "$(ls -A dist 2>/dev/null)" ]; then \
-      echo "ERROR: dist directory is empty!" && \
-      echo "TypeScript config:" && \
-      cat tsconfig.json && \
-      exit 1; \
-    fi
-
-# Verify build output with better error messages
-RUN if [ ! -d dist ]; then \
-      echo "ERROR: dist directory does not exist!" && \
-      echo "Current directory: $(pwd)" && \
-      echo "Contents of server directory:" && \
-      ls -la && \
-      exit 1; \
-    fi && \
-    if [ ! "$(ls -A dist)" ]; then \
-      echo "ERROR: dist directory is empty!" && \
-      echo "Contents of dist directory:" && \
-      ls -la dist || true && \
-      echo "Source files:" && \
-      find src -type f -name "*.ts" | head -10 || true && \
-      exit 1; \
-    fi && \
-    echo "Build verification successful. Files in dist:" && \
-    ls -la dist
+RUN npm run build && \
+    test -d dist && test "$(ls -A dist)" || (echo "ERROR: Build failed - dist directory is empty or missing!" && exit 1)
 
 # Stage 2: Production stage
 FROM node:20-alpine AS production
