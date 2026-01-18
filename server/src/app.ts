@@ -45,18 +45,25 @@ if (process.env.NODE_ENV !== 'test') {
 const swaggerRouter = express.Router();
 app.use('/api-docs', swaggerRouter);
 
-if (process.env.NODE_ENV !== 'production') {
-  Promise.all([import('swagger-ui-express'), import('./utils/swagger.js')])
-    .then(([swaggerUi, swaggerUtils]) => {
-      swaggerRouter.use(
-        swaggerUi.default.serve,
-        swaggerUi.default.setup(swaggerUtils.swaggerSpec)
+// Initialize Swagger UI (available in all environments)
+Promise.all([import('swagger-ui-express'), import('./utils/swagger.js')])
+  .then(([swaggerUi, swaggerUtils]) => {
+    swaggerRouter.use(
+      swaggerUi.default.serve,
+      swaggerUi.default.setup(swaggerUtils.swaggerSpec)
+    );
+    console.log('📚 Swagger UI initialized at /api-docs');
+  })
+  .catch((err) => {
+    // Only log error if swagger packages are missing (shouldn't happen in production)
+    if (err.code === 'ERR_MODULE_NOT_FOUND') {
+      console.warn(
+        '⚠️  Swagger UI packages not found. API docs will not be available.'
       );
-    })
-    .catch((err) => {
+    } else {
       console.error('Failed to initialize Swagger UI:', err);
-    });
-}
+    }
+  });
 
 // API Routes - All routes are automatically prefixed with /api/v1
 app.use('/api/v1', apiRouter);
