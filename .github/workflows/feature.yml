@@ -41,17 +41,16 @@ jobs:
         run: npm run build -w server
 
       - name: Deploy Server to Render
-        if: github.ref == 'refs/heads/dev'
         run: |
           echo "🚀 Deploying server to Render..."
-          if [ -n "$RENDER_DEPLOY_URL" ]; then
-            curl -X POST "$RENDER_DEPLOY_URL" \
+          if [ -n "$RENDER_DEPLOY_URL_SERVER" ]; then
+            curl -X POST "$RENDER_DEPLOY_URL_SERVER" \
               -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
           else
             echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
         env:
-          RENDER_DEPLOY_URL: ${{ secrets.RENDER_DEPLOY_URL }}
+          RENDER_DEPLOY_URL_SERVER: ${{ secrets.RENDER_DEPLOY_URL_SERVER }}
 
   client:
     name: Client - Test, Lint & Deploy
@@ -88,20 +87,14 @@ jobs:
       - name: Deploy Client to Render
         run: |
           echo "🚀 Deploying client to Render..."
-          # Render Static Sites auto-deploy via GitHub integration
-          # This step ensures deployment happens after CI passes
-          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_CLIENT_SERVICE_ID" ]; then
-            curl -X POST "https://api.render.com/v1/services/$RENDER_CLIENT_SERVICE_ID/deploys" \
-              -H "Authorization: Bearer $RENDER_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{"clearCache": "do_not_clear"}' \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed (service may auto-deploy via GitHub integration)"
+          if [ -n "$RENDER_DEPLOY_URL_CLIENT" ]; then
+            curl -X POST "$RENDER_DEPLOY_URL_CLIENT" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
           else
-            echo "⚠️  Render secrets not configured - relying on GitHub integration for auto-deploy"
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
         env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_CLIENT_SERVICE_ID: ${{ secrets.RENDER_CLIENT_SERVICE_ID }}
+          RENDER_DEPLOY_URL_CLIENT: ${{ secrets.RENDER_DEPLOY_URL_CLIENT }}
 
   admin:
     name: Admin - Test, Lint & Deploy
