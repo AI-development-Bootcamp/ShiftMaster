@@ -1,4 +1,4 @@
-name: feature CI/CD
+name: Feature CI/CD
 
 on:
   push:

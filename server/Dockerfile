@@ -25,19 +25,32 @@ RUN npm ci
 # Build shared workspace first (server depends on it)
 WORKDIR /app/shared
 RUN npm run build
-RUN mkdir -p dist
 
 # Build server workspace
 # Create build-specific tsconfig that overrides conflicting options from base config
 WORKDIR /app/server
 RUN echo '{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false,"outDir":"dist","rootDir":"src","moduleResolution":"node","allowImportingTsExtensions":false}}' > tsconfig.build.json && \
-    npx tsc --project tsconfig.build.json && \
+    (npx tsc --project tsconfig.build.json || (echo "TypeScript compilation failed!" && cat tsconfig.build.json && rm tsconfig.build.json && exit 1)) && \
     rm tsconfig.build.json
 
-
-
-# Verify build output
-RUN test -d dist && test "$(ls -A dist)" || (echo "ERROR: dist directory is empty!" && exit 1)
+# Verify build output with better error messages
+RUN if [ ! -d dist ]; then \
+      echo "ERROR: dist directory does not exist!" && \
+      echo "Current directory: $(pwd)" && \
+      echo "Contents of server directory:" && \
+      ls -la && \
+      exit 1; \
+    fi && \
+    if [ ! "$(ls -A dist)" ]; then \
+      echo "ERROR: dist directory is empty!" && \
+      echo "Contents of dist directory:" && \
+      ls -la dist || true && \
+      echo "Source files:" && \
+      find src -type f -name "*.ts" | head -10 || true && \
+      exit 1; \
+    fi && \
+    echo "Build verification successful. Files in dist:" && \
+    ls -la dist
 
 # Stage 2: Production stage
 FROM node:20-alpine AS production
