@@ -18,7 +18,7 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@shared': path.resolve(__dirname, '../shared/src'),
+      '@abra-shift-master/shared': path.resolve(__dirname, '../shared/src/index.ts'),
     },
   },
 });
- 

@@ -31,6 +31,25 @@ export function parseDate(dateStr: string): Date {
 }
 
 /**
+ * Parse YYYY-MM-DD string to local Date object (midnight)
+ * Avoids UTC conversion issues with new Date('YYYY-MM-DD')
+ */
+export function parseLocalDate(dateStr: string): Date | null {
+  if (!dateStr) return null;
+  const parts = dateStr.split('-');
+  if (parts.length !== 3) return null;
+
+  const year = parseInt(parts[0], 10);
+  const month = parseInt(parts[1], 10);
+  const day = parseInt(parts[2], 10);
+
+  if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+    return new Date(year, month - 1, day);
+  }
+  return null;
+}
+
+/**
  * Check if date is weekend (Saturday or Sunday)
  */
 export function isWeekend(date: Date | string): boolean {
