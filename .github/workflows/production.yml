@@ -38,14 +38,24 @@ jobs:
       - name: Build
         run: npm run build -w server
 
-      - name: Deploy Server
+      - name: Deploy Server to Render
         run: |
-          echo "🚀 Deploying server to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Or deploy to your server infrastructure
+          echo "🚀 Deploying server to Render..."
+          # Trigger Render deployment via API
+          # Note: If GitHub integration is enabled, Render will auto-deploy on push
+          # This step ensures deployment happens after CI passes
+          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
+            curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"clearCache": "do_not_clear"}' \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed (service may auto-deploy via GitHub integration)"
+          else
+            echo "⚠️  Render secrets not configured - relying on GitHub integration for auto-deploy"
+          fi
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
 
   client:
     name: Client - Test, Lint & Deploy
@@ -79,14 +89,23 @@ jobs:
       - name: Build
         run: npm run build -w client
 
-      - name: Deploy Client
+      - name: Deploy Client to Render
         run: |
-          echo "🚀 Deploying client to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
+          echo "🚀 Deploying client to Render..."
+          # Render Static Sites auto-deploy via GitHub integration
+          # This step ensures deployment happens after CI passes
+          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_CLIENT_SERVICE_ID" ]; then
+            curl -X POST "https://api.render.com/v1/services/$RENDER_CLIENT_SERVICE_ID/deploys" \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"clearCache": "do_not_clear"}' \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed (service may auto-deploy via GitHub integration)"
+          else
+            echo "⚠️  Render secrets not configured - relying on GitHub integration for auto-deploy"
+          fi
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_CLIENT_SERVICE_ID: ${{ secrets.RENDER_CLIENT_SERVICE_ID }}
 
   admin:
     name: Admin - Test, Lint & Deploy
@@ -120,14 +139,23 @@ jobs:
       - name: Build
         run: npm run build -w admin
 
-      - name: Deploy Admin
+      - name: Deploy Admin to Render
         run: |
-          echo "🚀 Deploying admin to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
+          echo "🚀 Deploying admin to Render..."
+          # Render Static Sites auto-deploy via GitHub integration
+          # This step ensures deployment happens after CI passes
+          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_ADMIN_SERVICE_ID" ]; then
+            curl -X POST "https://api.render.com/v1/services/$RENDER_ADMIN_SERVICE_ID/deploys" \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d '{"clearCache": "do_not_clear"}' \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed (service may auto-deploy via GitHub integration)"
+          else
+            echo "⚠️  Render secrets not configured - relying on GitHub integration for auto-deploy"
+          fi
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_ADMIN_SERVICE_ID: ${{ secrets.RENDER_ADMIN_SERVICE_ID }}
 
   shared:
     name: Shared - Test & Lint

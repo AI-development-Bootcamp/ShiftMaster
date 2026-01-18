@@ -47,12 +47,12 @@
 
 ## 5. CI/CD Integration
 
-- [ ] 5.1 Install Render CLI in GitHub Actions workflow
-- [ ] 5.2 Add RENDER_API_KEY as GitHub secret
-- [ ] 5.3 Update server deployment step to use Render CLI
-- [ ] 5.4 Update client deployment step (if Render CLI supports static sites, otherwise use manual trigger)
-- [ ] 5.5 Update admin deployment step (if Render CLI supports static sites, otherwise use manual trigger)
-- [ ] 5.6 Test automated deployment on push to production branch
+- [x] 5.1 Install Render CLI in GitHub Actions workflow (using Render API instead)
+- [ ] 5.2 Add RENDER_API_KEY as GitHub secret (manual step - see .github/RENDER_SETUP.md)
+- [x] 5.3 Update server deployment step to use Render API
+- [x] 5.4 Update client deployment step (using Render API for static sites)
+- [x] 5.5 Update admin deployment step (using Render API for static sites)
+- [ ] 5.6 Test automated deployment on push to production branch (requires secrets setup)
 - [ ] 5.7 Verify deployment logs and success status
 
 ## 6. Documentation Updates
