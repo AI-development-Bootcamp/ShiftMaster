@@ -59,12 +59,12 @@
 
 ## 7. Testing
 
-- [ ] 7.1 Write tests for UserRepository
-- [ ] 7.2 Write tests for ClientRepository
-- [ ] 7.3 Write tests for ProjectRepository
-- [ ] 7.4 Write tests for database health check
-- [ ] 7.5 Write tests for query logger
-- [ ] 7.6 Ensure all repository tests pass
+- [x] 7.1 Write tests for UserRepository
+- [x] 7.2 Write tests for ClientRepository
+- [x] 7.3 Write tests for ProjectRepository
+- [x] 7.4 Write tests for database health check
+- [x] 7.5 Write tests for query logger
+- [x] 7.6 Ensure all repository tests pass
 
 ## 8. Documentation
 

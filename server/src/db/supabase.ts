@@ -1,25 +1,34 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { env } from '../config/env.js';
 
-if (!env.supabaseUrl || !env.supabaseAnonKey) {
+// For testing environments, allow partial configuration to avoid import-time crashes
+// The tests will mock the usage of these clients anyway.
+const isTest = process.env.NODE_ENV === 'test';
+
+if ((!env.supabaseUrl || !env.supabaseAnonKey) && !isTest) {
   throw new Error(
     'Missing Supabase environment variables: SUPABASE_URL and SUPABASE_ANON_KEY are required'
   );
 }
 
-if (!env.supabaseSecretKey) {
+if (!env.supabaseSecretKey && !isTest) {
   throw new Error(
     'Missing Supabase service role key: SUPABASE_SECRET_KEY is required for admin operations'
   );
 }
+
+// Fallbacks for test environment to ensure createClient doesn't crash
+const url = env.supabaseUrl || 'https://mock.supabase.co';
+const key = env.supabaseAnonKey || 'mock-key';
+const secret = env.supabaseSecretKey || 'mock-secret';
 
 /**
  * Regular Supabase client for standard operations
  * Uses anon key with RLS policies enforced
  */
 export const supabase: SupabaseClient = createClient(
-  env.supabaseUrl,
-  env.supabaseAnonKey
+  url,
+  key
 );
 
 /**
@@ -28,6 +37,6 @@ export const supabase: SupabaseClient = createClient(
  * WARNING: Only use this for trusted backend operations
  */
 export const supabaseAdmin: SupabaseClient = createClient(
-  env.supabaseUrl,
-  env.supabaseSecretKey
+  url,
+  secret
 );

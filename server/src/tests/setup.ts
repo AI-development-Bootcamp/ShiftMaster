@@ -1,19 +1,10 @@
-import { beforeAll, afterAll, afterEach } from 'vitest';
+import { vi } from 'vitest';
 
-// Global test setup
-beforeAll(async () => {
-  // Setup code that runs once before all tests
-  // e.g., initialize test database, mock services, etc.
-});
+// Mock environment variables
+process.env.SUPABASE_URL = 'https://mock.supabase.co';
+process.env.SUPABASE_ANON_KEY = 'mock-key';
+process.env.SUPABASE_SECRET_KEY = 'mock-secret';
 
-// Cleanup after each test
-afterEach(async () => {
-  // Cleanup code that runs after each test
-  // e.g., clear database, reset mocks, etc.
-});
-
-// Global test teardown
-afterAll(async () => {
-  // Teardown code that runs once after all tests
-  // e.g., close database connections, cleanup resources, etc.
-});
+// Mock Supabase client globally if needed, but per-test mocking is often safer.
+// However, since `supabase.ts` instantiates the client immediately at top-level,
+// we need valid env vars BEFORE imports happen.
