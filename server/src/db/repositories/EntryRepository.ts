@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IEntryRepository } from '../types/repositories.js';
 import { Entry, NewEntry, UpdateEntry } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry> implements IEntryRepository {
-    constructor() {
-        super('entries', 'entry_id');
+    constructor(client?: SupabaseClient) {
+        super('entries', 'entry_id', client);
     }
 
     async findByUserIdAndDate(userId: number, date: string): Promise<Entry | null> {

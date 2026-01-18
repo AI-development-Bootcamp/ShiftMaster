@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IMonthLockRepository } from '../types/repositories.js';
 import { MonthLock, NewMonthLock, UpdateMonthLock } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock, UpdateMonthLock> implements IMonthLockRepository {
-    constructor() {
-        super('month_locks', 'lock_id');
+    constructor(client?: SupabaseClient) {
+        super('month_locks', 'lock_id', client);
     }
 
     async findByYearAndMonth(year: number, month: number): Promise<MonthLock | null> {

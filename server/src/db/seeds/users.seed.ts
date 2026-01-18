@@ -1,9 +1,11 @@
 import { NewUser } from '../types/entities.js';
 
-export const users: NewUser[] = [
+// Note: password_hash is set dynamically in the seed script
+type SeedUser = Omit<NewUser, 'password_hash'>;
+
+export const users: SeedUser[] = [
     {
         email: 'admin@abrashiftmaster.com',
-        password_hash: '$2b$10$YourHashedPasswordHere', // We will use a proper hash in the seed script
         full_name: 'Admin User',
         role: 'admin',
         job_title: 'System Administrator',
@@ -11,7 +13,6 @@ export const users: NewUser[] = [
     },
     {
         email: 'john.doe@abrashiftmaster.com',
-        password_hash: '$2b$10$YourHashedPasswordHere',
         full_name: 'John Doe',
         role: 'regular',
         job_title: 'Senior Developer',
@@ -19,7 +20,6 @@ export const users: NewUser[] = [
     },
     {
         email: 'jane.smith@abrashiftmaster.com',
-        password_hash: '$2b$10$YourHashedPasswordHere',
         full_name: 'Jane Smith',
         role: 'regular',
         job_title: 'Product Manager',

@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IAdminTaskAssignmentRepository } from '../types/repositories.js';
 import { AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment> implements IAdminTaskAssignmentRepository {
-    constructor() {
-        super('admin_task_assignments', 'admin_task_assignment_id');
+    constructor(client?: SupabaseClient) {
+        super('admin_task_assignments', 'admin_task_assignment_id', client);
     }
 
     async findByUserId(userId: number): Promise<AdminTaskAssignment[]> {

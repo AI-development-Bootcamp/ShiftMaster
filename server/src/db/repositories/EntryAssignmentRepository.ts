@@ -1,11 +1,12 @@
+import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IEntryAssignmentRepository } from '../types/repositories.js';
 import { EntryAssignment, NewEntryAssignment, UpdateEntryAssignment } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class EntryAssignmentRepository extends BaseRepository<EntryAssignment, NewEntryAssignment, UpdateEntryAssignment> implements IEntryAssignmentRepository {
-    constructor() {
-        super('entry_assignments', 'entry_assignment_id');
+    constructor(client?: SupabaseClient) {
+        super('entry_assignments', 'entry_assignment_id', client);
     }
 
     async findByEntryId(entryId: number): Promise<EntryAssignment[]> {
