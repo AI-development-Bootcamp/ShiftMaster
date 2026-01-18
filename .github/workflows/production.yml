@@ -3,8 +3,10 @@ name: Production CI/CD
 on:
   push:
     branches:
-      - production
-
+      - 'feature/**'
+  pull_request:
+    branches:
+      - 'feature/**'
 jobs:
   server:
     name: Server - Test, Lint & Deploy
@@ -39,23 +41,9 @@ jobs:
         run: npm run build -w server
 
       - name: Deploy Server to Render
+        if: github.ref == 'refs/heads/dev'
         run: |
-          echo "🚀 Deploying server to Render..."
-          # Trigger Render deployment via API
-          # Note: If GitHub integration is enabled, Render will auto-deploy on push
-          # This step ensures deployment happens after CI passes
-          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
-            curl -X POST "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys" \
-              -H "Authorization: Bearer $RENDER_API_KEY" \
-              -H "Content-Type: application/json" \
-              -d '{"clearCache": "do_not_clear"}' \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed (service may auto-deploy via GitHub integration)"
-          else
-            echo "⚠️  Render secrets not configured - relying on GitHub integration for auto-deploy"
-          fi
-        env:
-          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
-          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          curl -X POST "https://api.render.com/deploy/srv-d5mgvcngi27c739j62b0?key=r2fBxqE-yQo"
 
   client:
     name: Client - Test, Lint & Deploy
