@@ -1,6 +1,8 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "noEmit": false,
+    "noEmitOnError": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "ESNext",
@@ -9,7 +11,9 @@
     "lib": ["ES2020"],
     "types": ["node"],
     "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": false,
+    "skipLibCheck": true
   },
   "include": ["src/**/*"],
   "exclude": [
