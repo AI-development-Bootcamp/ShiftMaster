@@ -1,0 +1,20 @@
+.tag-component {
+    display: inline-flex;
+    align-items: center;
+    height: var(--tag-height);
+    padding-inline: var(--tag-padding-x);
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-family: var(--font-family);
+    font-size: var(--chip-font-size);
+    line-height: var(--chip-line-height);
+    font-weight: var(--chip-font-weight);
+    border-radius: var(--chip-radius);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: rtl;
+    text-align: right;
+    /* Reset default styles if needed */
+    box-sizing: border-box;
+}

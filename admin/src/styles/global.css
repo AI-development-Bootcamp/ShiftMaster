@@ -12,6 +12,43 @@
   --color-warning: #f59e0b;
   --color-error: #ef4444;
 
+  /* ===== Tag & MultiTags Colors ===== */
+  --tag-bg: #E8E8E8;
+  --tag-text: #202020;
+  --multitag-bg: #F0F0F8;
+  --multitag-text: #284868;
+  --tooltip-bg: #383838;
+  --tooltip-text: #F8F8F8;
+
+  /* ===== Tag & MultiTags Typography ===== */
+  --chip-font-size: 13px;
+  --chip-line-height: 16px;
+  --chip-font-weight: 500;
+  --tooltip-font-size: 13px;
+  --tooltip-line-height: 18px;
+  --tooltip-font-weight: 400;
+
+  /* ===== Tag & MultiTags Radii ===== */
+  --chip-radius: 9999px;
+  --tooltip-radius: 8px;
+
+  /* ===== Tag & MultiTags Sizing & Spacing ===== */
+  --tag-height: 32px;
+  --tag-padding-x: 12px;
+  --tag-padding-y: 0px;
+  --tag-gap: 8px;
+
+  --multitag-height: 28px;
+  --multitag-min-width: 34px;
+  --multitag-padding-x: 10px;
+  --multitag-padding-y: 0px;
+
+  --tooltip-padding-x: 12px;
+  --tooltip-padding-y: 10px;
+  --tooltip-max-width: 400px;
+  --tooltip-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --caret-size: 8px;
+
   /* ===== Text Colors ===== */
   --color-text-primary: #141e3e;
   --color-text-secondary: #6b7280;

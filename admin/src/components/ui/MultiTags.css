@@ -1,0 +1,72 @@
+.multitags-container {
+    display: inline-block;
+    position: relative;
+}
+
+.multitag-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: var(--multitag-height);
+    min-width: var(--multitag-min-width);
+    padding-inline: var(--multitag-padding-x);
+    background: var(--multitag-bg);
+    color: var(--multitag-text);
+    font-family: var(--font-family);
+    font-size: var(--chip-font-size);
+    line-height: var(--chip-line-height);
+    font-weight: var(--chip-font-weight);
+    border-radius: var(--chip-radius);
+    cursor: default;
+    transition: all 0.2s ease;
+
+    /* Reset */
+    box-sizing: border-box;
+}
+
+.multitag-chip.disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.multitag-tooltip {
+    position: absolute;
+    bottom: 100%;
+    /* Above the chip */
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    /* Center horizontally and add gap */
+
+    background: var(--tooltip-bg);
+    color: var(--tooltip-text);
+    padding: var(--tooltip-padding-y) var(--tooltip-padding-x);
+    border-radius: var(--tooltip-radius);
+    box-shadow: var(--tooltip-shadow);
+
+    font-family: var(--font-family);
+    font-size: var(--tooltip-font-size);
+    line-height: var(--tooltip-line-height);
+    font-weight: var(--tooltip-font-weight);
+
+    width: max-content;
+    max-width: var(--tooltip-max-width);
+    white-space: normal;
+    word-break: break-word;
+    text-align: center;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.tooltip-caret {
+    position: absolute;
+    top: 100%;
+    /* Bottom of tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 0;
+    height: 0;
+    border-left: var(--caret-size) solid transparent;
+    border-right: var(--caret-size) solid transparent;
+    border-top: var(--caret-size) solid var(--tooltip-bg);
+}

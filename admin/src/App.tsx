@@ -8,7 +8,6 @@ import { LoginPage } from './pages/LoginPage';
 import { AssignmentPage } from './pages/AssignmentPage';
 import { EntriesManagementPage } from './pages/EntriesManagementPage';
 import { EmployeesManagmentPage } from './pages/EmployeesManagmentPage';
-
 import { mockCurrentUser } from './mocks/users';
 
 function AppContent() {
