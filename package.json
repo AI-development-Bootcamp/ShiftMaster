@@ -46,6 +46,7 @@
     "clean": "npm run clean --workspaces --if-present && rm -rf node_modules",
     "install:all": "npm install",
     "db:migrate": "npm run db:migrate -w server",
+    "seed:dev": "npm run seed:dev -w server",
     "start": "npm run start -w server",
     "start:server": "npm run start -w server",
     "preview:client": "npm run preview -w client",

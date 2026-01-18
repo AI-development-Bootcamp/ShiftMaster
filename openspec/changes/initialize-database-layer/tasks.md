@@ -49,13 +49,13 @@
 
 ## 6. Seed Data
 
-- [ ] 6.1 Create seed data schema and types (`db/seeds/types.ts`)
-- [ ] 6.2 Create admin user seed data (`db/seeds/users.seed.ts`)
-- [ ] 6.3 Create sample clients seed data (`db/seeds/clients.seed.ts`)
-- [ ] 6.4 Create sample projects seed data (`db/seeds/projects.seed.ts`)
-- [ ] 6.5 Create sample tasks seed data (`db/seeds/tasks.seed.ts`)
-- [ ] 6.6 Create seed execution script (`db/seeds/index.ts`)
-- [ ] 6.7 Add npm script to run seeds: `npm run seed:dev`
+- [x] 6.1 Create seed data schema and types (`db/seeds/types.ts`)
+- [x] 6.2 Create admin user seed data (`db/seeds/users.seed.ts`)
+- [x] 6.3 Create sample clients seed data (`db/seeds/clients.seed.ts`)
+- [x] 6.4 Create sample projects seed data (`db/seeds/projects.seed.ts`)
+- [x] 6.5 Create sample tasks seed data (`db/seeds/tasks.seed.ts`)
+- [x] 6.6 Create seed execution script (`db/seeds/index.ts`)
+- [x] 6.7 Add npm script to run seeds: `npm run seed:dev`
 
 ## 7. Testing
 
