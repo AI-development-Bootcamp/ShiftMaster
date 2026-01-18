@@ -28,7 +28,32 @@ RUN npm run build
 
 # Build server workspace
 WORKDIR /app/server
-RUN npm run build || (echo "TypeScript compilation failed!" && exit 1)
+RUN echo "=== Building server workspace ===" && \
+    echo "Current directory: $(pwd)" && \
+    echo "Source files found:" && \
+    find src -name "*.ts" | head -10 && \
+    echo "Running TypeScript compilation..." && \
+    npx tsc --project tsconfig.json --listEmittedFiles 2>&1 && \
+    echo "=== TypeScript compilation finished ===" && \
+    echo "Checking for dist directory..." && \
+    if [ -d dist ]; then \
+      echo "dist directory exists" && \
+      echo "Files in dist:" && \
+      find dist -type f | head -20; \
+    else \
+      echo "ERROR: dist directory does not exist!" && \
+      echo "Current directory contents:" && \
+      ls -la && \
+      echo "Checking if files were emitted elsewhere..." && \
+      find . -name "*.js" -not -path "./node_modules/*" | head -10 && \
+      exit 1; \
+    fi && \
+    if [ ! "$(ls -A dist 2>/dev/null)" ]; then \
+      echo "ERROR: dist directory is empty!" && \
+      echo "TypeScript config:" && \
+      cat tsconfig.json && \
+      exit 1; \
+    fi
 
 # Verify build output with better error messages
 RUN if [ ! -d dist ]; then \
