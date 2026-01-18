@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DailyEntryCard, { DailyEntry } from '../../components/DailyEntryCard/DailyEntryCard';
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
+import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import './HomePage.css';
 
 // Mock data for testing
@@ -137,6 +138,7 @@ function HomePage() {
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -275,7 +277,7 @@ function HomePage() {
       {/* Bottom navigation - RTL: DOM order is reversed visually */}
       <nav className="bottom-nav">
         <div className="bottom-nav-content">
-          <button className="nav-btn add-btn">
+          <button className="nav-btn add-btn" onClick={() => setIsManualReportModalOpen(true)}>
             <span className="nav-label">דיווח ידני</span>
             <span className="nav-icon-wrapper">
               <span className="icon-outer-ring"></span>
@@ -318,6 +320,12 @@ function HomePage() {
           </button>
         </div>
       </nav>
+
+      {/* Manual Report Modal */}
+      <ManualReportModal
+        isOpen={isManualReportModalOpen}
+        onClose={() => setIsManualReportModalOpen(false)}
+      />
     </div>
   );
 }
