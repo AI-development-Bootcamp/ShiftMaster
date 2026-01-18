@@ -5,20 +5,20 @@
 - [x] 1.1 Development Supabase project created (pre-existing)
 - [x] 1.2 Production Supabase project created (pre-existing)
 - [x] 1.3 Update `.env` and `.env.example` with dev/prod database URLs and keys
-- [ ] 1.4 Document environment variable configuration in README
+- [x] 1.4 Document environment variable configuration in README
 
 ## 2. Database Schema Migrations
 
-- [ ] 2.1 Create migration file for enums (user_role, project_time_format_type, entry_kind, absence_type, work_location)
-- [ ] 2.2 Create migration file for users table
-- [ ] 2.3 Create migration file for clients table
-- [ ] 2.4 Create migration file for projects table
-- [ ] 2.5 Create migration file for tasks table
-- [ ] 2.6 Create migration file for admin_task_assignments table
-- [ ] 2.7 Create migration file for entries table
-- [ ] 2.8 Create migration file for entry_assignments table
-- [ ] 2.9 Create migration file for month_locks table
-- [ ] 2.10 Apply all migrations to development database via Supabase MCP
+- [x] 2.1 Create migration file for enums (user_role, project_time_format_type, entry_kind, absence_type, work_location)
+- [x] 2.2 Create migration file for users table
+- [x] 2.3 Create migration file for clients table
+- [x] 2.4 Create migration file for projects table
+- [x] 2.5 Create migration file for tasks table
+- [x] 2.6 Create migration file for admin_task_assignments table
+- [x] 2.7 Create migration file for entries table
+- [x] 2.8 Create migration file for entry_assignments table
+- [x] 2.9 Create migration file for month_locks table
+- [x] 2.10 Apply all migrations to development database via Supabase MCP
 
 ## 3. Database Utilities
 

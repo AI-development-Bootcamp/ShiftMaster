@@ -162,14 +162,55 @@ http://localhost:3000/api-docs
 Create a `.env` file in the root directory based on `.env.example`:
 
 ```env
-# Server
+# Backend API URL (for frontend apps)
+VITE_API_URL=http://localhost:3000/api/v1
+
+# JWT Authentication
+JWT_SECRET=your-secret-key-change-in-production
+
+# Supabase Configuration
+DATABASE_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SECRET_KEY=your-service-role-key-here
+
+# Server Port
 PORT=3000
+
+# Node Environment
 NODE_ENV=development
 
-# Supabase
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
+# CORS Configuration
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174
 ```
+
+### Required Environment Variables
+
+| Variable | Description | Required | Usage |
+|----------|-------------|----------|-------|
+| `DATABASE_URL` | PostgreSQL connection string from Supabase | ✅ Yes | Database operations, auto-extracts Supabase URL |
+| `SUPABASE_ANON_KEY` | Public API key for client-side operations | ✅ Yes | Frontend & regular backend operations |
+| `SUPABASE_SECRET_KEY` | Service role key for admin operations | ✅ Yes | Migrations, seed data, admin operations (server-only) |
+| `JWT_SECRET` | Secret key for JWT token signing/verification | ✅ Yes | Authentication |
+| `PORT` | Server port number | No (default: 3000) | Server configuration |
+| `NODE_ENV` | Environment mode | No (default: development) | Server behavior |
+| `VITE_API_URL` | Backend API URL for frontends | ✅ Yes (frontends) | Frontend API calls |
+| `CORS_ORIGINS` | Comma-separated allowed CORS origins | No (default: localhost:5173,5174) | CORS configuration |
+
+### Getting Supabase Credentials
+
+1. Go to your Supabase project dashboard
+2. Navigate to **Settings → API**
+3. Copy the following values:
+   - **Project URL** → Use in `DATABASE_URL` (format: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
+   - **anon public** key → `SUPABASE_ANON_KEY`
+   - **service_role** key → `SUPABASE_SECRET_KEY` (⚠️ Keep this secret! Server-only)
+
+### Security Notes
+
+- ⚠️ **NEVER** commit `.env` files to version control
+- ⚠️ **NEVER** expose `SUPABASE_SECRET_KEY` in frontend code
+- ✅ `SUPABASE_ANON_KEY` is safe to use in frontend (protected by RLS policies)
+- ✅ Use different credentials for development and production databases
 
 ## 📦 Workspaces
 
