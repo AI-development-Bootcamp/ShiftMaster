@@ -3,11 +3,11 @@ name: Staging CI
 on:
   push:
     branches:
-      # - dev
+      - dev
   pull_request:
     branches:
-      # - dev
-      # - 'feature/**'
+      - dev
+      - 'feature/**'
 
 jobs:
   server:
