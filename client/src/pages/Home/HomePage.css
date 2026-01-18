@@ -23,6 +23,36 @@
   z-index: 10;
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #141e3e;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.logout-btn:hover {
+  background-color: #f3f4f6;
+  color: #EE2662;
+}
+
+.logout-btn:active {
+  transform: scale(0.95);
+}
+
 .home-title {
   font-size: 20px;
   font-weight: 600;
@@ -54,12 +84,104 @@
   color: #3b82f6;
 }
 
+.month-label-container {
+  min-width: 100px;
+  overflow: hidden;
+  position: relative;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .month-label {
   font-size: 16px;
   font-weight: 500;
   color: #141e3e;
-  min-width: 80px;
   text-align: center;
+  position: absolute;
+  white-space: nowrap;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.month-label-old {
+  z-index: 0;
+}
+
+.month-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Slide in from right (next month, left arrow) */
+.month-slide-in-left {
+  animation: slideInFromRight 300ms ease-out;
+}
+
+/* Slide in from left (prev month, right arrow) */
+.month-slide-in-right {
+  animation: slideInFromLeft 300ms ease-out;
+}
+
+/* Slide out to left (old month when going next) */
+.month-slide-out-left {
+  animation: slideOutToLeft 300ms ease-out;
+}
+
+/* Slide out to right (old month when going prev) */
+.month-slide-out-right {
+  animation: slideOutToRight 300ms ease-out;
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-150%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutToLeft {
+  0% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-150%);
+    opacity: 0;
+  }
+}
+
+@keyframes slideOutToRight {
+  0% {
+    transform: translateX(-50%);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(50%);
+    opacity: 0;
+  }
+}
+
+/* Keep old month invisible after animation ends */
+.month-slide-out-left,
+.month-slide-out-right {
+  animation-fill-mode: forwards;
 }
 
 /* Main content area */

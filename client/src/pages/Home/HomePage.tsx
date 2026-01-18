@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DailyEntryCard, { DailyEntry } from '../../components/DailyEntryCard/DailyEntryCard';
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import './HomePage.css';
@@ -113,8 +114,26 @@ const mockEntries: DailyEntry[] = [
   },
 ];
 
+const HEBREW_MONTHS = [
+  'ינואר',
+  'פברואר',
+  'מרץ',
+  'אפריל',
+  'מאי',
+  'יוני',
+  'יולי',
+  'אוגוסט',
+  'ספטמבר',
+  'אוקטובר',
+  'נובמבר',
+  'דצמבר',
+];
+
 function HomePage() {
-  const [currentMonth, _setCurrentMonth] = useState('אוקטובר');
+  const navigate = useNavigate();
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October
+  const [prevMonthIndex, setPrevMonthIndex] = useState(9);
+  const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(null);
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
@@ -135,14 +154,25 @@ function HomePage() {
     };
   }, [isTimerRunning]);
 
+  useEffect(() => {
+    if (monthDirection) {
+      const timer = setTimeout(() => {
+        setMonthDirection(null);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [monthDirection]);
+
   const handlePrevMonth = () => {
-    // TODO: Implement month navigation
-    console.log('Previous month');
+    setPrevMonthIndex(currentMonthIndex);
+    setMonthDirection('right');
+    setCurrentMonthIndex((prev) => (prev === 0 ? 11 : prev - 1));
   };
 
   const handleNextMonth = () => {
-    // TODO: Implement month navigation
-    console.log('Next month');
+    setPrevMonthIndex(currentMonthIndex);
+    setMonthDirection('left');
+    setCurrentMonthIndex((prev) => (prev === 11 ? 0 : prev + 1));
   };
 
   const handleToggleEntry = (id: string) => {
@@ -170,16 +200,56 @@ function HomePage() {
     }
   };
 
+  const handleLogout = () => {
+    navigate('/login');
+  };
+
   return (
     <div className="home-page">
       {/* Header */}
       <header className="home-header">
-        <h1 className="home-title">דיווח שעות</h1>
+        <div className="header-left">
+          <button className="logout-btn" onClick={handleLogout} aria-label="התנתק">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M13 14L17 10M17 10L13 6M17 10H7M7 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H7"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+          <h1 className="home-title">דיווח שעות</h1>
+        </div>
         <div className="month-nav">
           <button className="month-nav-btn" onClick={handleNextMonth}>
             <span className="chevron-left">‹</span>
           </button>
-          <span className="month-label">{currentMonth}</span>
+          <div className="month-label-container">
+            <span
+              className={`month-label month-label-old ${
+                monthDirection === 'left'
+                  ? 'month-slide-out-left'
+                  : monthDirection === 'right'
+                  ? 'month-slide-out-right'
+                  : 'month-hidden'
+              }`}
+            >
+              {HEBREW_MONTHS[prevMonthIndex]}
+            </span>
+            <span
+              className={`month-label ${
+                monthDirection === 'left'
+                  ? 'month-slide-in-left'
+                  : monthDirection === 'right'
+                  ? 'month-slide-in-right'
+                  : ''
+              }`}
+            >
+              {HEBREW_MONTHS[currentMonthIndex]}
+            </span>
+          </div>
           <button className="month-nav-btn" onClick={handlePrevMonth}>
             <span className="chevron-right">›</span>
           </button>
