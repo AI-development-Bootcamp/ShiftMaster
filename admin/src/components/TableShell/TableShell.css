@@ -29,6 +29,10 @@
     overflow-y: auto;
 }
 
+.table-shell-container--empty {
+    overflow-y: hidden;
+}
+
 /* === Table Element === */
 .table-shell {
     width: 100%;

@@ -35,7 +35,7 @@ export function TableShell<T>({
     const showFooter = pagination.totalPages > 1 && !isEmpty && !isLoading;
 
     return (
-        <div className={`table-shell-container ${className}`}>
+        <div className={`table-shell-container ${className} ${isEmpty ? 'table-shell-container--empty' : ''}`}>
             <table className="table-shell">
                 <TableHeader
                     columns={columns}
