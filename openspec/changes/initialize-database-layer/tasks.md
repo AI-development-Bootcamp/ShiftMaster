@@ -28,9 +28,9 @@
 
 ## 4. TypeScript Types
 
-- [ ] 4.1 Generate TypeScript types from Supabase schema
-- [ ] 4.2 Create database entity interfaces (`db/types/entities.ts`)
-- [ ] 4.3 Create repository interfaces (`db/types/repositories.ts`)
+- [x] 4.1 Generate TypeScript types from Supabase schema
+- [x] 4.2 Create database entity interfaces (`db/types/entities.ts`)
+- [x] 4.3 Create repository interfaces (`db/types/repositories.ts`)
 
 ## 5. Repository Pattern Implementation
 
