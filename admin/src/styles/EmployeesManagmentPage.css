@@ -1,15 +1,42 @@
 .employees-managment-page {
-    padding: 2rem;
     height: 100%;
+    padding: 2rem;
     overflow-y: auto;
 }
 
-.employees-managment-page h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #333;
+.employees-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.employees-page-header h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary, #111827);
+    margin: 0;
+}
+
+.add-employee-btn {
+    background-color: var(--color-primary, #0052D6);
+    color: var(--color-text-on-primary, #ffffff);
+    border: none;
+    border-radius: var(--radius-md, 6px);
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.add-employee-btn:hover {
+    background-color: var(--color-primary-dark, #0041b3);
 }
 
 .employees-managment-page p {
-    color: #666;
+    color: var(--color-text-secondary, #6b7280);
 }
