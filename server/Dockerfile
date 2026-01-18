@@ -30,9 +30,10 @@ RUN mkdir -p dist
 # Build server workspace
 # Create build-specific tsconfig that overrides conflicting options from base config
 WORKDIR /app/server
-RUN echo '{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false,"outDir":"dist","rootDir":"src","moduleResolution":"node"}}' > tsconfig.build.json && \
+RUN echo '{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false,"outDir":"dist","rootDir":"src","moduleResolution":"node","allowImportingTsExtensions":false}}' > tsconfig.build.json && \
     npx tsc --project tsconfig.build.json && \
     rm tsconfig.build.json
+
 
 
 # Verify build output
