@@ -11,7 +11,6 @@ export const env = {
     process.env.SUPABASE_URL || (isTest ? 'https://test.supabase.co' : ''),
   supabaseAnonKey:
     process.env.SUPABASE_ANON_KEY || (isTest ? 'test-anon-key' : ''),
-  databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret:
     process.env.JWT_SECRET ||
     (isTest ? 'test-jwt-secret-do-not-use-in-production' : ''),
@@ -19,6 +18,7 @@ export const env = {
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : ['http://localhost:5173', 'http://localhost:5174'],
+  renderDeployUrl: process.env.RENDER_DEPLOY_URL || '',
 };
 
 /**
