@@ -1,0 +1,356 @@
+/* Form Field Styles */
+
+/* ... (previous styles remain the same) ... */
+
+/* Field container */
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+/* Label */
+.form-field__label {
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.form-field__required {
+    color: var(--color-error);
+    margin-right: var(--spacing-xs);
+}
+
+/* Input Wrapper for password toggle */
+.form-field__input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.form-field__input-wrapper--password .form-field__input {
+    padding-left: 40px;
+}
+
+/* Input base styles */
+.form-field__input,
+.form-field__textarea {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    box-sizing: border-box;
+}
+
+.form-field__input:focus,
+.form-field__textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 214, 0.1);
+}
+
+.form-field__input:disabled,
+.form-field__textarea:disabled {
+    background-color: var(--color-bg-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.form-field__input::placeholder,
+.form-field__textarea::placeholder {
+    color: var(--color-text-light);
+}
+
+/* Error state */
+.form-field__input--error,
+.form-field__textarea--error {
+    border-color: var(--color-error);
+}
+
+.form-field__input--error:focus,
+.form-field__textarea--error:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Textarea specific */
+.form-field__textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Custom Dropdown Styling */
+.form-field__dropdown-container {
+    position: relative;
+    /* To position the menu absolutely */
+    width: 100%;
+}
+
+.form-field__dropdown-trigger {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    background-color: #ffffff;
+    /* White background */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    text-align: right;
+    /* RTL support */
+}
+
+.form-field__dropdown-trigger:focus,
+.form-field__dropdown-trigger--open {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(0, 82, 214, 0.1);
+}
+
+.form-field__dropdown-trigger:disabled {
+    background-color: var(--color-bg-secondary);
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.form-field__dropdown-trigger--error {
+    border-color: var(--color-error);
+}
+
+.form-field__dropdown-value {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.form-field__dropdown-value--placeholder {
+    color: var(--color-text-light);
+}
+
+.form-field__dropdown-arrow {
+    font-size: 10px;
+    color: var(--color-text-secondary);
+    margin-right: 8px;
+    /* Little gap from text */
+}
+
+/* Dropdown Menu */
+.form-field__dropdown-menu {
+    position: absolute;
+    top: calc(100% + 4px);
+    /* Just below the trigger */
+    right: 0;
+    left: 0;
+    background-color: #ffffff;
+    /* White background */
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: 100;
+    /* Above other fields */
+    max-height: 200px;
+    /* Scrollable limit */
+    overflow-y: auto;
+    padding: 4px;
+}
+
+/* Dropdown Option */
+.form-field__dropdown-option {
+    width: 100%;
+    padding: 8px 12px;
+    text-align: right;
+    background: none;
+    border: none;
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: background-color var(--transition-fast);
+    display: block;
+}
+
+.form-field__dropdown-option:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.form-field__dropdown-option--selected {
+    background-color: rgba(0, 82, 214, 0.1);
+    /* Light primary color */
+    color: var(--color-primary);
+    font-weight: 500;
+}
+
+/* Customize Scrollbar for Dropdown */
+.form-field__dropdown-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.form-field__dropdown-menu::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 4px;
+}
+
+.form-field__dropdown-menu::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+/* Error message */
+.form-field__error {
+    font-size: var(--font-size-xs);
+    color: var(--color-error);
+}
+
+/* Password Toggle Button */
+.form-field__password-toggle {
+    position: absolute;
+    left: var(--spacing-sm);
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-fast);
+}
+
+.form-field__password-toggle:hover {
+    color: var(--color-text-primary);
+}
+
+.form-field__password-toggle:focus {
+    outline: 2px solid var(--color-primary);
+}
+
+/* Date picker overrides */
+.form-field__datepicker {
+    cursor: pointer;
+}
+
+/* Date range specific */
+.form-field--date-range .form-field__date-range-inputs {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--spacing-sm);
+}
+
+.form-field--date-range .form-field__date-range-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.form-field--date-range .form-field__date-range-label {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+}
+
+.form-field--date-range .form-field__date-range-separator {
+    color: var(--color-text-light);
+    padding-bottom: var(--spacing-sm);
+}
+
+/* Collapsible Section */
+.collapsible-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    transition: gap 0.3s ease;
+}
+
+.collapsible-section--collapsed {
+    gap: 0;
+    margin-bottom: -10px;
+}
+
+.collapsible-section__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: none;
+    border: none;
+    padding: var(--spacing-xs) 0;
+    font-size: var(--font-size-sm);
+    color: var(--color-primary);
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.collapsible-section__toggle:hover {
+    text-decoration: underline;
+}
+
+.collapsible-section__icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+    font-size: 10px;
+}
+
+.collapsible-section__icon--expanded {
+    transform: rotate(90deg);
+}
+
+.collapsible-section__content {
+    overflow: hidden;
+}
+
+/* React DatePicker RTL overrides */
+.react-datepicker {
+    font-family: inherit;
+    direction: rtl;
+}
+
+.react-datepicker__header {
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.react-datepicker__current-month {
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.react-datepicker__day-name,
+.react-datepicker__day {
+    color: var(--color-text-primary);
+}
+
+.react-datepicker__day:hover {
+    background-color: var(--color-bg-secondary);
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--in-range {
+    background-color: var(--color-primary) !important;
+    color: var(--color-text-on-primary) !important;
+}
+
+.react-datepicker__day--keyboard-selected {
+    background-color: rgba(0, 82, 214, 0.2);
+}
+
+.react-datepicker__day--disabled {
+    color: var(--color-text-light);
+}
+
+.react-datepicker__navigation {
+    top: 10px;
+}
+
+.react-datepicker-popper {
+    z-index: 1001;
+}

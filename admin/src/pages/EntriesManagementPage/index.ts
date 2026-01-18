@@ -1,0 +1,1 @@
+export { EntriesManagementPage } from './EntriesManagementPage';
