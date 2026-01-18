@@ -3,14 +3,14 @@
 - [x] 1.1 Create Dockerfile in server/ directory
 - [x] 1.2 Configure multi-stage build (build stage + production stage)
 - [x] 1.3 Set up .dockerignore file to exclude unnecessary files
-- [ ] 1.4 Test Docker build locally (`docker build --file server/Dockerfile -t shiftmaster-server .`)
-- [ ] 1.5 Verify Docker image runs correctly (`docker run -p 3000:3000 shiftmaster-server`)
-- [ ] 1.6 Test with environment variables passed to container
+- [x] 1.4 Test Docker build locally (`docker build --file server/Dockerfile -t shiftmaster-server .`)
+- [x] 1.5 Verify Docker image runs correctly (`docker run -p 3000:3000 shiftmaster-server`)
+- [x] 1.6 Test with environment variables passed to container
 
 ## 2. Render Backend Configuration
 
-- [ ] 2.1 Create Render Web Service for backend
-- [ ] 2.2 Configure Dockerfile path and build settings
+- [x] 2.1 Create Render Web Service for backend
+- [x] 2.2 Configure Dockerfile path and build settings
 - [ ] 2.3 Set up environment variables in Render dashboard:
   - [ ] JWT_SECRET
   - [ ] SUPABASE_URL

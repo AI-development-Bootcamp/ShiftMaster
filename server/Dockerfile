@@ -24,7 +24,7 @@ RUN npm ci
 
 # Build shared workspace first (server depends on it)
 WORKDIR /app/shared
-RUN npm run build || true
+RUN npm run build
 RUN mkdir -p dist
 
 # Build server workspace
