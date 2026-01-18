@@ -201,12 +201,12 @@ server/src/
 ```json
 {
   "dependencies": {
-    "bcrypt": "^5.1.1",
-    "jsonwebtoken": "^9.0.2"
+    "bcrypt": "^6.0.0",
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
-    "@types/bcrypt": "^5.0.2",
-    "@types/jsonwebtoken": "^9.0.6"
+    "@types/bcrypt": "^6.0.0",
+    "@types/jsonwebtoken": "^9.0.10"
   }
 }
 ```
