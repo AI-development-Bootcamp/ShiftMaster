@@ -1,6 +1,11 @@
 import { useState } from 'react';
 import './HomePage.css';
 
+/**
+ * Render the application's Home page with month navigation, main content placeholder, and bottom action buttons.
+ *
+ * @returns The HomePage component's JSX element containing a header with the current month and navigation buttons, a main content area for daily entries, and a bottom navigation with clock and manual-report actions.
+ */
 function HomePage() {
   const [currentMonth, _setCurrentMonth] = useState('אוקטובר');
 

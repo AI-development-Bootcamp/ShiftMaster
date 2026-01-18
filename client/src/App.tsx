@@ -6,6 +6,13 @@ import './styles/global.css';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 
+/**
+ * Top-level application component that configures client-side routes and sets the UI direction to right-to-left.
+ *
+ * Defines routes for "/login" and "/home", and redirects both the root ("/") and any unknown path ("*") to "/login".
+ *
+ * @returns The React element containing the BrowserRouter, RTL app container, and route definitions.
+ */
 function App() {
   return (
     <BrowserRouter>
