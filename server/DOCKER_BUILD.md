@@ -57,7 +57,7 @@ docker run -p 3000:3000 \
 ### 3. Verify the server is running
 
 - Check logs: The container should output server startup messages
-- Health check: `curl http://localhost:3000/api/health`
+- Health check: `curl http://localhost:3000/api/v1/health`
 - API docs: `http://localhost:3000/api-docs`
 
 ### 4. Test with different port

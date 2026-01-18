@@ -46,7 +46,11 @@ const swaggerRouter = express.Router();
 app.use('/api-docs', swaggerRouter);
 
 // Initialize Swagger UI (available in all environments)
-Promise.all([import('swagger-ui-express'), import('./utils/swagger.js')])
+// Export promise so server waits for Swagger initialization before starting
+export const swaggerInitPromise = Promise.all([
+  import('swagger-ui-express'),
+  import('./utils/swagger.js'),
+])
   .then(([swaggerUi, swaggerUtils]) => {
     swaggerRouter.use(
       swaggerUi.default.serve,
@@ -63,6 +67,8 @@ Promise.all([import('swagger-ui-express'), import('./utils/swagger.js')])
     } else {
       console.error('Failed to initialize Swagger UI:', err);
     }
+    // Resolve promise even on error so server can start
+    // Swagger will just be unavailable
   });
 
 // API Routes - All routes are automatically prefixed with /api/v1

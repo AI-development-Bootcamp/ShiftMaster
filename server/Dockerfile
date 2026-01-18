@@ -54,7 +54,7 @@ COPY server/package.json ./server/
 RUN npm ci --omit=dev --workspace=server --workspace=shared
 
 # Copy built artifacts from builder stage
-COPY --from=builder /app/shared/src ./shared/src
+# Only copy compiled JavaScript from shared (no TypeScript sources)
 COPY --from=builder /app/shared/dist ./shared/dist
 COPY --from=builder /app/server/dist ./server/dist
 
