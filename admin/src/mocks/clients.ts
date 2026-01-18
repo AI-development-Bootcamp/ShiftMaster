@@ -22,4 +22,11 @@ export const mockClients: Client[] = [
         active: true,
         created_at: '2024-02-01T00:00:00Z',
     },
+    {
+        client_id: 4,
+        name: 'אברה',
+        contact_info: 'רעננה',
+        active: true,
+        created_at: '2024-02-01T00:00:00Z',
+    },
 ];

@@ -27,6 +27,22 @@ export const mockAdminTaskAssignments: AdminTaskAssignment[] = [
     },
     {
         admin_task_assignment_id: 4,
+        user_id: 4, // Daria Mula
+        task_id: 2, // Backend Dev
+        assigned_by: 1, // Assigned by Admin
+        assigned_at: '2024-01-02T10:00:00Z',
+        active: true,
+    },
+    {
+        admin_task_assignment_id: 5,
+        user_id: 3, // Rachel Green
+        task_id: 2, // Backend Dev
+        assigned_by: 1, // Assigned by Admin
+        assigned_at: '2024-01-02T10:00:00Z',
+        active: true,
+    },
+    {
+        admin_task_assignment_id: 6,
         user_id: 3, // Rachel Green
         task_id: 3, // Design
         assigned_by: 1,

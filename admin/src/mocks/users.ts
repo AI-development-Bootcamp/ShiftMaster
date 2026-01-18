@@ -28,6 +28,24 @@ export const mockUsers: User[] = [
         active: true,
         created_at: '2024-01-03T10:00:00Z',
     },
+    {
+        user_id: 4,
+        full_name: 'דריה מולטא',
+        email: 'daria@abra.com',
+        role: UserRole.ADMIN,
+        job_title: 'ראש צוות פיתוח',
+        active: true,
+        created_at: '2024-01-01T08:00:00Z',
+    },
+    {
+        user_id: 5,
+        full_name: 'שלומי בוטבול',
+        email: 'shlomi@abra.com',
+        role: UserRole.REGULAR,
+        job_title: 'מנהל ',
+        active: true,
+        created_at: '2024-01-01T08:00:00Z',
+    },
 ];
 
 export const mockCurrentUser = mockUsers[0];

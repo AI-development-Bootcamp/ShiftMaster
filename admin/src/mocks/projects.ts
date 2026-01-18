@@ -23,6 +23,17 @@ export const mockProjects: Project[] = [
         active: true,
         created_at: '2024-01-20T09:00:00Z',
     },
+    {
+        project_id: 3,
+        client_id: 4, // Abra
+        manager_user_id: 1,
+        name: 'פורטל ספקים',
+        description: 'מערכת לניהול הזמנות מספקים',
+        start_date: '2024-02-01',
+        time_format_type: ProjectTimeFormatType.SUM,
+        active: true,
+        created_at: '2024-01-20T09:00:00Z',
+    },
 ];
 
 export const mockTasks: Task[] = [
@@ -47,5 +58,12 @@ export const mockTasks: Task[] = [
         project_id: 2,
         name: 'אפיון ועיצוב',
         created_at: '2024-02-01T10:00:00Z',
+    },
+    {
+        task_id: 4,
+        project_id: 3,
+        name: 'פיתוח Frontend',
+        description: 'Implementing React Native screens',
+        created_at: '2024-01-01T10:00:00Z',
     },
 ];
