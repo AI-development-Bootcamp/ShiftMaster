@@ -36,7 +36,7 @@ export default defineConfig(({ command, mode }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
-        '@shared': sharedSrcPath,
+        '@shared': resolveShared,
         '@abra-shift-master/shared': resolveShared,
       },
     },
