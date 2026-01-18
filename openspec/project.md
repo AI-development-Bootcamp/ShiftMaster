@@ -313,6 +313,7 @@ Employees and administrators.
 | email         | TEXT        | Required, Unique |
 | password_hash | TEXT        | Required         |
 | role          | user_role   | Required         |
+| job_title     | TEXT        |                  |
 | active        | BOOLEAN     | Soft delete flag |
 | created_at    | TIMESTAMPTZ |                  |
 
