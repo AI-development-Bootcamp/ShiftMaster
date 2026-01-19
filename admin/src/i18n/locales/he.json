@@ -3,7 +3,9 @@
         "unknown": "לא ידוע",
         "unknownUser": "משתמש לא ידוע",
         "actions": "פעולות",
-        "appName": "Shift Master"
+        "appName": "Shift Master",
+        "show": "הצג",
+        "hide": "הסתר"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
@@ -67,6 +69,11 @@
         "textBox": {
             "showPassword": "הצג סיסמה",
             "hidePassword": "הסתר סיסמה"
+        },
+        "closeForm": "סגור טופס",
+        "validation": {
+            "required": "שדה חובה",
+            "endDateAfterStartDate": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
         }
     },
     "entriesPage": {
