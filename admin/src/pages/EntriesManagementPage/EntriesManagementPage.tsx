@@ -1,9 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableColumnDef, SortState } from '../../components/TableShell/types';
 import { Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
 import { mockProjects } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
+import { mockCurrentUser } from '../../mocks/users';
+import { MonthLockButton, MonthLockModal } from '../../components/MonthLocks';
 import { useTranslation } from 'react-i18next';
 import '../../styles/EntriesManagementPage.css';
 
@@ -14,6 +16,8 @@ export function EntriesManagementPage() {
         { key: 'client_name', direction: 'asc' },
         { key: 'name', direction: 'asc' }
     ]);
+    const [isMonthLockModalOpen, setIsMonthLockModalOpen] = useState(false);
+    const buttonRef = useRef<HTMLButtonElement>(null);
 
     // Local state for projects data (will be replaced with API data in the future)
     const [projects, setProjects] = useState<Project[]>(mockProjects);
@@ -117,8 +121,22 @@ export function EntriesManagementPage() {
     return (
         <div className="entries-management-page">
             <div className="entries-management-page-header">
-                <h1>{t('entriesPage.title')}</h1>
-                <p>{t('entriesPage.subtitle')}</p>
+                <div className="entries-management-page-header-text">
+                    <h1>{t('entriesPage.title')}</h1>
+                    <p>{t('entriesPage.subtitle')}</p>
+                </div>
+                <div className="month-lock-button-container">
+                    <MonthLockButton
+                        ref={buttonRef}
+                        user={mockCurrentUser}
+                        onClick={() => setIsMonthLockModalOpen(true)}
+                    />
+                    <MonthLockModal
+                        isOpen={isMonthLockModalOpen}
+                        onClose={() => setIsMonthLockModalOpen(false)}
+                        buttonRef={buttonRef}
+                    />
+                </div>
             </div>
 
             <TableShell

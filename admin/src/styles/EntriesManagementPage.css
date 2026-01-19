@@ -4,6 +4,22 @@
     overflow-y: auto;
 }
 
+.entries-management-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    gap: 1rem;
+}
+
+.entries-management-page-header-text {
+    flex: 1;
+}
+
+.month-lock-button-container {
+    position: relative;
+}
+
 .entries-management-page h1 {
     font-size: 2rem;
     margin-bottom: 1rem;

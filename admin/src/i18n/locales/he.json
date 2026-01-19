@@ -106,5 +106,31 @@
             "sum": "סכום שעות",
             "startEnd": "כניסה /יציאה"
         }
+    },
+    "monthNames": {
+        "january": "ינואר",
+        "february": "פברואר",
+        "march": "מרץ",
+        "april": "אפריל",
+        "may": "מאי",
+        "june": "יוני",
+        "july": "יולי",
+        "august": "אוגוסט",
+        "september": "ספטמבר",
+        "october": "אוקטובר",
+        "november": "נובמבר",
+        "december": "דצמבר"
+    },
+    "monthLocks": {
+        "button": "נעילת חודשים",
+        "modalTitle": "ניהול נעילת חודשים",
+        "yearNavigator": {
+            "previousYear": "שנה קודמת",
+            "nextYear": "שנה הבאה"
+        },
+        "closeModal": "סגור",
+        "loading": "טוען נתוני נעילה...",
+        "locked": "נעול",
+        "unlocked": "פתוח"
     }
 }
