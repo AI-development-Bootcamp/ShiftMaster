@@ -4,9 +4,11 @@ import { TableColumnDef, SortState } from '../../components/TableShell/types';
 import { Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
 import { mockProjects } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
+import { useTranslation } from 'react-i18next';
 import '../../styles/EntriesManagementPage.css';
 
 export function EntriesManagementPage() {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>([
         { key: 'client_name', direction: 'asc' },
@@ -43,19 +45,19 @@ export function EntriesManagementPage() {
     const columns: TableColumnDef<Project>[] = [
         {
             key: 'client_name',
-            header: 'שם לקוח',
+            header: t('entriesPage.tableHeaders.clientName'),
             type: 'text',
             sortable: true,
             disableSortClearing: true,
             width: '30%',
             accessor: (row) => {
                 const client = mockClients.find(c => c.client_id === row.client_id);
-                return client ? client.name : 'לא ידוע';
+                return client ? client.name : t('common.unknown');
             }
         },
         {
             key: 'name',
-            header: 'שם הפרויקט',
+            header: t('entriesPage.tableHeaders.projectName'),
             type: 'text',
             sortable: true,
             disableSortClearing: true,
@@ -64,13 +66,13 @@ export function EntriesManagementPage() {
         },
         {
             key: 'time_format_type',
-            header: 'סוג הדיווח',
+            header: t('entriesPage.tableHeaders.reportType'),
             type: 'radio',
             width: '40%',
             accessor: (row) => row.time_format_type,
             radioOptions: [
-                { value: ProjectTimeFormatType.SUM, label: 'סכום שעות' },
-                { value: ProjectTimeFormatType.START_END, label: 'כניסה ויציאה' }
+                { value: ProjectTimeFormatType.SUM, label: t('entriesPage.reportTypes.sum') },
+                { value: ProjectTimeFormatType.START_END, label: t('entriesPage.reportTypes.startEnd') }
             ]
         }
     ];
@@ -115,8 +117,8 @@ export function EntriesManagementPage() {
     return (
         <div className="entries-management-page">
             <div className="entries-management-page-header">
-                <h1>ניהול רשומות</h1>
-                <p>כאן יופיע מסך ניהול הרשומות והנתונים.</p>
+                <h1>{t('entriesPage.title')}</h1>
+                <p>{t('entriesPage.subtitle')}</p>
             </div>
 
             <TableShell

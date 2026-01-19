@@ -3,6 +3,7 @@ import DatePicker, { registerLocale } from 'react-datepicker';
 import { he } from 'date-fns/locale';
 import { formatDate, parseLocalDate } from '@abra-shift-master/shared';
 import { DateRangeBoxProps } from '../types';
+import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
 
 // Register Hebrew locale
@@ -24,6 +25,7 @@ export function DateRangeBox({
     disabled,
     onChange,
 }: DateRangeBoxProps) {
+    const { t } = useTranslation();
     const [internalError, setInternalError] = useState<string | undefined>();
 
     // Parse string dates to Date objects using shared utility
@@ -33,11 +35,11 @@ export function DateRangeBox({
     // Cross-field validation
     useEffect(() => {
         if (startDate && endDate && endDate < startDate) {
-            setInternalError('תאריך הסיום חייב להיות אחרי תאריך ההתחלה');
+            setInternalError(t('formShell.dateRangeBox.validationError'));
         } else {
             setInternalError(undefined);
         }
-    }, [startDate, endDate]);
+    }, [startDate, endDate, t]);
 
     const handleStartChange = (date: Date | null) => {
         const formatted = date ? formatDate(date) : '';
@@ -59,14 +61,14 @@ export function DateRangeBox({
             </label>
             <div className="form-field__date-range-inputs">
                 <div className="form-field__date-range-item">
-                    <span className="form-field__date-range-label">מתאריך</span>
+                    <span className="form-field__date-range-label">{t('formShell.dateRangeBox.startDateLabel')}</span>
                     <DatePicker
                         id={`${id}-start`}
                         selected={startDate}
                         onChange={handleStartChange}
                         locale="he"
                         dateFormat="dd/MM/yyyy"
-                        placeholderText="בחר תאריך התחלה"
+                        placeholderText={t('formShell.dateRangeBox.startDatePlaceholder')}
                         className={`form-field__input form-field__datepicker ${displayError ? 'form-field__input--error' : ''}`}
                         disabled={disabled}
                         calendarStartDay={0}
@@ -78,14 +80,14 @@ export function DateRangeBox({
                 </div>
                 <span className="form-field__date-range-separator">—</span>
                 <div className="form-field__date-range-item">
-                    <span className="form-field__date-range-label">עד תאריך</span>
+                    <span className="form-field__date-range-label">{t('formShell.dateRangeBox.endDateLabel')}</span>
                     <DatePicker
                         id={`${id}-end`}
                         selected={endDate}
                         onChange={handleEndChange}
                         locale="he"
                         dateFormat="dd/MM/yyyy"
-                        placeholderText="בחר תאריך סיום"
+                        placeholderText={t('formShell.dateRangeBox.endDatePlaceholder')}
                         className={`form-field__input form-field__datepicker ${displayError ? 'form-field__input--error' : ''}`}
                         disabled={disabled}
                         calendarStartDay={0}
