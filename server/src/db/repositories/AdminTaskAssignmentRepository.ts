@@ -9,7 +9,7 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
         super('admin_task_assignments', 'admin_task_assignment_id', client);
     }
 
-    async findByUserId(userId: number): Promise<AdminTaskAssignment[]> {
+    async findByUserId(userId: string): Promise<AdminTaskAssignment[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')
@@ -24,7 +24,7 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
         return data as AdminTaskAssignment[];
     }
 
-    async findByTaskId(taskId: number): Promise<AdminTaskAssignment[]> {
+    async findByTaskId(taskId: string): Promise<AdminTaskAssignment[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')
@@ -39,7 +39,7 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
         return data as AdminTaskAssignment[];
     }
 
-    async revoke(id: number): Promise<void> {
+    async revoke(id: string): Promise<void> {
         const { error } = await this.client
             .from(this.table)
             .update({ active: false, revoked_at: new Date().toISOString() })

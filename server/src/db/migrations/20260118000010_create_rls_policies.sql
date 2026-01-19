@@ -19,7 +19,7 @@ BEGIN
   SELECT EXISTS (
     SELECT 1
     FROM public.users
-    WHERE user_id = (auth.jwt() ->> 'user_id')::bigint
+    WHERE user_id = (auth.jwt() ->> 'user_id')::uuid
     AND role = 'admin'
   ) INTO is_admin;
 
@@ -36,7 +36,7 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 -- Users can read their own profile
 CREATE POLICY "users_select_own" ON users
   FOR SELECT
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can read all users
 CREATE POLICY "users_select_admin" ON users
@@ -48,8 +48,8 @@ CREATE POLICY "users_select_admin" ON users
 -- Users can update their own profile
 CREATE POLICY "users_update_own" ON users
   FOR UPDATE
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint)
-  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid)
+  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can update all users
 CREATE POLICY "users_update_admin" ON users
@@ -172,7 +172,7 @@ CREATE POLICY "tasks_select_assigned" ON tasks
     EXISTS (
       SELECT 1 FROM admin_task_assignments ata
       WHERE ata.task_id = tasks.task_id
-      AND ata.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND ata.user_id = (auth.jwt() ->> 'user_id')::uuid
       AND ata.active = true
     )
   );
@@ -217,7 +217,7 @@ ALTER TABLE admin_task_assignments ENABLE ROW LEVEL SECURITY;
 -- Users can read their own task assignments
 CREATE POLICY "admin_task_assignments_select_own" ON admin_task_assignments
   FOR SELECT
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can read all task assignments
 CREATE POLICY "admin_task_assignments_select_admin" ON admin_task_assignments
@@ -259,7 +259,7 @@ ALTER TABLE entries ENABLE ROW LEVEL SECURITY;
 -- Users can read their own entries
 CREATE POLICY "entries_select_own" ON entries
   FOR SELECT
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can read all entries
 CREATE POLICY "entries_select_admin" ON entries
@@ -271,7 +271,7 @@ CREATE POLICY "entries_select_admin" ON entries
 -- Users can insert their own entries
 CREATE POLICY "entries_insert_own" ON entries
   FOR INSERT
-  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can insert entries for any user
 CREATE POLICY "entries_insert_admin" ON entries
@@ -283,8 +283,8 @@ CREATE POLICY "entries_insert_admin" ON entries
 -- Users can update their own entries
 CREATE POLICY "entries_update_own" ON entries
   FOR UPDATE
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint)
-  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid)
+  WITH CHECK (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can update all entries
 CREATE POLICY "entries_update_admin" ON entries
@@ -299,7 +299,7 @@ CREATE POLICY "entries_update_admin" ON entries
 -- Users can delete their own entries
 CREATE POLICY "entries_delete_own" ON entries
   FOR DELETE
-  USING (user_id = (auth.jwt() ->> 'user_id')::bigint);
+  USING (user_id = (auth.jwt() ->> 'user_id')::uuid);
 
 -- Admins can delete all entries
 CREATE POLICY "entries_delete_admin" ON entries
@@ -321,7 +321,7 @@ CREATE POLICY "entry_assignments_select_own" ON entry_assignments
     EXISTS (
       SELECT 1 FROM entries e
       WHERE e.entry_id = entry_assignments.entry_id
-      AND e.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND e.user_id = (auth.jwt() ->> 'user_id')::uuid
     )
   );
 
@@ -339,7 +339,7 @@ CREATE POLICY "entry_assignments_insert_own" ON entry_assignments
     EXISTS (
       SELECT 1 FROM entries e
       WHERE e.entry_id = entry_assignments.entry_id
-      AND e.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND e.user_id = (auth.jwt() ->> 'user_id')::uuid
     )
   );
 
@@ -357,14 +357,14 @@ CREATE POLICY "entry_assignments_update_own" ON entry_assignments
     EXISTS (
       SELECT 1 FROM entries e
       WHERE e.entry_id = entry_assignments.entry_id
-      AND e.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND e.user_id = (auth.jwt() ->> 'user_id')::uuid
     )
   )
   WITH CHECK (
     EXISTS (
       SELECT 1 FROM entries e
       WHERE e.entry_id = entry_assignments.entry_id
-      AND e.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND e.user_id = (auth.jwt() ->> 'user_id')::uuid
     )
   );
 
@@ -385,7 +385,7 @@ CREATE POLICY "entry_assignments_delete_own" ON entry_assignments
     EXISTS (
       SELECT 1 FROM entries e
       WHERE e.entry_id = entry_assignments.entry_id
-      AND e.user_id = (auth.jwt() ->> 'user_id')::bigint
+      AND e.user_id = (auth.jwt() ->> 'user_id')::uuid
     )
   );
 

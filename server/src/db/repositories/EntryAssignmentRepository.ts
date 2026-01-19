@@ -9,7 +9,7 @@ export class EntryAssignmentRepository extends BaseRepository<EntryAssignment, N
         super('entry_assignments', 'entry_assignment_id', client);
     }
 
-    async findByEntryId(entryId: number): Promise<EntryAssignment[]> {
+    async findByEntryId(entryId: string): Promise<EntryAssignment[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')

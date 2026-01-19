@@ -3,8 +3,8 @@
 -- Description: Create entries table for unified work and absence entries
 
 CREATE TABLE entries (
-  entry_id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  entry_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
   entry_kind entry_kind NOT NULL,
   work_date DATE NOT NULL,
   start_time TIME,
@@ -14,7 +14,7 @@ CREATE TABLE entries (
   attachment_path TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  last_modified_by BIGINT REFERENCES users(user_id) ON DELETE SET NULL,
+  last_modified_by UUID REFERENCES users(user_id) ON DELETE SET NULL,
   last_modified_at TIMESTAMPTZ,
 
   CONSTRAINT chk_absence_type CHECK (

@@ -3,9 +3,9 @@
 -- Description: Create entry_assignments table for task-level work lines within entries
 
 CREATE TABLE entry_assignments (
-  entry_assignment_id BIGSERIAL PRIMARY KEY,
-  entry_id BIGINT NOT NULL REFERENCES entries(entry_id) ON DELETE CASCADE,
-  task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
+  entry_assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entry_id UUID NOT NULL REFERENCES entries(entry_id) ON DELETE CASCADE,
+  task_id UUID NOT NULL REFERENCES tasks(task_id) ON DELETE RESTRICT,
   location work_location NOT NULL,
   start_time TIME,
   end_time TIME,

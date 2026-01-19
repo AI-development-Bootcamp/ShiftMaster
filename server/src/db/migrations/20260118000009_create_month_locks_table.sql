@@ -3,11 +3,11 @@
 -- Description: Create month_locks table for admin controls to prevent editing historical data
 
 CREATE TABLE month_locks (
-  lock_id BIGSERIAL PRIMARY KEY,
+  lock_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   year INT NOT NULL,
-  month INT NOT NULL CHECK (month >= 1 AND month <= 12),
+  month INT NOT NULL,
   locked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  locked_by BIGINT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  locked_by UUID NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
   unlocked_at TIMESTAMPTZ,
   CONSTRAINT uq_year_month UNIQUE (year, month)
 );

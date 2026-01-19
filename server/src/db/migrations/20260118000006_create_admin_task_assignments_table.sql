@@ -3,10 +3,10 @@
 -- Description: Create admin_task_assignments table for admin-assigned user-to-task relationships
 
 CREATE TABLE admin_task_assignments (
-  admin_task_assignment_id BIGSERIAL PRIMARY KEY,
-  user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
-  task_id BIGINT NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
-  assigned_by BIGINT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  admin_task_assignment_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+  task_id UUID NOT NULL REFERENCES tasks(task_id) ON DELETE CASCADE,
+  assigned_by UUID NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
   assigned_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   active BOOLEAN NOT NULL DEFAULT true,
   revoked_at TIMESTAMPTZ,
@@ -30,7 +30,7 @@ COMMENT ON CONSTRAINT uq_user_task ON admin_task_assignments IS 'Prevent duplica
 CREATE OR REPLACE FUNCTION enforce_assigned_by()
 RETURNS TRIGGER AS $$
 DECLARE
-  current_user_id BIGINT;
+  current_user_id UUID;
 BEGIN
   -- Allow service_role to bypass all checks
   IF (auth.role() = 'service_role') THEN
@@ -38,7 +38,7 @@ BEGIN
   END IF;
 
   -- Extract user_id from JWT claims
-  current_user_id := (auth.jwt() ->> 'user_id')::BIGINT;
+  current_user_id := (auth.jwt() ->> 'user_id')::UUID;
   
   -- Strict enforcing: user_id must be present for non-service roles
   IF current_user_id IS NULL THEN

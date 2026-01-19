@@ -9,7 +9,7 @@ export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry
         super('entries', 'entry_id', client);
     }
 
-    async findByUserIdAndDate(userId: number, date: string): Promise<Entry[]> {
+    async findByUserIdAndDate(userId: string, date: string): Promise<Entry[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')
@@ -24,7 +24,7 @@ export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry
         return data as Entry[];
     }
 
-    async findByUserIdAndDateRange(userId: number, startDate: string, endDate: string): Promise<Entry[]> {
+    async findByUserIdAndDateRange(userId: string, startDate: string, endDate: string): Promise<Entry[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')

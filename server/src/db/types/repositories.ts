@@ -15,10 +15,10 @@ import type {
  */
 export interface IBaseRepository<T, NewT, UpdateT> {
     create(data: NewT): Promise<T>;
-    findById(id: number): Promise<T | null>;
+    findById(id: string): Promise<T | null>;
     findAll(): Promise<T[]>;
-    update(id: number, data: UpdateT): Promise<T>;
-    delete(id: number): Promise<boolean>;
+    update(id: string, data: UpdateT): Promise<T>;
+    delete(id: string): Promise<boolean>;
 }
 
 export interface IUserRepository extends IBaseRepository<User, NewUser, UpdateUser> {
@@ -30,27 +30,27 @@ export interface IClientRepository extends IBaseRepository<Client, NewClient, Up
 }
 
 export interface IProjectRepository extends IBaseRepository<Project, NewProject, UpdateProject> {
-    findByClientId(clientId: number): Promise<Project[]>;
+    findByClientId(clientId: string): Promise<Project[]>;
     findActive(): Promise<Project[]>;
 }
 
 export interface ITaskRepository extends IBaseRepository<Task, NewTask, UpdateTask> {
-    findByProjectId(projectId: number): Promise<Task[]>;
+    findByProjectId(projectId: string): Promise<Task[]>;
 }
 
 export interface IAdminTaskAssignmentRepository extends IBaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment> {
-    findByUserId(userId: number): Promise<AdminTaskAssignment[]>;
-    findByTaskId(taskId: number): Promise<AdminTaskAssignment[]>;
-    revoke(id: number): Promise<void>;
+    findByUserId(userId: string): Promise<AdminTaskAssignment[]>;
+    findByTaskId(taskId: string): Promise<AdminTaskAssignment[]>;
+    revoke(id: string): Promise<void>;
 }
 
 export interface IEntryRepository extends IBaseRepository<Entry, NewEntry, UpdateEntry> {
-    findByUserIdAndDate(userId: number, date: string): Promise<Entry[]>;
-    findByUserIdAndDateRange(userId: number, startDate: string, endDate: string): Promise<Entry[]>;
+    findByUserIdAndDate(userId: string, date: string): Promise<Entry[]>;
+    findByUserIdAndDateRange(userId: string, startDate: string, endDate: string): Promise<Entry[]>;
 }
 
 export interface IEntryAssignmentRepository extends IBaseRepository<EntryAssignment, NewEntryAssignment, UpdateEntryAssignment> {
-    findByEntryId(entryId: number): Promise<EntryAssignment[]>;
+    findByEntryId(entryId: string): Promise<EntryAssignment[]>;
 }
 
 export interface IMonthLockRepository extends IBaseRepository<MonthLock, NewMonthLock, UpdateMonthLock> {

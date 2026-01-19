@@ -3,7 +3,7 @@
 -- Description: Create clients table for external organizations
 
 CREATE TABLE clients (
-  client_id BIGSERIAL PRIMARY KEY,
+  client_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   contact_info TEXT,
   active BOOLEAN NOT NULL DEFAULT true,

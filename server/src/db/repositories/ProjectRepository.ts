@@ -10,7 +10,7 @@ export class ProjectRepository extends BaseRepository<Project, NewProject, Updat
         super('projects', 'project_id', client);
     }
 
-    async findByClientId(clientId: number): Promise<Project[]> {
+    async findByClientId(clientId: string): Promise<Project[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')

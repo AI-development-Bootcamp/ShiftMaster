@@ -29,7 +29,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         return created as T;
     }
 
-    async findById(id: number): Promise<T | null> {
+    async findById(id: string): Promise<T | null> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')
@@ -60,7 +60,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         return data as T[];
     }
 
-    async update(id: number, data: UpdateT): Promise<T> {
+    async update(id: string, data: UpdateT): Promise<T> {
         const { data: updated, error } = await this.client
             .from(this.table)
             .update(data)
@@ -76,7 +76,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         return updated as T;
     }
 
-    async delete(id: number): Promise<boolean> {
+    async delete(id: string): Promise<boolean> {
         // Soft-delete for specific tables
         const softDeleteTables = ['users', 'clients', 'projects', 'tasks', 'admin_task_assignments'];
 

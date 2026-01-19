@@ -3,9 +3,9 @@
 -- Description: Create projects table for work initiatives
 
 CREATE TABLE projects (
-  project_id BIGSERIAL PRIMARY KEY,
-  client_id BIGINT NOT NULL REFERENCES clients(client_id) ON DELETE RESTRICT,
-  manager_user_id BIGINT NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
+  project_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  client_id UUID NOT NULL REFERENCES clients(client_id) ON DELETE RESTRICT,
+  manager_user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE RESTRICT,
   name TEXT NOT NULL,
   description TEXT,
   start_date DATE NOT NULL,

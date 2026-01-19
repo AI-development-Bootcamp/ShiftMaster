@@ -3,7 +3,8 @@
 -- Description: Create users table for employees and administrators
 
 CREATE TABLE users (
-  user_id BIGSERIAL PRIMARY KEY,
+  user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  last_modified_by UUID REFERENCES users(user_id),
   full_name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,

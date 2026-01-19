@@ -10,7 +10,7 @@ export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> im
         super('tasks', 'task_id', client);
     }
 
-    async findByProjectId(projectId: number): Promise<Task[]> {
+    async findByProjectId(projectId: string): Promise<Task[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')

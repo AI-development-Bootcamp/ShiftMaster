@@ -17,10 +17,10 @@ All repositories inherit from this class. It provides the following methods for 
 | Method | Signature | Description |
 | :--- | :--- | :--- |
 | **`create`** | `create(data: NewT): Promise<T>` | Creates a new record in the database. |
-| **`findById`** | `findById(id: number): Promise<T \| null>` | Finds a single record by its primary key. Returns `null` if not found. |
+| **`findById`** | `findById(id: string): Promise<T \| null>` | Finds a single record by its primary key. Returns `null` if not found. |
 | **`findAll`** | `findAll(): Promise<T[]>` | Retrieves all records from the table. |
-| **`update`** | `update(id: number, data: UpdateT): Promise<T>` | Updates a specific record by ID. |
-| **`delete`** | `delete(id: number): Promise<boolean>` | Deletes a record. Supports **Soft Delete** (`active: false`) for `users`, `clients`, `projects`, `tasks`, `admin_task_assignments`. |
+| **`update`** | `update(id: string, data: UpdateT): Promise<T>` | Updates a specific record by ID. |
+| **`delete`** | `delete(id: string): Promise<boolean>` | Deletes a record. Supports **Soft Delete** (`active: false`) for `users`, `clients`, `projects`, `tasks`, `admin_task_assignments`. |
 
 ---
 
@@ -38,35 +38,35 @@ All repositories inherit from this class. It provides the following methods for 
 
 ### 🚀 ProjectRepository
 *Extends `BaseRepository<Project, NewProject, UpdateProject>`*
-*   **`findByClientId(clientId: number): Promise<Project[]>`**
+*   **`findByClientId(clientId: string): Promise<Project[]>`**
     *   Returns all projects associated with a specific client.
 *   **`findActive(): Promise<Project[]>`**
     *   Returns all active projects.
 
 ### ✅ TaskRepository
 *Extends `BaseRepository<Task, NewTask, UpdateTask>`*
-*   **`findByProjectId(projectId: number): Promise<Task[]>`**
+*   **`findByProjectId(projectId: string): Promise<Task[]>`**
     *   Returns all tasks belonging to a specific project.
 
 ### 📝 EntryRepository
 *Extends `BaseRepository<Entry, NewEntry, UpdateEntry>`*
-*   **`findByUserIdAndDate(userId: number, date: string): Promise<Entry[]>`**
+*   **`findByUserIdAndDate(userId: string, date: string): Promise<Entry[]>`**
     *   Finds entries for a specific user on a specific date.
-*   **`findByUserIdAndDateRange(userId: number, startDate: string, endDate: string): Promise<Entry[]>`**
+*   **`findByUserIdAndDateRange(userId: string, startDate: string, endDate: string): Promise<Entry[]>`**
     *   Finds entries for a user within a given date range.
 
 ### 🔗 EntryAssignmentRepository
 *Extends `BaseRepository<EntryAssignment, NewEntryAssignment, UpdateEntryAssignment>`*
-*   **`findByEntryId(entryId: number): Promise<EntryAssignment[]>`**
+*   **`findByEntryId(entryId: string): Promise<EntryAssignment[]>`**
     *   Returns all task assignments associated with a specific daily entry.
 
 ### 📌 AdminTaskAssignmentRepository
 *Extends `BaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment>`*
-*   **`findByUserId(userId: number): Promise<AdminTaskAssignment[]>`**
+*   **`findByUserId(userId: string): Promise<AdminTaskAssignment[]>`**
     *   Returns all *active* task assignments for a specific user.
-*   **`findByTaskId(taskId: number): Promise<AdminTaskAssignment[]>`**
+*   **`findByTaskId(taskId: string): Promise<AdminTaskAssignment[]>`**
     *   Returns all *active* assignments of a specific task.
-*   **`revoke(id: number): Promise<void>`**
+*   **`revoke(id: string): Promise<void>`**
     *   Soft-deletes an assignment (sets `active: false` and `revoked_at` timestamp).
 
 ### 🔒 MonthLockRepository

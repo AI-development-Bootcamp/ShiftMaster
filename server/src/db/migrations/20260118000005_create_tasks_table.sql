@@ -3,8 +3,8 @@
 -- Description: Create tasks table for specific work items within projects
 
 CREATE TABLE tasks (
-  task_id BIGSERIAL PRIMARY KEY,
-  project_id BIGINT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
+  task_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
   active BOOLEAN NOT NULL DEFAULT true,
