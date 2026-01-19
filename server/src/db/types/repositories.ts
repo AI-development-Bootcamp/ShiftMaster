@@ -45,7 +45,7 @@ export interface IAdminTaskAssignmentRepository extends IBaseRepository<AdminTas
 }
 
 export interface IEntryRepository extends IBaseRepository<Entry, NewEntry, UpdateEntry> {
-    findByUserIdAndDate(userId: number, date: string): Promise<Entry | null>;
+    findByUserIdAndDate(userId: number, date: string): Promise<Entry[]>;
     findByUserIdAndDateRange(userId: number, startDate: string, endDate: string): Promise<Entry[]>;
 }
 

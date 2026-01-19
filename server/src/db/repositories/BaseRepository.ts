@@ -83,9 +83,8 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         if (softDeleteTables.includes(this.table)) {
             const { error, count } = await this.client
                 .from(this.table)
-                .update({ active: false })
-                .eq(this.primaryKey, id)
-                .select('', { count: 'exact', head: true }); // Use select count to verify update
+                .update({ active: false }, { count: 'exact' })
+                .eq(this.primaryKey, id);
 
             if (error) {
                 logDbError(`BaseRepository.delete (soft) [${this.table}]`, error);

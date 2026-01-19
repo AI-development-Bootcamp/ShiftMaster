@@ -9,21 +9,19 @@ export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry
         super('entries', 'entry_id', client);
     }
 
-    async findByUserIdAndDate(userId: number, date: string): Promise<Entry | null> {
+    async findByUserIdAndDate(userId: number, date: string): Promise<Entry[]> {
         const { data, error } = await this.client
             .from(this.table)
             .select('*')
             .eq('user_id', userId)
-            .eq('work_date', date)
-            .single();
+            .eq('work_date', date);
 
         if (error) {
-            if (error.code === 'PGRST116') return null;
             logDbError('EntryRepository.findByUserIdAndDate', error);
             throw error;
         }
 
-        return data as Entry;
+        return data as Entry[];
     }
 
     async findByUserIdAndDateRange(userId: number, startDate: string, endDate: string): Promise<Entry[]> {
