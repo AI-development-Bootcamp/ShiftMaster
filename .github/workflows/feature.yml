@@ -46,7 +46,7 @@ jobs:
           echo "🚀 Deploying server to Render..."
           if [ -n "$RENDER_DEPLOY_URL_SERVER" ]; then
             curl -X POST "$RENDER_DEPLOY_URL_SERVER" \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
           else
             echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
@@ -91,7 +91,7 @@ jobs:
           echo "🚀 Deploying client to Render..."
           if [ -n "$RENDER_DEPLOY_URL_CLIENT" ]; then
             curl -X POST "$RENDER_DEPLOY_URL_CLIENT" \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
           else
             echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
@@ -136,7 +136,7 @@ jobs:
           echo "🚀 Deploying admin to Render..."
           if [ -n "$RENDER_DEPLOY_URL_ADMIN" ]; then
             curl -X POST "$RENDER_DEPLOY_URL_ADMIN" \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
           else
             echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
