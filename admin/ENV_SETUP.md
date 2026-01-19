@@ -11,9 +11,6 @@ Create a `.env.development` file with the following content (keys are in lexicog
 
 # API URL for backend server
 VITE_API_URL=http://localhost:3000
-
-# Render deployment hook URL (optional, used for CI/CD)
-VITE_RENDER_DEPLOY_URL_ADMIN=
 ```
 
 ### Production (.env.production)
@@ -25,9 +22,6 @@ Create a `.env.production` file with the following content (keys are in lexicogr
 
 # API URL for backend server
 VITE_API_URL=https://your-api-url.onrender.com
-
-# Render deployment hook URL (optional, used for CI/CD)
-VITE_RENDER_DEPLOY_URL_ADMIN=
 ```
 
 ## Important Notes
@@ -53,6 +47,5 @@ Environment variables are typed in `src/vite-env.d.ts`:
 ```typescript
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
-  readonly VITE_RENDER_DEPLOY_URL_ADMIN?: string;
 }
 ```
