@@ -30,7 +30,8 @@
   border-radius: 20px 20px 0 0;
   width: 100%;
   height: 90vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
   animation: slideUp 300ms ease-out;
 }
@@ -85,6 +86,8 @@
 /* Modal body */
 .modal-body {
   padding: 20px;
+  flex: 1;
+  overflow-y: auto;
 }
 
 /* Tabs */
@@ -281,4 +284,283 @@
 
 .add-project-btn svg {
   flex-shrink: 0;
+}
+
+/* Project Entries Section */
+.project-entries-section {
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: #141e3e;
+  text-align: right;
+  margin: 0 0 16px 0;
+}
+
+/* Project Entry */
+.project-entry {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Project Selection Fields */
+.project-field {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.project-field:hover {
+  background: #e9ecef;
+}
+
+.field-label {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.field-chevron {
+  font-size: 18px;
+  color: #999;
+}
+
+.field-icon {
+  font-size: 14px;
+  color: #999;
+}
+
+/* Project Time Row */
+.project-time-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.project-time-row:hover {
+  background: #e9ecef;
+}
+
+/* Project Description */
+.project-description {
+  width: 100%;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #141e3e;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.project-description::placeholder {
+  color: #999;
+}
+
+.project-description:focus {
+  background: #ffffff;
+  border-color: #3b82f6;
+}
+
+/* Delete Project Button */
+.delete-project-btn {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  color: #EE2662;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+
+.delete-project-btn:hover {
+  opacity: 0.8;
+}
+
+/* Project Time Error */
+.project-time-error {
+  font-family: 'Assistant', sans-serif;
+  font-size: 12px;
+  color: #EE2662;
+  text-align: center;
+  padding: 8px;
+  background: #fee2e2;
+  border-radius: 6px;
+  direction: rtl;
+}
+
+/* Confirmation Dialog */
+.confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  animation: fadeIn 200ms ease-out;
+}
+
+.confirmation-dialog {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 24px;
+  width: 90%;
+  max-width: 320px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  animation: scaleIn 200ms ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.confirmation-message {
+  font-family: 'Assistant', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: #141e3e;
+  text-align: center;
+  margin: 0 0 20px 0;
+  direction: rtl;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.confirm-btn-cancel,
+.confirm-btn-delete {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.confirm-btn-cancel {
+  background: #f3f4f6;
+  color: #666;
+}
+
+.confirm-btn-cancel:hover {
+  opacity: 0.8;
+}
+
+.confirm-btn-delete {
+  background: #EE2662;
+  color: #ffffff;
+}
+
+.confirm-btn-delete:hover {
+  opacity: 0.9;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 16px 20px 20px 20px;
+  background: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.footer-hours-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  direction: rtl;
+}
+
+.hours-reported {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.hours-number {
+  color: #FF6B00;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.hours-text {
+  color: #666;
+}
+
+.hours-remaining {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+}
+
+.footer-save-btn {
+  width: 100%;
+  padding: 16px;
+  background: #141e3e;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.footer-save-btn:hover {
+  background: #1a2747;
+}
+
+.footer-save-btn:active {
+  background: #0f1629;
 }

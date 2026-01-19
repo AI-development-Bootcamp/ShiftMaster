@@ -6,11 +6,30 @@ interface ManualReportModalProps {
   onClose: () => void;
 }
 
+interface TimeValue {
+  hours: number;
+  minutes: number;
+  period: 'AM' | 'PM';
+}
+
+interface ProjectEntry {
+  id: string;
+  project: string;
+  task: string;
+  location: string;
+  startTime: TimeValue;
+  endTime: TimeValue;
+  description: string;
+}
+
 function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
-  const [editingField, setEditingField] = useState<'entry' | 'exit' | null>(null);
-  const [entryTime, setEntryTime] = useState({ hours: 9, minutes: 41, period: 'AM' as 'AM' | 'PM' });
-  const [exitTime, setExitTime] = useState({ hours: 9, minutes: 4, period: 'AM' as 'AM' | 'PM' });
+  const [editingField, setEditingField] = useState<'entry' | 'exit' | string | null>(null);
+  const [entryTime, setEntryTime] = useState<TimeValue>({ hours: 9, minutes: 41, period: 'AM' });
+  const [exitTime, setExitTime] = useState<TimeValue>({ hours: 9, minutes: 4, period: 'AM' });
+  const [projectEntries, setProjectEntries] = useState<ProjectEntry[]>([]);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [timeErrors, setTimeErrors] = useState<Record<string, string>>({});
 
   const hoursRef = useRef<HTMLDivElement>(null);
   const minutesRef = useRef<HTMLDivElement>(null);
@@ -21,10 +40,142 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const minutes = Array.from({ length: 60 }, (_, i) => i);
   const periods: ('AM' | 'PM')[] = ['AM', 'PM'];
 
+  // Convert time to minutes since midnight for comparison
+  const timeToMinutes = (time: TimeValue): number => {
+    let hours24 = time.hours;
+    if (time.period === 'PM' && hours24 !== 12) hours24 += 12;
+    if (time.period === 'AM' && hours24 === 12) hours24 = 0;
+    return hours24 * 60 + time.minutes;
+  };
+
+  // Validate project times
+  const validateProjectTime = (projectId: string, startTime: TimeValue, endTime: TimeValue) => {
+    const startMinutes = timeToMinutes(startTime);
+    const endMinutes = timeToMinutes(endTime);
+
+    const newErrors = { ...timeErrors };
+
+    if (endMinutes <= startMinutes) {
+      newErrors[projectId] = 'שעת הסיום חייבת להיות אחרי שעת ההתחלה';
+    } else {
+      delete newErrors[projectId];
+    }
+
+    setTimeErrors(newErrors);
+  };
+
+  // Calculate total hours from all project entries
+  const calculateTotalHours = (): number => {
+    let totalMinutes = 0;
+    projectEntries.forEach(project => {
+      const startMinutes = timeToMinutes(project.startTime);
+      const endMinutes = timeToMinutes(project.endTime);
+      if (endMinutes > startMinutes) {
+        totalMinutes += (endMinutes - startMinutes);
+      }
+    });
+    return Math.round((totalMinutes / 60) * 10) / 10; // Round to 1 decimal
+  };
+
+  // Handle save button
+  const handleSave = () => {
+    // Check for validation errors
+    if (Object.keys(timeErrors).length > 0) {
+      // There are errors, don't close
+      return;
+    }
+
+    // TODO: Save the data to backend/state
+    console.log('Saving data:', {
+      entryTime,
+      exitTime,
+      projectEntries
+    });
+
+    // Close modal
+    onClose();
+  };
+
+  // Add new project entry
+  const handleAddProject = () => {
+    const newProject: ProjectEntry = {
+      id: Date.now().toString(),
+      project: '',
+      task: '',
+      location: '',
+      startTime: { hours: 9, minutes: 0, period: 'AM' },
+      endTime: { hours: 5, minutes: 0, period: 'PM' },
+      description: '',
+    };
+    setProjectEntries([...projectEntries, newProject]);
+  };
+
+  // Update project description
+  const handleDescriptionChange = (projectId: string, description: string) => {
+    setProjectEntries(projectEntries.map(p =>
+      p.id === projectId ? { ...p, description } : p
+    ));
+  };
+
+  // Delete project with confirmation
+  const handleDeleteProject = (projectId: string) => {
+    setDeleteConfirmId(projectId);
+  };
+
+  const confirmDelete = () => {
+    if (deleteConfirmId) {
+      setProjectEntries(projectEntries.filter(p => p.id !== deleteConfirmId));
+      setDeleteConfirmId(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirmId(null);
+  };
+
+  // Get current time value being edited
+  const getCurrentTime = (): TimeValue => {
+    if (editingField === 'entry') return entryTime;
+    if (editingField === 'exit') return exitTime;
+    if (typeof editingField === 'string' && editingField.startsWith('project-')) {
+      const [, projectId, field] = editingField.split('-');
+      const project = projectEntries.find(p => p.id === projectId);
+      if (project) {
+        return field === 'start' ? project.startTime : project.endTime;
+      }
+    }
+    return entryTime;
+  };
+
+  // Set current time value being edited
+  const setCurrentTime = (newTime: TimeValue) => {
+    if (editingField === 'entry') {
+      setEntryTime(newTime);
+    } else if (editingField === 'exit') {
+      setExitTime(newTime);
+    } else if (typeof editingField === 'string' && editingField.startsWith('project-')) {
+      const [, projectId, field] = editingField.split('-');
+      setProjectEntries(projectEntries.map(p => {
+        if (p.id === projectId) {
+          const updatedProject = {
+            ...p,
+            [field === 'start' ? 'startTime' : 'endTime']: newTime
+          };
+          // Validate after update
+          setTimeout(() => {
+            validateProjectTime(projectId, updatedProject.startTime, updatedProject.endTime);
+          }, 0);
+          return updatedProject;
+        }
+        return p;
+      }));
+    }
+  };
+
   // Scroll to selected values when picker opens
   useEffect(() => {
     if (editingField) {
-      const currentTime = editingField === 'entry' ? entryTime : exitTime;
+      const currentTime = getCurrentTime();
 
       if (hoursRef.current) {
         const hourIndex = hours.indexOf(currentTime.hours);
@@ -53,15 +204,14 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     const index = Math.round(scrollTop / itemHeight);
     const clampedIndex = Math.max(0, Math.min(index, items.length - 1));
 
-    const currentTime = editingField === 'entry' ? entryTime : exitTime;
-    const setTime = editingField === 'entry' ? setEntryTime : setExitTime;
+    const currentTime = getCurrentTime();
 
     if (field === 'hours' && currentTime.hours !== items[clampedIndex]) {
-      setTime({ ...currentTime, hours: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, hours: items[clampedIndex] });
     } else if (field === 'minutes' && currentTime.minutes !== items[clampedIndex]) {
-      setTime({ ...currentTime, minutes: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, minutes: items[clampedIndex] });
     } else if (field === 'period' && currentTime.period !== items[clampedIndex]) {
-      setTime({ ...currentTime, period: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, period: items[clampedIndex] });
     }
   };
 
@@ -101,7 +251,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     });
   };
 
-  const handleTimeClick = (field: 'entry' | 'exit') => {
+  const handleTimeClick = (field: 'entry' | 'exit' | string) => {
     setEditingField(editingField === field ? null : field);
   };
 
@@ -158,8 +308,8 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
 
           <div className="time-entries">
             <div className="time-entry-row" onClick={() => handleTimeClick('entry')}>
-              <span className="time-value">{formatTime(entryTime.hours, entryTime.minutes)}</span>
               <span className="time-label">כניסה</span>
+              <span className="time-value">{formatTime(entryTime.hours, entryTime.minutes)}</span>
             </div>
 
             {editingField === 'entry' && (
@@ -225,8 +375,8 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
             )}
 
             <div className="time-entry-row" onClick={() => handleTimeClick('exit')}>
-              <span className="time-value">{formatTime(exitTime.hours, exitTime.minutes)}</span>
               <span className="time-label">יציאה</span>
+              <span className="time-value">{formatTime(exitTime.hours, exitTime.minutes)}</span>
             </div>
 
             {editingField === 'exit' && (
@@ -292,12 +442,225 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
             )}
           </div>
 
-          <button className="add-project-btn">
+          {/* Project Entries Section */}
+          {projectEntries.length > 0 && (
+            <div className="project-entries-section">
+              <h3 className="section-title">דיווח פרוייקטים</h3>
+              {projectEntries.map((project) => (
+                <div key={project.id} className="project-entry">
+                  {/* Project selection fields */}
+                  <div className="project-field" onClick={() => {}}>
+                    <span className="field-label">פרויקט</span>
+                    <span className="field-chevron">›</span>
+                  </div>
+
+                  <div className="project-field" onClick={() => {}}>
+                    <span className="field-label">משימה</span>
+                    <span className="field-chevron">›</span>
+                  </div>
+
+                  <div className="project-field" onClick={() => {}}>
+                    <span className="field-label">מיקום</span>
+                    <span className="field-icon">◊</span>
+                  </div>
+
+                  {/* Project time entries */}
+                  <div className="project-time-row" onClick={() => handleTimeClick(`project-${project.id}-start`)}>
+                    <span className="time-label">שעת התחלה</span>
+                    <span className="time-value">{formatTime(project.startTime.hours, project.startTime.minutes)}</span>
+                  </div>
+
+                  {editingField === `project-${project.id}-start` && (
+                    <div className="time-picker">
+                      <div className="time-picker-columns" dir="ltr">
+                        <div
+                          className="time-picker-column"
+                          ref={hoursRef}
+                          onScroll={() => handleScroll(hoursRef, hours, 'hours')}
+                          onWheel={(e) => handleWheel(e, hoursRef, hours)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {hours.map((hour, index) => (
+                            <div
+                              key={hour}
+                              className={`time-picker-item ${project.startTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(hoursRef, index)}
+                            >
+                              {hour}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                        <div
+                          className="time-picker-column"
+                          ref={minutesRef}
+                          onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
+                          onWheel={(e) => handleWheel(e, minutesRef, minutes)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {minutes.map((minute, index) => (
+                            <div
+                              key={minute}
+                              className={`time-picker-item ${project.startTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(minutesRef, index)}
+                            >
+                              {minute.toString().padStart(2, '0')}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                        <div
+                          className="time-picker-column"
+                          ref={periodRef}
+                          onScroll={() => handleScroll(periodRef, periods, 'period')}
+                          onWheel={(e) => handleWheel(e, periodRef, periods)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {periods.map((period, index) => (
+                            <div
+                              key={period}
+                              className={`time-picker-item ${project.startTime.period === period ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(periodRef, index)}
+                            >
+                              {period}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                      </div>
+                      <div className="time-picker-selection-indicator"></div>
+                    </div>
+                  )}
+
+                  <div className="project-time-row" onClick={() => handleTimeClick(`project-${project.id}-end`)}>
+                    <span className="time-label">שעת סיום</span>
+                    <span className="time-value">{formatTime(project.endTime.hours, project.endTime.minutes)}</span>
+                  </div>
+
+                  {editingField === `project-${project.id}-end` && (
+                    <div className="time-picker">
+                      <div className="time-picker-columns" dir="ltr">
+                        <div
+                          className="time-picker-column"
+                          ref={hoursRef}
+                          onScroll={() => handleScroll(hoursRef, hours, 'hours')}
+                          onWheel={(e) => handleWheel(e, hoursRef, hours)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {hours.map((hour, index) => (
+                            <div
+                              key={hour}
+                              className={`time-picker-item ${project.endTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(hoursRef, index)}
+                            >
+                              {hour}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                        <div
+                          className="time-picker-column"
+                          ref={minutesRef}
+                          onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
+                          onWheel={(e) => handleWheel(e, minutesRef, minutes)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {minutes.map((minute, index) => (
+                            <div
+                              key={minute}
+                              className={`time-picker-item ${project.endTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(minutesRef, index)}
+                            >
+                              {minute.toString().padStart(2, '0')}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                        <div
+                          className="time-picker-column"
+                          ref={periodRef}
+                          onScroll={() => handleScroll(periodRef, periods, 'period')}
+                          onWheel={(e) => handleWheel(e, periodRef, periods)}
+                        >
+                          <div className="time-picker-padding"></div>
+                          {periods.map((period, index) => (
+                            <div
+                              key={period}
+                              className={`time-picker-item ${project.endTime.period === period ? 'time-picker-item-selected' : ''}`}
+                              onClick={() => handleItemClick(periodRef, index)}
+                            >
+                              {period}
+                            </div>
+                          ))}
+                          <div className="time-picker-padding"></div>
+                        </div>
+                      </div>
+                      <div className="time-picker-selection-indicator"></div>
+                    </div>
+                  )}
+
+                  {/* Description field */}
+                  <textarea
+                    className="project-description"
+                    placeholder="הוספת פירוט..."
+                    value={project.description}
+                    onChange={(e) => handleDescriptionChange(project.id, e.target.value)}
+                    rows={3}
+                    dir="rtl"
+                  />
+
+                  {/* Delete button */}
+                  <button className="delete-project-btn" onClick={() => handleDeleteProject(project.id)}>
+                    מחיקת פרויקט
+                  </button>
+
+                  {/* Error message */}
+                  {timeErrors[project.id] && (
+                    <div className="project-time-error" role="alert">
+                      {timeErrors[project.id]}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Add Project Button */}
+          <button className="add-project-btn" onClick={handleAddProject}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="2" />
               <path d="M10 6V14M6 10H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
             <span>הוספת פרויקט</span>
+          </button>
+
+          {/* Delete Confirmation Dialog */}
+          {deleteConfirmId && (
+            <div className="confirmation-overlay" onClick={cancelDelete}>
+              <div className="confirmation-dialog" onClick={(e) => e.stopPropagation()}>
+                <p className="confirmation-message">האם אתה בטוח שברצונך למחוק פרויקט זה?</p>
+                <div className="confirmation-buttons">
+                  <button className="confirm-btn-cancel" onClick={cancelDelete}>ביטול</button>
+                  <button className="confirm-btn-delete" onClick={confirmDelete}>מחיקה</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Modal Footer */}
+        <div className="modal-footer">
+          <div className="footer-hours-summary">
+            <div className="hours-reported">
+              <span className="hours-number">{calculateTotalHours()}</span>
+              <span className="hours-text"> מתוך 9 שעות</span>
+            </div>
+            <div className="hours-remaining">
+              הפחת {Math.max(0, 9 - calculateTotalHours())} שעות לדיווח
+            </div>
+          </div>
+          <button className="footer-save-btn" onClick={handleSave}>
+            שמירה
           </button>
         </div>
       </div>
