@@ -147,8 +147,17 @@ export function AssignmentPage() {
                 rowActions={{
                     showEdit: true,
                     showDelete: true,
-                    onEdit: (row) => console.log('Edit assignment:', row),
-                    onDelete: (row) => console.log('Delete assignment:', row),
+                    editOptions: [
+                        { label: 'ערוך לקוח', onClick: () => console.log(1) },
+                        { label: 'ערוך פרוייקט', onClick: () => console.log(2) },
+                        { label: 'ערוך משימה', onClick: () => console.log(3) },
+                        { label: 'ערוך שיוך עובדים', onClick: () => console.log(4) },
+                    ],
+                    deleteOptions: [
+                        { label: 'מחק לקוח', onClick: () => console.log(11) },
+                        { label: 'מחק פרויקט', onClick: () => console.log(12) },
+                        { label: 'מחק משימה', onClick: () => console.log(13) },
+                    ]
                 }}
             />
         </div>

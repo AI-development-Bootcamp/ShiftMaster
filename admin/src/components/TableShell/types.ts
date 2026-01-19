@@ -39,14 +39,26 @@ export interface TableColumnDef<T> {
 }
 
 // --- Action Types ---
+// --- Action Types ---
+export interface ActionOption<T> {
+    label: string;
+    onClick: (row: T) => void;
+    variant?: 'danger' | 'default';
+}
+
 export interface RowActionsConfig<T> {
     showEdit?: boolean;
     showDelete?: boolean;
     showAdd?: boolean;
 
     onEdit?: (row: T) => void;
+    editOptions?: ActionOption<T>[];
+
     onDelete?: (row: T) => void;
+    deleteOptions?: ActionOption<T>[];
+
     onAdd?: (row: T) => void;
+    addOptions?: ActionOption<T>[];
 }
 
 // --- Pagination Types ---

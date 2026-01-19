@@ -100,11 +100,18 @@
     color: var(--color-text-primary, #111827);
     font-size: var(--font-size-sm, 0.875rem);
     overflow: hidden;
+    /* Changed from hidden to visible/clip might be needed but dropdown needs to show */
     text-overflow: ellipsis;
     white-space: nowrap;
     position: relative;
     /* Enable absolute positioning for children (e.g. empty state bg) */
 }
+
+/* Allow overflow for actions cell so dropdowns can appear */
+.table-shell__cell:has(.table-shell__actions) {
+    overflow: visible;
+}
+
 
 /* === Empty State === */
 .table-shell__empty-container {
@@ -325,7 +332,13 @@
 }
 
 /* Actions cell styling */
-/* Actions cell styling */
+.table-shell__actions {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    /* Consistent spacing */
+}
+
 .table-shell__action-btn {
     padding: 4px 8px;
     margin: 0 2px;
@@ -337,6 +350,10 @@
     /* Default Edit Button (generic class) */
     color: #3b82f6;
     /* Light Blue */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .table-shell__action-btn:hover {
@@ -357,4 +374,53 @@
     /* Lighter Red background */
     color: #dc2626;
     /* Darker red text on hover */
+}
+
+/* --- Action Dropdown Styles --- */
+.table-shell__action-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.table-shell__action-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-top: 4px;
+    background-color: #ffffff;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 6px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    z-index: 1001;
+    /* Above almost everything else in the table */
+    min-width: 140px;
+    overflow: hidden;
+    padding: 4px 0;
+}
+
+.table-shell__action-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: right;
+    /* RTL friendly */
+    background: none;
+    border: none;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-text-primary, #111827);
+    cursor: pointer;
+    transition: background-color var(--transition-fast, 150ms);
+}
+
+.table-shell__action-dropdown-item:hover {
+    background-color: var(--color-bg-secondary, #f9fafb);
+}
+
+.table-shell__action-dropdown-item--danger {
+    color: #ef4444;
+}
+
+.table-shell__action-dropdown-item--danger:hover {
+    background-color: #fee2e2;
 }
