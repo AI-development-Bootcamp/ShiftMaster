@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StatusBadge, { EntryStatus } from '../StatusBadge/StatusBadge';
 import TimeEntryItem, { TimeEntry } from '../TimeEntryItem/TimeEntryItem';
 import './DailyEntryCard.css';
@@ -28,6 +28,11 @@ function DailyEntryCard({
   onAddReport,
 }: DailyEntryCardProps) {
   const [expanded, setExpanded] = useState(isExpanded);
+
+  // Sync local expanded state with prop changes
+  useEffect(() => {
+    setExpanded(isExpanded);
+  }, [isExpanded]);
 
   const handleToggle = () => {
     const newState = !expanded;

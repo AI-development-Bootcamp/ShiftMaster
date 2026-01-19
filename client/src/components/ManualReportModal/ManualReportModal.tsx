@@ -23,6 +23,8 @@ interface ProjectEntry {
   description: string;
 }
 
+type TimePickerItem = number | 'AM' | 'PM';
+
 function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
   const [editingField, setEditingField] = useState<'entry' | 'exit' | string | null>(null);
@@ -295,7 +297,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   // Handle scroll to update selected time
   const handleScroll = (
     ref: React.RefObject<HTMLDivElement>,
-    items: any[],
+    items: TimePickerItem[],
     field: 'hours' | 'minutes' | 'period'
   ) => {
     if (!ref.current) return;
@@ -308,11 +310,11 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     const currentTime = getCurrentTime();
 
     if (field === 'hours' && currentTime.hours !== items[clampedIndex]) {
-      setCurrentTime({ ...currentTime, hours: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, hours: items[clampedIndex] as number });
     } else if (field === 'minutes' && currentTime.minutes !== items[clampedIndex]) {
-      setCurrentTime({ ...currentTime, minutes: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, minutes: items[clampedIndex] as number });
     } else if (field === 'period' && currentTime.period !== items[clampedIndex]) {
-      setCurrentTime({ ...currentTime, period: items[clampedIndex] });
+      setCurrentTime({ ...currentTime, period: items[clampedIndex] as 'AM' | 'PM' });
     }
   };
 
@@ -320,7 +322,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const handleWheel = (
     e: React.WheelEvent<HTMLDivElement>,
     ref: React.RefObject<HTMLDivElement>,
-    items: any[]
+    items: TimePickerItem[]
   ) => {
     e.preventDefault();
     if (!ref.current) return;
