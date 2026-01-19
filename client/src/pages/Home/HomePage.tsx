@@ -130,15 +130,34 @@ const HEBREW_MONTHS = [
   'דצמבר',
 ];
 
+// Function to load entries for a specific month/year
+// TODO: Replace with actual API call to backend
+const loadEntriesForMonth = (month: number, year: number): DailyEntry[] => {
+  // For now, only return mock data for October 2025
+  if (month === 9 && year === 2025) {
+    return mockEntries;
+  }
+  // Return empty array for other months (will be replaced with API call)
+  return [];
+};
+
 function HomePage() {
   const navigate = useNavigate();
   const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October
+  const [currentYear, setCurrentYear] = useState(2025);
   const [prevMonthIndex, setPrevMonthIndex] = useState(9);
   const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(null);
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
+  const [entries, setEntries] = useState<DailyEntry[]>([]);
+
+  // Load entries when month/year changes
+  useEffect(() => {
+    const loadedEntries = loadEntriesForMonth(currentMonthIndex, currentYear);
+    setEntries(loadedEntries);
+  }, [currentMonthIndex, currentYear]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -168,13 +187,25 @@ function HomePage() {
   const handlePrevMonth = () => {
     setPrevMonthIndex(currentMonthIndex);
     setMonthDirection('right');
-    setCurrentMonthIndex((prev) => (prev === 0 ? 11 : prev - 1));
+    setCurrentMonthIndex((prev) => {
+      if (prev === 0) {
+        setCurrentYear((y) => y - 1);
+        return 11;
+      }
+      return prev - 1;
+    });
   };
 
   const handleNextMonth = () => {
     setPrevMonthIndex(currentMonthIndex);
     setMonthDirection('left');
-    setCurrentMonthIndex((prev) => (prev === 11 ? 0 : prev + 1));
+    setCurrentMonthIndex((prev) => {
+      if (prev === 11) {
+        setCurrentYear((y) => y + 1);
+        return 0;
+      }
+      return prev + 1;
+    });
   };
 
   const handleToggleEntry = (id: string) => {
@@ -261,16 +292,31 @@ function HomePage() {
       {/* Main content - entries list */}
       <main className="home-content">
         <div className="entries-list">
-          {mockEntries.map((entry) => (
-            <DailyEntryCard
-              key={entry.id}
-              entry={entry}
-              isExpanded={expandedEntryId === entry.id}
-              onToggle={handleToggleEntry}
-              onEditEntry={handleEditEntry}
-              onAddReport={handleAddReport}
-            />
-          ))}
+          {entries.length > 0 ? (
+            entries.map((entry) => (
+              <DailyEntryCard
+                key={entry.id}
+                entry={entry}
+                isExpanded={expandedEntryId === entry.id}
+                onToggle={handleToggleEntry}
+                onEditEntry={handleEditEntry}
+                onAddReport={handleAddReport}
+              />
+            ))
+          ) : (
+            <div className="empty-state">
+              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                <circle cx="40" cy="40" r="38" stroke="#E0E0E0" strokeWidth="4" />
+                <path
+                  d="M40 20V40M40 40V60M40 40H60M40 40H20"
+                  stroke="#E0E0E0"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              <p className="empty-state-text">אין דיווחים לחודש זה</p>
+            </div>
+          )}
         </div>
       </main>
 
