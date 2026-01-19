@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import './ManualReportModal.css';
+import SelectionModal, { SelectionType, SelectionGroup } from '../SelectionModal/SelectionModal';
 
 interface ManualReportModalProps {
   isOpen: boolean;
@@ -30,10 +31,46 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const [projectEntries, setProjectEntries] = useState<ProjectEntry[]>([]);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [timeErrors, setTimeErrors] = useState<Record<string, string>>({});
+  const [showMissingHoursAlert, setShowMissingHoursAlert] = useState(false);
+  const [selectionModal, setSelectionModal] = useState<{ isOpen: boolean; type: SelectionType | null; projectId: string | null }>({
+    isOpen: false,
+    type: null,
+    projectId: null,
+  });
 
   const hoursRef = useRef<HTMLDivElement>(null);
   const minutesRef = useRef<HTMLDivElement>(null);
   const periodRef = useRef<HTMLDivElement>(null);
+
+  // Mock data for selections
+  const projectGroups: SelectionGroup[] = [
+    {
+      title: 'אברה',
+      items: ['פרויקט א', 'פרויקט ב', 'פרויקט ג']
+    },
+    {
+      title: 'חברת הייטק',
+      items: ['מערכת ניהול', 'אפליקציה מובייל', 'אתר אינטרנט']
+    },
+    {
+      title: 'לקוח פרטי',
+      items: ['יעוץ', 'פיתוח', 'תחזוקה']
+    }
+  ];
+
+  const taskGroups: SelectionGroup[] = [
+    {
+      title: 'משימות',
+      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review']
+    }
+  ];
+
+  const locationGroups: SelectionGroup[] = [
+    {
+      title: 'מיקום',
+      items: ['משרד', 'עבודה מהבית', 'אצל לקוח', 'בחוץ']
+    }
+  ];
 
   // Generate hours (1-12), minutes (0-59), and periods (AM/PM)
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -85,6 +122,13 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
       return;
     }
 
+    // Check if total hours is less than 9
+    const totalHours = calculateTotalHours();
+    if (totalHours < 9) {
+      setShowMissingHoursAlert(true);
+      return;
+    }
+
     // TODO: Save the data to backend/state
     console.log('Saving data:', {
       entryTime,
@@ -93,6 +137,24 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     });
 
     // Close modal
+    onClose();
+  };
+
+  // Handle completing hours
+  const handleCompleteHours = () => {
+    setShowMissingHoursAlert(false);
+    // User will add more hours manually
+  };
+
+  // Handle don't show again
+  const handleDontShowAgain = () => {
+    setShowMissingHoursAlert(false);
+    // TODO: Save the data anyway
+    console.log('Saving data:', {
+      entryTime,
+      exitTime,
+      projectEntries
+    });
     onClose();
   };
 
@@ -131,6 +193,45 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
 
   const cancelDelete = () => {
     setDeleteConfirmId(null);
+  };
+
+  // Handle opening selection modal
+  const handleOpenSelection = (type: SelectionType, projectId: string) => {
+    setSelectionModal({ isOpen: true, type, projectId });
+  };
+
+  // Handle closing selection modal
+  const handleCloseSelection = () => {
+    setSelectionModal({ isOpen: false, type: null, projectId: null });
+  };
+
+  // Handle selection from modal
+  const handleSelection = (value: string) => {
+    if (!selectionModal.projectId || !selectionModal.type) return;
+
+    const fieldType = selectionModal.type;
+    const projectId = selectionModal.projectId;
+
+    setProjectEntries(projectEntries.map(p => {
+      if (p.id === projectId) {
+        return { ...p, [fieldType]: value };
+      }
+      return p;
+    }));
+  };
+
+  // Get current selection groups based on type
+  const getSelectionGroups = (): SelectionGroup[] => {
+    switch (selectionModal.type) {
+      case 'project':
+        return projectGroups;
+      case 'task':
+        return taskGroups;
+      case 'location':
+        return locationGroups;
+      default:
+        return [];
+    }
   };
 
   // Get current time value being edited
@@ -449,18 +550,24 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
               {projectEntries.map((project) => (
                 <div key={project.id} className="project-entry">
                   {/* Project selection fields */}
-                  <div className="project-field" onClick={() => {}}>
-                    <span className="field-label">פרויקט</span>
+                  <div className="project-field" onClick={() => handleOpenSelection('project', project.id)}>
+                    <span className={`field-label ${!project.project ? 'placeholder' : ''}`}>
+                      {project.project || 'בחר פרויקט'}
+                    </span>
                     <span className="field-chevron">›</span>
                   </div>
 
-                  <div className="project-field" onClick={() => {}}>
-                    <span className="field-label">משימה</span>
+                  <div className="project-field" onClick={() => handleOpenSelection('task', project.id)}>
+                    <span className={`field-label ${!project.task ? 'placeholder' : ''}`}>
+                      {project.task || 'בחר משימה'}
+                    </span>
                     <span className="field-chevron">›</span>
                   </div>
 
-                  <div className="project-field" onClick={() => {}}>
-                    <span className="field-label">מיקום</span>
+                  <div className="project-field" onClick={() => handleOpenSelection('location', project.id)}>
+                    <span className={`field-label ${!project.location ? 'placeholder' : ''}`}>
+                      {project.location || 'בחר מיקום'}
+                    </span>
                     <span className="field-icon">◊</span>
                   </div>
 
@@ -638,14 +745,48 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
           {deleteConfirmId && (
             <div className="confirmation-overlay" onClick={cancelDelete}>
               <div className="confirmation-dialog" onClick={(e) => e.stopPropagation()}>
-                <p className="confirmation-message">האם אתה בטוח שברצונך למחוק פרויקט זה?</p>
-                <div className="confirmation-buttons">
-                  <button className="confirm-btn-cancel" onClick={cancelDelete}>ביטול</button>
-                  <button className="confirm-btn-delete" onClick={confirmDelete}>מחיקה</button>
+                <div className="confirmation-icon-wrapper">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                    <rect width="56" height="56" rx="8" fill="#FEF5CC" />
+                    <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
+                    <path d="M28 26V30M28 32V33" stroke="#FEF5CC" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
                 </div>
+                <p className="confirmation-main-message">למחוק את הדיווח זה מהפרויקטים?</p>
+                <p className="confirmation-sub-message">המחיקה היא קבועה ולא ניתן יהיה לשחזר את הדיווח.</p>
+                <button className="confirmation-link-btn" onClick={cancelDelete}>מעדיף שלא למחוק</button>
+                <button className="confirmation-primary-btn" onClick={confirmDelete}>מחק את הפרויקט</button>
               </div>
             </div>
           )}
+
+          {/* Missing Hours Alert Dialog */}
+          {showMissingHoursAlert && (
+            <div className="confirmation-overlay" onClick={() => setShowMissingHoursAlert(false)}>
+              <div className="confirmation-dialog" onClick={(e) => e.stopPropagation()}>
+                <div className="confirmation-icon-wrapper">
+                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+                    <rect width="56" height="56" rx="8" fill="#FEF5CC" />
+                    <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
+                    <path d="M28 26V30M28 32V33" stroke="#FEF5CC" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                </div>
+                <p className="confirmation-main-message">יום העבודה שלך טרם הושלם.</p>
+                <p className="confirmation-sub-message">חסרות {Math.max(0, 9 - calculateTotalHours())} שעות דיווח כדי למלוא את היום.</p>
+                <button className="confirmation-link-btn" onClick={handleDontShowAgain}>אל תציג לנו זאת</button>
+                <button className="confirmation-primary-btn" onClick={handleCompleteHours}>תן לי להשלים את השעות</button>
+              </div>
+            </div>
+          )}
+
+          {/* Selection Modal */}
+          <SelectionModal
+            isOpen={selectionModal.isOpen}
+            onClose={handleCloseSelection}
+            type={selectionModal.type || 'project'}
+            groups={getSelectionGroups()}
+            onSelect={handleSelection}
+          />
         </div>
 
         {/* Modal Footer */}
@@ -656,8 +797,14 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
               <span className="hours-text"> מתוך 9 שעות</span>
             </div>
             <div className="hours-remaining">
-              הפחת {Math.max(0, 9 - calculateTotalHours())} שעות לדיווח
+              חסרות {Math.max(0, 9 - calculateTotalHours())} שעות לדיווח
             </div>
+          </div>
+          <div className="progress-bar-container">
+            <div
+              className="progress-bar-fill"
+              style={{ width: `${Math.min((calculateTotalHours() / 9) * 100, 100)}%` }}
+            />
           </div>
           <button className="footer-save-btn" onClick={handleSave}>
             שמירה
