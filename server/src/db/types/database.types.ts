@@ -12,6 +12,7 @@ export interface Database {
             users: {
                 Row: {
                     user_id: string
+                    last_modified_by: string | null
                     full_name: string
                     email: string
                     password_hash: string
@@ -22,6 +23,7 @@ export interface Database {
                 }
                 Insert: {
                     user_id?: string
+                    last_modified_by?: string | null
                     full_name: string
                     email: string
                     password_hash: string
@@ -32,6 +34,7 @@ export interface Database {
                 }
                 Update: {
                     user_id?: string
+                    last_modified_by?: string | null
                     full_name?: string
                     email?: string
                     password_hash?: string
@@ -145,8 +148,9 @@ export interface Database {
                     revoked_at: string | null
                 }
                 Insert: {
-                    task_id?: string
-                    assigned_by?: string
+                    user_id: string
+                    task_id: string
+                    assigned_by: string
                     assigned_at?: string
                     active?: boolean
                     revoked_at?: string | null

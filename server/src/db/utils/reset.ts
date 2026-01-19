@@ -71,8 +71,17 @@ async function resetDatabase() {
 const currentFilePath = fileURLToPath(import.meta.url);
 const executedFilePath = process.argv[1];
 
+// Safely resolve the real path; fall back to undefined if fs.realpathSync throws
+let resolvedExecutedPath: string | undefined;
+try {
+    resolvedExecutedPath = fs.realpathSync(executedFilePath);
+} catch {
+    // Path doesn't exist or is unresolvable; leave as undefined
+    resolvedExecutedPath = undefined;
+}
+
 const isMainModule = currentFilePath === executedFilePath ||
-    currentFilePath === fs.realpathSync(executedFilePath);
+    currentFilePath === resolvedExecutedPath;
 
 if (isMainModule) {
     resetDatabase();
