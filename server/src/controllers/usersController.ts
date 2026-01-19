@@ -119,6 +119,61 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
 }
 
 /**
+ * Handle GET /api/v1/users/me - Get current user's information
+ * @authenticated
+ */
+export async function getCurrentUser(req: Request, res: Response): Promise<void> {
+  try {
+    // Get user ID from JWT token (set by isAuthenticated middleware)
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        error: {
+          message: 'User ID not found in token',
+          code: 'UNAUTHORIZED',
+        },
+      });
+      return;
+    }
+
+    // Get user
+    const user = await usersService.getUserById(userId);
+
+    // Return success response
+    res.status(200).json({
+      success: true,
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    // Handle user not found error
+    if (error instanceof UserNotFoundError) {
+      res.status(404).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
+    // Handle unexpected errors
+    console.error('Get current user error:', error);
+    res.status(500).json({
+      success: false,
+      error: {
+        message: 'Internal server error',
+        code: 'INTERNAL_SERVER_ERROR',
+      },
+    });
+  }
+}
+
+/**
  * Handle GET /api/v1/users/:id - Get single user
  * @admin_only
  */

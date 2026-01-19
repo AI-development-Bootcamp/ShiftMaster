@@ -3,6 +3,7 @@ import { isAuthenticated, isAdmin } from '../middleware/auth.js';
 import {
   createUser,
   listUsers,
+  getCurrentUser,
   getUser,
   updateUser,
   deleteUser,
@@ -223,6 +224,63 @@ router.post('/', isAuthenticated, isAdmin, createUser);
  *         description: Internal server error
  */
 router.get('/', isAuthenticated, isAdmin, listUsers);
+
+/**
+ * @swagger
+ * /api/v1/users/me:
+ *   get:
+ *     summary: Get current user's information
+ *     description: Returns the authenticated user's own profile information
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Current user retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       type: object
+ *                       properties:
+ *                         user_id:
+ *                           type: string
+ *                           example: "550e8400-e29b-41d4-a716-446655440000"
+ *                         full_name:
+ *                           type: string
+ *                           example: John Doe
+ *                         email:
+ *                           type: string
+ *                           example: john@example.com
+ *                         role:
+ *                           type: string
+ *                           enum: [admin, regular]
+ *                           example: regular
+ *                         job_title:
+ *                           type: string
+ *                           nullable: true
+ *                           example: Software Engineer
+ *                         active:
+ *                           type: boolean
+ *                           example: true
+ *                         created_at:
+ *                           type: string
+ *                           format: date-time
+ *                           example: 2024-01-01T00:00:00Z
+ *       401:
+ *         description: Unauthorized - Missing or invalid token
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/me', isAuthenticated, getCurrentUser);
 
 /**
  * @swagger
