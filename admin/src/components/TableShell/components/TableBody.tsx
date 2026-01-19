@@ -62,7 +62,6 @@ export function TableBody<T>({
                                         return (
                                             <BoolCell
                                                 row={row}
-                                                rowId={rowId}
                                                 columnKey={col.key}
                                                 value={value as boolean}
                                                 onChange={onBoolChange}

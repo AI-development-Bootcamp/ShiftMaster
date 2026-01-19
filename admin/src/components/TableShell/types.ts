@@ -82,6 +82,7 @@ export interface TableShellProps<T> {
     // State
     isLoading?: boolean;
     emptyStateImageSrc?: string;
+    emptyStateAlt?: string;
 
     // Pagination
     pagination: TablePaginationConfig;

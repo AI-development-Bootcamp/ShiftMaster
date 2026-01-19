@@ -80,7 +80,7 @@ TableShell is the primary table component for Admin UI, designed to display pagi
 
 ## Component Structure
 
-```
+```text
 TableShell/
 ├── TableShell.tsx          # Main container, orchestrates header/body/footer
 ├── TableShell.css          # All styling (single file for component)

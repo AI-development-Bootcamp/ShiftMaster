@@ -20,6 +20,7 @@ export function TableShell<T>({
     columns,
     isLoading = false,
     emptyStateImageSrc = emptySpaceImg,
+    emptyStateAlt = '',
     pagination,
     sort,
     onSortChange,
@@ -76,7 +77,7 @@ export function TableShell<T>({
                 <div className="table-shell__empty-container">
                     <img
                         src={emptyStateImageSrc}
-                        alt="אין נתונים"
+                        alt={emptyStateAlt}
                         className="table-shell__empty-image"
                     />
                 </div>

@@ -14,6 +14,7 @@ Admin interfaces require a standardized, reusable table component for displaying
 - **ADDED**: Server-side sorting support via header
 - **ADDED**: Fixed viewport-relative sizing (866:1080 height ratio)
 - **ADDED**: RTL-only layout with strict alignment rules
+- **BREAKING**: None (New component, no existing code affected)
 
 ## Impact
 

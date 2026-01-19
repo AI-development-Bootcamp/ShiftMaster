@@ -37,6 +37,11 @@
     background-color: var(--color-primary-dark, #0041b3);
 }
 
+.add-employee-btn:focus-visible {
+    outline: 2px solid var(--color-primary-dark, #0041b3);
+    outline-offset: 2px;
+}
+
 .employees-managment-page p {
     color: var(--color-text-secondary, #6b7280);
 }

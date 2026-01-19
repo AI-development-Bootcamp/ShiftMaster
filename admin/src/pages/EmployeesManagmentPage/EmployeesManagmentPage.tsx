@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { FormShell, FormValues } from '../../components/FormShell';
 import { createUserForm } from '../../components/forms';
 import { TableShell, TableColumnDef, SortState } from '../../components/TableShell';
@@ -13,6 +13,15 @@ export function EmployeesManagmentPage() {
     const [users, setUsers] = useState<User[]>(mockUsers);
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>(null);
+
+    // Watch users and clamp page if needed
+    const pageSize = 10;
+    useEffect(() => {
+        const totalPages = Math.max(1, Math.ceil(users.length / pageSize));
+        if (page > totalPages) {
+            setPage(totalPages);
+        }
+    }, [users.length, page]);
 
     // Columns Configuration
     const columns: TableColumnDef<User>[] = [

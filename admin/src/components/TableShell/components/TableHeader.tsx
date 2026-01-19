@@ -66,8 +66,15 @@ export function TableHeader<T>({ columns, sort, onSortChange }: TableHeaderProps
                                 textAlign: col.align || 'right',
                             }}
                             onClick={() => handleHeaderClick(col)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' || e.key === ' ') {
+                                    if (e.key === ' ') e.preventDefault();
+                                    handleHeaderClick(col);
+                                }
+                            }}
                             role={col.sortable ? 'button' : undefined}
                             tabIndex={col.sortable ? 0 : undefined}
+                            aria-sort={isSorted ? (sortDirection === 'asc' ? 'ascending' : 'descending') : (col.sortable ? 'none' : undefined)}
                         >
                             {isSorted && (
                                 <span className="table-shell__sort-indicator">

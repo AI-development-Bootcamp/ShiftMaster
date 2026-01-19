@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { FormShell } from '../components/FormShell';
@@ -126,7 +126,29 @@ describe('FormShell', () => {
         });
 
         it('submits form when required fields are filled', async () => {
-            // ... (keep test logic, no changes needed for this part)
+            render(
+                <FormShell
+                    title="טופס"
+                    primaryActionLabel="שלח"
+                    fields={basicFields}
+                    onSubmit={mockOnSubmit}
+                    onClose={mockOnClose}
+                />
+            );
+
+            // Fill required field
+            const nameInput = screen.getByLabelText(/שם/);
+            fireEvent.change(nameInput, { target: { value: 'ישראל ישראלי' } });
+
+            // Submit
+            const submitButton = screen.getByRole('button', { name: /שלח/i });
+            fireEvent.click(submitButton);
+
+            await waitFor(() => {
+                expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({
+                    name: 'ישראל ישראלי'
+                }));
+            });
         });
 
         it('clears error when field value changes', async () => {

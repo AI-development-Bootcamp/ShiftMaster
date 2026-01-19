@@ -11,7 +11,11 @@
     /* Ensure full coverage */
     width: 100vw;
     height: 100vh;
-    height: 100dvh;
+
+    @supports (height: 100dvh) {
+        height: 100dvh;
+    }
+
     /* Modern mobile viewport unit */
 
     /* Reset margins/padding */

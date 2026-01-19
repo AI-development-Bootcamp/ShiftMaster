@@ -1,6 +1,6 @@
 import { createPortal } from 'react-dom';
 import '../../styles/DesktopOnlyOverlay.css';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, Trans } from 'react-i18next';
 
 export function DesktopOnlyOverlay() {
     const { t } = useTranslation();
@@ -10,7 +10,7 @@ export function DesktopOnlyOverlay() {
             <div className="desktop-only-content">
                 <div className="desktop-only-icon">💻</div>
                 <h1>{t('desktopOnlyOverlay.title')}</h1>
-                <p dangerouslySetInnerHTML={{ __html: t('desktopOnlyOverlay.message') }} />
+                <Trans i18nKey="desktopOnlyOverlay.message" components={[<br key="br" />]} />
             </div>
         </div>,
         document.body

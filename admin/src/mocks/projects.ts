@@ -27,8 +27,8 @@ export const mockProjects: Project[] = [
         project_id: 3,
         client_id: 4, // Abra
         manager_user_id: 1,
-        name: 'פורטל ספקים',
-        description: 'מערכת לניהול הזמנות מספקים',
+        name: 'מערכת משאבי אנוש',
+        description: 'פלטפורמה לניהול עובדים וגיוס',
         start_date: '2024-02-01',
         time_format_type: ProjectTimeFormatType.SUM,
         active: true,

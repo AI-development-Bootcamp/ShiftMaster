@@ -1,8 +1,7 @@
-import { TableRowId } from '../../types';
+
 
 interface BoolCellProps<T> {
     row: T;
-    rowId: TableRowId;
     columnKey: string;
     value: boolean;
     onChange?: (args: { row: T; columnKey: string; nextValue: boolean }) => void;
@@ -27,6 +26,8 @@ export function BoolCell<T>({
             className="table-shell__checkbox"
             checked={value}
             onChange={handleChange}
+            aria-label={`Toggle ${columnKey}`}
+            aria-labelledby={`${columnKey}-header`} // Best effort if we knew the header ID, fallback to basic label
         />
     );
 }

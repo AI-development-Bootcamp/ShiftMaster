@@ -42,7 +42,7 @@ export const mockUsers: User[] = [
         full_name: 'שלומי בוטבול',
         email: 'shlomi@abra.com',
         role: UserRole.REGULAR,
-        job_title: 'מנהל ',
+        job_title: 'מנהל',
         active: true,
         created_at: '2024-01-01T08:00:00Z',
     },
