@@ -184,9 +184,6 @@ Create a `.env` file in the `client` directory. See `client/ENV_SETUP.md` for de
 ```env
 # API URL for backend server
 VITE_API_URL=http://localhost:3000
-
-# Render deployment hook URL (optional, used for CI/CD)
-VITE_RENDER_DEPLOY_URL_CLIENT=
 ```
 
 ### Admin
@@ -196,9 +193,6 @@ Create a `.env` file in the `admin` directory. See `admin/ENV_SETUP.md` for deta
 ```env
 # API URL for backend server
 VITE_API_URL=http://localhost:3000
-
-# Render deployment hook URL (optional, used for CI/CD)
-VITE_RENDER_DEPLOY_URL_ADMIN=
 ```
 
 **Important Notes:**
