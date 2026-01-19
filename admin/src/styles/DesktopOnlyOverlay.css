@@ -1,28 +1,38 @@
 .desktop-only-overlay {
     display: none;
     /* Hidden by default on big screens */
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    bottom: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    height: 100dvh !important;
-    /* Fallback and Dynamic */
-    margin: 0 !important;
-    padding: 0 !important;
-    background-color: #f3f4f6 !important;
-    background-image: url('../assets/login_background.svg') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    z-index: 2147483647 !important;
+    /* Fixed positioning relative to the viewport (since it's in body) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    /* Ensure full coverage */
+    width: 100vw;
+    height: 100vh;
+    height: 100dvh;
+    /* Modern mobile viewport unit */
+
+    /* Reset margins/padding */
+    margin: 0;
+    padding: 20px;
+
+    /* Styling */
+    background-color: #f3f4f6;
+    background-image: url('../assets/login_background.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* High z-index to stay on top */
+    z-index: 99999;
+
+    /* Flex layout for content alignment */
     align-items: center;
     justify-content: center;
     text-align: center;
     direction: rtl;
-    padding: 20px;
 }
 
 .desktop-only-content {
