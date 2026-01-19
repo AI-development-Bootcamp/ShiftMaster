@@ -164,11 +164,11 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
           <label htmlFor="password" className="login-card__label">
             {t('login.passwordLabel')}
           </label>
-          <div className="login-card__password-wrapper" style={{ position: 'relative' }}>
+          <div className="login-card__password-wrapper">
             <input
               id="password"
               type={showPassword ? 'text' : 'password'}
-              className={`login-card__input ${touched.password && errors.password ? 'login-card__input--error' : ''
+              className={`login-card__input login-card__input--with-toggle ${touched.password && errors.password ? 'login-card__input--error' : ''
                 }`}
               value={password}
               onChange={(e) => setPassword(e.target.value)}

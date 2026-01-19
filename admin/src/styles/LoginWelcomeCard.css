@@ -99,6 +99,17 @@
   color: var(--color-text-light);
 }
 
+.login-card__password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.login-card__input--with-toggle {
+  padding-left: 40px;
+  /* Space for the absolute icon on the left */
+}
+
+
 .login-card__password-toggle {
   position: absolute;
   left: 10px;
