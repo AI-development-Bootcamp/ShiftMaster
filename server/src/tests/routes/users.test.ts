@@ -13,13 +13,6 @@ vi.mock('../../db/supabase.js', () => ({
   },
 }));
 
-// Create mock service methods  
-const mockCreateUser = vi.fn();
-const mockListUsers = vi.fn();
-const mockGetUserById = vi.fn();
-const mockUpdateUser = vi.fn();
-const mockDeleteUser = vi.fn();
-
 // Mock the UsersService class
 vi.mock('../../services/usersService.js', () => {
   const mockCreateUser = vi.fn();
@@ -44,7 +37,7 @@ vi.mock('../../services/usersService.js', () => {
     },
     UserNotFoundError: class UserNotFoundError extends Error {
       code = 'USER_NOT_FOUND';
-      constructor(userId: number) {
+      constructor(userId: string) {
         super(`User with ID ${userId} not found`);
       }
     },
@@ -66,20 +59,18 @@ vi.mock('../../utils/jwt.js', () => ({
 }));
 
 import usersRouter from '../../routes/users.js';
-import {
-  DuplicateEmailError,
-  UserNotFoundError,
-  __mocks,
-} from '../../services/usersService.js';
+import { DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
 import * as jwtUtil from '../../utils/jwt.js';
 
+// Get mocks from the mocked module
+const usersServiceModule = await vi.importMock<typeof import('../../services/usersService.js')>('../../services/usersService.js');
 const {
   mockCreateUser: serviceCreateUser,
   mockListUsers: serviceListUsers,
   mockGetUserById: serviceGetUserById,
   mockUpdateUser: serviceUpdateUser,
   mockDeleteUser: serviceDeleteUser,
-} = __mocks;
+} = (usersServiceModule as unknown as { __mocks: Record<string, ReturnType<typeof vi.fn>> }).__mocks;
 
 // Create test app
 const app = express();
@@ -89,18 +80,21 @@ app.use('/users', usersRouter);
 // Test constants
 const VALID_ADMIN_TOKEN = 'valid.admin.token';
 const VALID_USER_TOKEN = 'valid.user.token';
-const INVALID_TOKEN = 'invalid.token';
 
 const mockAdminUser = {
-  userId: 1,
+  userId: '550e8400-e29b-41d4-a716-446655440000',
   email: 'admin@example.com',
   role: 'admin' as const,
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600,
 };
 
 const mockRegularUser = {
-  userId: 2,
+  userId: '550e8400-e29b-41d4-a716-446655440001',
   email: 'user@example.com',
   role: 'regular' as const,
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + 3600,
 };
 
 describe('Users Routes', () => {
@@ -111,7 +105,7 @@ describe('Users Routes', () => {
   describe('POST /users', () => {
     it('should create user when authenticated as admin', async () => {
       const mockUser = {
-        user_id: 3,
+        user_id: '550e8400-e29b-41d4-a716-446655440002',
         full_name: 'New User',
         email: 'newuser@example.com',
         role: 'regular' as const,
@@ -129,7 +123,7 @@ describe('Users Routes', () => {
         .send({
           full_name: 'New User',
           email: 'newuser@example.com',
-          password: 'password123',
+          password: 'Password123!',
           role: 'regular',
           job_title: 'Engineer',
         });
@@ -149,7 +143,7 @@ describe('Users Routes', () => {
         .send({
           full_name: 'New User',
           email: 'newuser@example.com',
-          password: 'password123',
+          password: 'Password123!',
           role: 'regular',
         });
 
@@ -166,7 +160,7 @@ describe('Users Routes', () => {
         .send({
           full_name: 'New User',
           email: 'newuser@example.com',
-          password: 'password123',
+          password: 'Password123!',
           role: 'regular',
         });
 
@@ -186,7 +180,7 @@ describe('Users Routes', () => {
         .send({
           full_name: 'New User',
           email: 'newuser@example.com',
-          password: 'password123',
+          password: 'Password123!',
           role: 'regular',
         });
 
@@ -215,7 +209,7 @@ describe('Users Routes', () => {
       const mockResult = {
         users: [
           {
-            user_id: 1,
+            user_id: '550e8400-e29b-41d4-a716-446655440003',
             full_name: 'User 1',
             email: 'user1@example.com',
             role: 'regular' as const,
@@ -287,10 +281,71 @@ describe('Users Routes', () => {
     });
   });
 
+  describe('GET /users/me', () => {
+    it('should get current user info when authenticated', async () => {
+      const mockUser = {
+        user_id: mockRegularUser.userId,
+        full_name: 'Current User',
+        email: mockRegularUser.email,
+        role: 'regular' as const,
+        job_title: 'Engineer',
+        active: true,
+        created_at: '2024-01-01T00:00:00Z',
+      };
+
+      vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockRegularUser);
+      serviceGetUserById.mockResolvedValue(mockUser);
+
+      const response = await request(app)
+        .get('/users/me')
+        .set('Authorization', `Bearer ${VALID_USER_TOKEN}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body).toEqual({
+        success: true,
+        data: {
+          user: mockUser,
+        },
+      });
+      expect(serviceGetUserById).toHaveBeenCalledWith(mockRegularUser.userId);
+    });
+
+    it('should return 401 when not authenticated', async () => {
+      const response = await request(app).get('/users/me');
+
+      expect(response.status).toBe(401);
+      expect(response.body.error.code).toBe('UNAUTHORIZED');
+    });
+
+    it('should work for admin users too', async () => {
+      const mockUser = {
+        user_id: mockAdminUser.userId,
+        full_name: 'Admin User',
+        email: mockAdminUser.email,
+        role: 'admin' as const,
+        job_title: 'Administrator',
+        active: true,
+        created_at: '2024-01-01T00:00:00Z',
+      };
+
+      vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
+      serviceGetUserById.mockResolvedValue(mockUser);
+
+      const response = await request(app)
+        .get('/users/me')
+        .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
+
+      expect(response.status).toBe(200);
+      expect(response.body.data.user.role).toBe('admin');
+    });
+  });
+
   describe('GET /users/:id', () => {
+    const testUserId = '550e8400-e29b-41d4-a716-446655440004';
+
     it('should get user by ID when admin', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: testUserId,
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -303,7 +358,7 @@ describe('Users Routes', () => {
       serviceGetUserById.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .get('/users/1')
+        .get(`/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -316,11 +371,12 @@ describe('Users Routes', () => {
     });
 
     it('should return 404 when user not found', async () => {
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440999';
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
-      serviceGetUserById.mockRejectedValue(new UserNotFoundError(999));
+      serviceGetUserById.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .get('/users/999')
+        .get(`/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(404);
@@ -328,7 +384,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).get('/users/1');
+      const response = await request(app).get(`/users/${testUserId}`);
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -336,9 +392,11 @@ describe('Users Routes', () => {
   });
 
   describe('PATCH /users/:id', () => {
+    const testUserId = '550e8400-e29b-41d4-a716-446655440005';
+
     it('should update user when admin', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: testUserId,
         full_name: 'Updated Name',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -351,7 +409,7 @@ describe('Users Routes', () => {
       serviceUpdateUser.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .patch('/users/1')
+        .patch(`/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'Updated Name',
@@ -368,11 +426,12 @@ describe('Users Routes', () => {
     });
 
     it('should return 404 when user not found', async () => {
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440999';
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
-      serviceUpdateUser.mockRejectedValue(new UserNotFoundError(999));
+      serviceUpdateUser.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .patch('/users/999')
+        .patch(`/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'Updated Name',
@@ -389,7 +448,7 @@ describe('Users Routes', () => {
       );
 
       const response = await request(app)
-        .patch('/users/1')
+        .patch(`/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           email: 'taken@example.com',
@@ -401,7 +460,7 @@ describe('Users Routes', () => {
 
     it('should return 401 when not authenticated', async () => {
       const response = await request(app)
-        .patch('/users/1')
+        .patch(`/users/${testUserId}`)
         .send({
           full_name: 'Updated Name',
         });
@@ -412,17 +471,19 @@ describe('Users Routes', () => {
   });
 
   describe('DELETE /users/:id', () => {
+    const testUserId = '550e8400-e29b-41d4-a716-446655440006';
+
     it('should delete user when admin', async () => {
       const mockResult = {
         success: true,
-        message: 'User 1 has been deactivated',
+        message: `User ${testUserId} has been deactivated`,
       };
 
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
       serviceDeleteUser.mockResolvedValue(mockResult);
 
       const response = await request(app)
-        .delete('/users/1')
+        .delete(`/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -433,11 +494,12 @@ describe('Users Routes', () => {
     });
 
     it('should return 404 when user not found', async () => {
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440999';
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
-      serviceDeleteUser.mockRejectedValue(new UserNotFoundError(999));
+      serviceDeleteUser.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .delete('/users/999')
+        .delete(`/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(404);
@@ -445,7 +507,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).delete('/users/1');
+      const response = await request(app).delete(`/users/${testUserId}`);
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -455,7 +517,7 @@ describe('Users Routes', () => {
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockRegularUser);
 
       const response = await request(app)
-        .delete('/users/1')
+        .delete(`/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_USER_TOKEN}`);
 
       expect(response.status).toBe(403);

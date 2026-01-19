@@ -74,8 +74,9 @@ const router = Router();
  *                       type: object
  *                       properties:
  *                         user_id:
- *                           type: integer
- *                           example: 1
+ *                           type: string
+ *                           format: uuid
+ *                           example: "550e8400-e29b-41d4-a716-446655440000"
  *                         full_name:
  *                           type: string
  *                           example: John Doe
@@ -296,9 +297,10 @@ router.get('/me', isAuthenticated, getCurrentUser);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         description: User ID
- *         example: 1
+ *         example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
  *         description: User retrieved successfully
@@ -317,8 +319,9 @@ router.get('/me', isAuthenticated, getCurrentUser);
  *                       type: object
  *                       properties:
  *                         user_id:
- *                           type: integer
- *                           example: 1
+ *                           type: string
+ *                           format: uuid
+ *                           example: "550e8400-e29b-41d4-a716-446655440000"
  *                         full_name:
  *                           type: string
  *                           example: John Doe
@@ -361,7 +364,7 @@ router.get('/me', isAuthenticated, getCurrentUser);
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: User with ID 999 not found
+ *                       example: User with ID 550e8400-e29b-41d4-a716-446655440000 not found
  *                     code:
  *                       type: string
  *                       example: USER_NOT_FOUND
@@ -384,9 +387,10 @@ router.get('/:id', isAuthenticated, isAdmin, getUser);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         description: User ID
- *         example: 1
+ *         example: "550e8400-e29b-41d4-a716-446655440000"
  *     requestBody:
  *       required: true
  *       content:
@@ -440,8 +444,9 @@ router.get('/:id', isAuthenticated, isAdmin, getUser);
  *                       type: object
  *                       properties:
  *                         user_id:
- *                           type: integer
- *                           example: 1
+ *                           type: string
+ *                           format: uuid
+ *                           example: "550e8400-e29b-41d4-a716-446655440000"
  *                         full_name:
  *                           type: string
  *                           example: Jane Doe
@@ -490,9 +495,10 @@ router.patch('/:id', isAuthenticated, isAdmin, updateUser);
  *         name: id
  *         required: true
  *         schema:
- *           type: integer
+ *           type: string
+ *           format: uuid
  *         description: User ID
- *         example: 1
+ *         example: "550e8400-e29b-41d4-a716-446655440000"
  *     responses:
  *       200:
  *         description: User deleted (deactivated) successfully
@@ -512,7 +518,7 @@ router.patch('/:id', isAuthenticated, isAdmin, updateUser);
  *                       example: true
  *                     message:
  *                       type: string
- *                       example: User 1 has been deactivated
+ *                       example: User 550e8400-e29b-41d4-a716-446655440000 has been deactivated
  *       400:
  *         description: Validation error (invalid user ID)
  *       401:
