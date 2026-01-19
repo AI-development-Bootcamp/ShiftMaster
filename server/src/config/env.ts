@@ -11,7 +11,6 @@ export const env = {
     process.env.SUPABASE_URL || (isTest ? 'https://test.supabase.co' : ''),
   supabaseAnonKey:
     process.env.SUPABASE_ANON_KEY || (isTest ? 'test-anon-key' : ''),
-  databaseUrl: process.env.DATABASE_URL || '',
   jwtSecret:
     process.env.JWT_SECRET ||
     (isTest ? 'test-jwt-secret-do-not-use-in-production' : ''),

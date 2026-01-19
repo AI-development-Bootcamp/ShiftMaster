@@ -25,17 +25,11 @@ RUN npm ci
 # Build shared workspace first (server depends on it)
 WORKDIR /app/shared
 RUN npm run build
-RUN mkdir -p dist
 
 # Build server workspace
-# Create build-specific tsconfig that overrides conflicting options from base config
 WORKDIR /app/server
-RUN echo '{"extends":"./tsconfig.json","compilerOptions":{"noEmit":false,"allowImportingTsExtensions":false,"moduleResolution":"node"}}' > tsconfig.build.json && \
-    npx tsc --project tsconfig.build.json && \
-    rm tsconfig.build.json
-
-# Verify build output
-RUN test -d dist && test "$(ls -A dist)" || (echo "ERROR: dist directory is empty!" && exit 1)
+RUN npm run build && \
+    test -d dist && test "$(ls -A dist)" || (echo "ERROR: Build failed - dist directory is empty or missing!" && exit 1)
 
 # Stage 2: Production stage
 FROM node:20-alpine AS production

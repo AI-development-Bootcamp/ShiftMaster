@@ -6,7 +6,8 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@shared/*": ["../shared/src/*"]
+      "@shared/*": ["../shared/src/*"],
+      "@abra-shift-master/shared": ["../shared/src/index.ts"]
     }
   },
   "include": ["src/**/*"],
