@@ -32,18 +32,21 @@ RETURNS TRIGGER AS $$
 DECLARE
   current_user_id BIGINT;
 BEGIN
-  -- Extract user_id from JWT claims (assumed to be stored as 'user_id' in app_metadata or user_metadata for this project's pattern)
-  -- Or typically auth.uid() if using Supabase Auth UUIDs. 
-  -- Since this schema uses BIGINT user_id, we extract it from custom claim or metadata.
-  -- For now, we trust the auth.jwt() ->> 'user_id' if available, otherwise fallback (or skip for service role)
-  
-  -- Note: In a real Supabase Auth scenario with UUIDs, this would be: NEW.assigned_by != auth.uid()
-  -- Here we assume the app sets a custom claim 'user_id' in the JWT for the integer ID.
+  -- Allow service_role to bypass all checks
+  IF (auth.role() = 'service_role') THEN
+    RETURN NEW;
+  END IF;
+
+  -- Extract user_id from JWT claims
   current_user_id := (auth.jwt() ->> 'user_id')::BIGINT;
   
-  -- Allow service role (which might not have user_id claim) or if claim is missing (dev context) to bypass if needed,
-  -- but strictly enforcing helps security. 
-  IF current_user_id IS NOT NULL AND NEW.assigned_by != current_user_id THEN
+  -- Strict enforcing: user_id must be present for non-service roles
+  IF current_user_id IS NULL THEN
+    RAISE EXCEPTION 'Missing user_id in JWT claims';
+  END IF;
+
+  -- Ensure the user acts as themselves
+  IF NEW.assigned_by != current_user_id THEN
     RAISE EXCEPTION 'assigned_by must match the authenticated user id';
   END IF;
 

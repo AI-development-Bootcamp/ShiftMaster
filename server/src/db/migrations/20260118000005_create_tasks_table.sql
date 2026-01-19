@@ -7,6 +7,7 @@ CREATE TABLE tasks (
   project_id BIGINT NOT NULL REFERENCES projects(project_id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   description TEXT,
+  active BOOLEAN NOT NULL DEFAULT true,
   start_date DATE,
   end_date DATE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
