@@ -1,7 +1,5 @@
 # admin-table Specification
 
-## Purpose
-TBD - created by archiving change implement-table-shell. Update Purpose after archive.
 ## Requirements
 ### Requirement: TableShell Component Identity
 
@@ -50,18 +48,6 @@ The TableShell header SHALL always be visible and maintain fixed height.
 
 - **WHEN** TableShell is positioned on page
 - **THEN** the top edge of the header SHALL align with the top of the first navigation item in the Sidebar
-
----
-
-### Requirement: Column Width Distribution
-
-TableShell columns SHALL have equal width distribution.
-
-#### Scenario: Equal column widths
-
-- **WHEN** TableShell renders N columns
-- **THEN** each column width SHALL equal TableWidth / N
-- **AND** column widths SHALL not resize based on content
 
 ---
 

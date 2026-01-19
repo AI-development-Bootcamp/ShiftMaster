@@ -5,9 +5,9 @@ import { TableShell, TableColumnDef, SortState } from '../../components/TableShe
 import { mockUsers } from '../../mocks/users';
 import { User, UserRole } from '@abra-shift-master/shared';
 import { useTranslation } from 'react-i18next';
-import '../../styles/EmployeesManagmentPage.css';
+import '../../styles/EmployeesManagementPage.css';
 
-export function EmployeesManagmentPage() {
+export function EmployeesManagementPage() {
     const { t } = useTranslation();
     const [activeForm, setActiveForm] = useState<'user' | null>(null);
     const [users, setUsers] = useState<User[]>(mockUsers);

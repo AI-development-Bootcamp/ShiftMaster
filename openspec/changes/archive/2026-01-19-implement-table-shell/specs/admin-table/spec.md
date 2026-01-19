@@ -50,18 +50,6 @@ The TableShell header SHALL always be visible and maintain fixed height.
 
 ---
 
-### Requirement: Column Width Distribution
-
-TableShell columns SHALL have equal width distribution.
-
-#### Scenario: Equal column widths
-
-- **WHEN** TableShell renders N columns
-- **THEN** each column width SHALL equal TableWidth / N
-- **AND** column widths SHALL not resize based on content
-
----
-
 ### Requirement: Row Specification
 
 All data rows SHALL have uniform, fixed height.
