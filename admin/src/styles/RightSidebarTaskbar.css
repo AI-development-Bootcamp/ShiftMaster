@@ -1,0 +1,185 @@
+/* RightSidebarTaskbar - Main navigation sidebar */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  right: 0;
+  width: var(--sidebar-width);
+  /* min/max handled by variable clamp */
+  height: 100vh;
+  height: 100vh;
+  background-color: var(--color-nav-bg);
+  display: flex;
+  flex-direction: column;
+  padding: var(--spacing-md) 0;
+  /* Remove horizontal padding from container for full-width items */
+  box-sizing: border-box;
+  z-index: 100;
+}
+
+/* Header Section */
+.sidebar-header {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--spacing-xl);
+  padding: 0 var(--spacing-md);
+  /* Add padding back to header content */
+}
+
+.sidebar-logo {
+  max-width: 120px;
+  height: auto;
+}
+
+/* Navigation Section */
+.sidebar-nav {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  /* Increased gap from xs to sm */
+  overflow-y: auto;
+}
+
+/* NavItem Styles */
+.nav-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: var(--spacing-sm) var(--spacing-md);
+  /* Add horizontal padding to item */
+  padding-left: var(--spacing-md);
+  /* Ensure left padding matches right */
+  width: 100%;
+  /* Force full width */
+  box-sizing: border-box;
+  color: var(--color-nav-text);
+  text-decoration: none;
+  /* border-radius removed to allow edge-to-edge highlight, or keep if pill design desired but edge-to-edge usually means strictly rectangle or slight internal radius with logic */
+  border-radius: 0;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.nav-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-left: var(--spacing-sm);
+}
+
+.nav-item-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-item-label {
+  flex: 1;
+  text-align: right;
+  font-size: var(--font-size-base);
+}
+
+/* Hover State */
+.nav-item:hover:not(.nav-item--active) {
+  background-color: var(--color-nav-hover);
+}
+
+/* Active State */
+.nav-item--active {
+  color: var(--color-nav-text-active);
+  font-weight: 700;
+  background-color: var(--color-nav-hover);
+}
+
+/* Active Indicator Bar (right side in RTL) */
+.nav-item-indicator {
+  width: 4px;
+  height: 24px;
+  background-color: transparent;
+  /* Reserved space, invisible by default */
+  border-radius: var(--radius-sm);
+  margin-left: var(--spacing-sm);
+  flex-shrink: 0;
+  transition: background-color var(--transition-fast);
+}
+
+.nav-item--active .nav-item-indicator {
+  background-color: var(--color-nav-active-indicator);
+}
+
+/* Sidebar Actions (Logout) */
+.sidebar-actions {
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: var(--spacing-sm);
+  /* Nav items inside here already have padding, so no extra padding needed on container if using nav-item class */
+}
+
+.logout-button {
+  background: none;
+  border: none;
+  width: 100%;
+  font-family: inherit;
+  font-size: inherit;
+  /* Inherits .nav-item padding/styles */
+}
+
+/* Footer Section */
+.sidebar-footer {
+  min-height: 70px;
+  padding-top: var(--spacing-sm);
+  padding-right: var(--spacing-md);
+  padding-left: var(--spacing-md);
+}
+
+.user-profile {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-md);
+  text-align: right;
+  /* Ensure profile stays contained if it gets tight */
+}
+
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.user-name {
+  color: var(--color-nav-text-active);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.user-job-title {
+  color: #ffffff;
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+}

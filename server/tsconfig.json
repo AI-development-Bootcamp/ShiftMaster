@@ -1,6 +1,8 @@
 {
   "extends": "../tsconfig.base.json",
   "compilerOptions": {
+    "noEmit": false,
+    "noEmitOnError": true,
     "outDir": "./dist",
     "rootDir": "./src",
     "module": "NodeNext",
@@ -15,6 +17,7 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": false,
+    "skipLibCheck": true,
     "noEmit": false
   },
   "include": [

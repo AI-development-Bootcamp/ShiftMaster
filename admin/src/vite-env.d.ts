@@ -3,6 +3,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
+  readonly VITE_RENDER_DEPLOY_URL_ADMIN?: string;
   // Add more env variables as needed
 }
 

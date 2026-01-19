@@ -1,0 +1,15 @@
+.entries-management-page {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.entries-management-page h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.entries-management-page p {
+    color: #666;
+}

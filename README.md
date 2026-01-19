@@ -159,7 +159,9 @@ http://localhost:3000/api-docs
 
 ## 🌍 Environment Variables
 
-Create a `.env` file in the root directory based on `.env.example`:
+### Server
+
+Create a `.env` file in the `server` directory. See `server/ENV_SETUP.md` for details:
 
 ```env
 # Backend API URL (for frontend apps)

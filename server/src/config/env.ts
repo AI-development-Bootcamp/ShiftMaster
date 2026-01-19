@@ -48,6 +48,7 @@ export const env = {
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : ['http://localhost:5173', 'http://localhost:5174'],
+  renderDeployUrlServer: process.env.VITE_RENDER_DEPLOY_URL_SERVER || '',
 };
 
 /**

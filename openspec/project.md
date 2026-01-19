@@ -2,7 +2,7 @@
 
 ## Purpose
 
-AbraShiftMaster is a shift management application for Abra Bootcamp. It provides a mobile-first client interface for employees and a web-based admin interface for managers.
+AbraShiftMaster is a shift management application for Abra Bootcamp. It provides a mobile-first client interface for employees and a web-based admin interface for managers
 
 ## Tech Stack
 

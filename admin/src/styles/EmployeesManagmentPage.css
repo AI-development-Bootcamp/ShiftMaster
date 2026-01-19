@@ -1,0 +1,15 @@
+.employees-managment-page {
+    padding: 2rem;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.employees-managment-page h1 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: #333;
+}
+
+.employees-managment-page p {
+    color: #666;
+}

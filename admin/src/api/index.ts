@@ -4,5 +4,8 @@
 import { ApiClient } from '@shared/api';
 import { env } from '../config/env';
 
-// Create and export a configured API client instance with the admin's API URL
+/**
+ * The initialized API client instance for the Admin application.
+ * Configured with the base API URL from the environment.
+ */
 export const apiClient = new ApiClient(env.apiUrl);
