@@ -23,7 +23,20 @@ interface ProjectEntry {
   description: string;
 }
 
+interface AbsenceType {
+  id: string;
+  label: string;
+  emoji: string;
+}
+
+interface DateValue {
+  day: number;
+  month: number;
+  year: number;
+}
+
 type TimePickerItem = number | 'AM' | 'PM';
+type DatePickerItem = number;
 
 function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
@@ -40,9 +53,45 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     projectId: null,
   });
 
+  // Absence report state
+  const [selectedAbsenceType, setSelectedAbsenceType] = useState<AbsenceType | null>(null);
+  const [isAbsenceDropdownOpen, setIsAbsenceDropdownOpen] = useState(false);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [isMultiDayView, setIsMultiDayView] = useState(false);
+  const [startDate, setStartDate] = useState<DateValue>({ day: 4, month: 9, year: 2025 });
+  const [endDate, setEndDate] = useState<DateValue>({ day: 8, month: 9, year: 2025 });
+  const [openCalendar, setOpenCalendar] = useState<'start' | 'end' | null>(null);
+  const [calendarMonth, setCalendarMonth] = useState(9);
+  const [calendarYear, setCalendarYear] = useState(2025);
+
   const hoursRef = useRef<HTMLDivElement>(null);
   const minutesRef = useRef<HTMLDivElement>(null);
   const periodRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const absenceDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Absence types
+  const absenceTypes: AbsenceType[] = [
+    { id: 'vacation-half', label: 'חופשה - חצי יום', emoji: '🏖️' },
+    { id: 'vacation-full', label: 'חופשה - יום מלא', emoji: '🏖️' },
+    { id: 'sick', label: 'מחלה', emoji: '😷' },
+    { id: 'reserves', label: 'מילואים', emoji: '🚨' },
+  ];
+
+  // Hebrew month names (abbreviated)
+  const hebrewMonthsShort = [
+    'ינו\'', 'פבר\'', 'מרץ', 'אפר\'', 'מאי', 'יוני',
+    'יולי', 'אוג\'', 'ספט\'', 'אוק\'', 'נוב\'', 'דצמ\''
+  ];
+
+  // Hebrew month names (full)
+  const hebrewMonthsFull = [
+    'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+    'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+  ];
+
+  // Hebrew day names (full for calendar)
+  const hebrewDayNamesFull = ['יום א\'', 'יום ב\'', 'יום ג\'', 'יום ד\'', 'יום ה\'', 'יום ו\'', 'שבת'];
 
   // Mock data for selections
   const projectGroups: SelectionGroup[] = [
@@ -87,6 +136,145 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     return hours24 * 60 + time.minutes;
   };
 
+  // Calculate days between two dates (inclusive)
+  const calculateDaysBetween = (start: DateValue, end: DateValue): number => {
+    const startDateObj = new Date(start.year, start.month, start.day);
+    const endDateObj = new Date(end.year, end.month, end.day);
+    const diffTime = Math.abs(endDateObj.getTime() - startDateObj.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays + 1; // +1 to include both start and end days
+  };
+
+  // Format date for display
+  const formatDate = (date: DateValue): string => {
+    return `${date.day.toString().padStart(2, '0')} ${hebrewMonthsShort[date.month]} ${date.year}`;
+  };
+
+  // Format date for calendar header (e.g. "04 נוב 2025")
+  const formatDateForCalendar = (date: DateValue): string => {
+    return `${date.day.toString().padStart(2, '0')} ${hebrewMonthsShort[date.month]} ${date.year}`;
+  };
+
+  // Get days in month
+  const getDaysInMonth = (month: number, year: number): number => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  // Get first day of month (0 = Sunday, 6 = Saturday)
+  const getFirstDayOfMonth = (month: number, year: number): number => {
+    return new Date(year, month, 1).getDay();
+  };
+
+  // Generate calendar days array
+  const generateCalendarDays = (month: number, year: number): (number | null)[] => {
+    const daysInMonth = getDaysInMonth(month, year);
+    const firstDay = getFirstDayOfMonth(month, year);
+    const days: (number | null)[] = [];
+
+    // Add empty cells for days before the first day of month
+    for (let i = 0; i < firstDay; i++) {
+      days.push(null);
+    }
+
+    // Add all days of the month
+    for (let day = 1; day <= daysInMonth; day++) {
+      days.push(day);
+    }
+
+    return days;
+  };
+
+  // Toggle calendar dropdown
+  const handleToggleCalendar = (type: 'start' | 'end') => {
+    if (openCalendar === type) {
+      // Close if already open
+      setOpenCalendar(null);
+    } else {
+      // Open and set to current date's month/year
+      const currentDate = type === 'start' ? startDate : endDate;
+      setOpenCalendar(type);
+      setCalendarMonth(currentDate.month);
+      setCalendarYear(currentDate.year);
+    }
+  };
+
+  // Handle calendar month navigation
+  const handleCalendarPrevMonth = () => {
+    const newMonth = calendarMonth === 0 ? 11 : calendarMonth - 1;
+    const newYear = calendarMonth === 0 ? calendarYear - 1 : calendarYear;
+    setCalendarMonth(newMonth);
+    setCalendarYear(newYear);
+  };
+
+  const handleCalendarNextMonth = () => {
+    const newMonth = calendarMonth === 11 ? 0 : calendarMonth + 1;
+    const newYear = calendarMonth === 11 ? calendarYear + 1 : calendarYear;
+    setCalendarMonth(newMonth);
+    setCalendarYear(newYear);
+  };
+
+  // Compare two dates (returns negative if date1 < date2, 0 if equal, positive if date1 > date2)
+  const compareDates = (date1: DateValue, date2: DateValue): number => {
+    const d1 = new Date(date1.year, date1.month, date1.day);
+    const d2 = new Date(date2.year, date2.month, date2.day);
+    return d1.getTime() - d2.getTime();
+  };
+
+  // Handle date selection from calendar
+  const handleDateSelect = (day: number) => {
+    if (!openCalendar) return;
+
+    const selectedDate = { day, month: calendarMonth, year: calendarYear };
+
+    if (openCalendar === 'start') {
+      setStartDate(selectedDate);
+      // If start date is after end date, update end date to match start date
+      if (compareDates(selectedDate, endDate) > 0) {
+        setEndDate(selectedDate);
+      }
+    } else {
+      setEndDate(selectedDate);
+      // If end date is before start date, update start date to match end date
+      if (compareDates(selectedDate, startDate) < 0) {
+        setStartDate(selectedDate);
+      }
+    }
+  };
+
+  // Check if date is selected in calendar
+  const isDateSelected = (day: number): boolean => {
+    if (!openCalendar) return false;
+    const compareDate = openCalendar === 'start' ? startDate : endDate;
+    return (
+      compareDate.day === day &&
+      compareDate.month === calendarMonth &&
+      compareDate.year === calendarYear
+    );
+  };
+
+  // Handle file upload
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (10MB max)
+    const maxSize = 10 * 1024 * 1024; // 10MB in bytes
+    if (file.size > maxSize) {
+      alert('הקובץ גדול מדי. גודל מקסימלי: 10MB');
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('סוג קובץ לא נתמך. אנא העלה JPG, PNG או PDF');
+      return;
+    }
+
+    setUploadedFile(file);
+  };
+
+
   // Validate project times
   const validateProjectTime = (projectId: string, startTime: TimeValue, endTime: TimeValue) => {
     const startMinutes = timeToMinutes(startTime);
@@ -118,25 +306,37 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
 
   // Handle save button
   const handleSave = () => {
-    // Check for validation errors
-    if (Object.keys(timeErrors).length > 0) {
-      // There are errors, don't close
-      return;
-    }
+    if (activeTab === 'work') {
+      // Work tab validation
+      if (Object.keys(timeErrors).length > 0) {
+        // There are errors, don't close
+        return;
+      }
 
-    // Check if total hours is less than 9
-    const totalHours = calculateTotalHours();
-    if (totalHours < 9) {
-      setShowMissingHoursAlert(true);
-      return;
-    }
+      // Check if total hours is less than 9
+      const totalHours = calculateTotalHours();
+      if (totalHours < 9) {
+        setShowMissingHoursAlert(true);
+        return;
+      }
 
-    // TODO: Save the data to backend/state
-    console.log('Saving data:', {
-      entryTime,
-      exitTime,
-      projectEntries
-    });
+      // TODO: Save the work data to backend/state
+      console.log('Saving work data:', {
+        entryTime,
+        exitTime,
+        projectEntries
+      });
+    } else {
+      // Absence tab
+      // TODO: Save the absence data to backend/state
+      console.log('Saving absence data:', {
+        selectedAbsenceType,
+        uploadedFile,
+        isMultiDayView,
+        startDate,
+        endDate
+      });
+    }
 
     // Close modal
     onClose();
@@ -362,6 +562,26 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
 
+  // Click outside to close dropdown
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        absenceDropdownRef.current &&
+        !absenceDropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsAbsenceDropdownOpen(false);
+      }
+    };
+
+    if (isAbsenceDropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAbsenceDropdownOpen]);
+
   if (!isOpen) return null;
 
   return (
@@ -398,7 +618,10 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
             </button>
           </div>
 
-          <div className="info-row">
+          {/* Work Report Tab */}
+          {activeTab === 'work' && (
+            <>
+              <div className="info-row">
             <div className="date-display">יום ב' 06/10/25</div>
             <div className="daily-quota">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -789,28 +1012,342 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
             groups={getSelectionGroups()}
             onSelect={handleSelection}
           />
+            </>
+          )}
+
+          {/* Absence Report Tab */}
+          {activeTab === 'absence' && (
+            <>
+              <div className="info-row">
+                <div className="date-display">יום ב' 06/10/25</div>
+              </div>
+
+              {/* Absence Type Selector */}
+              <div className="absence-type-section" ref={absenceDropdownRef}>
+                <div
+                  className="absence-type-selector"
+                  onClick={() => setIsAbsenceDropdownOpen(!isAbsenceDropdownOpen)}
+                >
+                  <span className="absence-type-chevron">◊</span>
+                  <span className="absence-type-text">
+                    {selectedAbsenceType ? (
+                      <>
+                        <span className="absence-emoji">{selectedAbsenceType.emoji}</span>
+                        {selectedAbsenceType.label}
+                      </>
+                    ) : (
+                      'בחר סוג היעדרות'
+                    )}
+                  </span>
+                </div>
+
+                {/* Absence Type Dropdown */}
+                {isAbsenceDropdownOpen && (
+                  <div className="absence-dropdown">
+                    {absenceTypes.map((type) => (
+                      <div
+                        key={type.id}
+                        className={`absence-dropdown-item ${
+                          selectedAbsenceType?.id === type.id ? 'absence-dropdown-item-selected' : ''
+                        }`}
+                        onClick={() => {
+                          setSelectedAbsenceType(type);
+                          setIsAbsenceDropdownOpen(false);
+                        }}
+                      >
+                        {selectedAbsenceType?.id === type.id && (
+                          <svg className="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <circle cx="10" cy="10" r="10" fill="#3B82F6" />
+                            <path
+                              d="M6 10L9 13L14 7"
+                              stroke="white"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                        )}
+                        <span className="absence-dropdown-text">
+                          <span className="absence-emoji">{type.emoji}</span>
+                          {type.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Multi-day or Single-day View */}
+              {!isMultiDayView ? (
+                <>
+                  {/* File Upload Section */}
+                  <div className="file-upload-section">
+                    <h3 className="file-upload-title">צירוף קבצים ומסמכים</h3>
+                    <div
+                      className="file-upload-area"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {uploadedFile ? (
+                        <div className="file-uploaded">
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
+                            <path
+                              d="M20 12V20M20 20V28M20 20H28M20 20H12"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <p className="file-name">{uploadedFile.name}</p>
+                          <p className="file-size">
+                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <rect x="12" y="16" width="40" height="32" rx="2" stroke="#3B82F6" strokeWidth="2" />
+                            <circle cx="32" cy="28" r="4" fill="#3B82F6" />
+                            <path
+                              d="M12 40L20 32L28 40L40 28L52 40"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <p className="file-upload-link">לחץ כאן להעלאת הקובץ</p>
+                          <p className="file-upload-hint">סוג הקבצים הנתמכים : JPG / PNG / PDF</p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      onChange={handleFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+
+                  {/* OR Divider */}
+                  <div className="divider-section">
+                    <span className="divider-line"></span>
+                    <span className="divider-text">או</span>
+                    <span className="divider-line"></span>
+                  </div>
+
+                  {/* Multi-day Button */}
+                  <button
+                    className="multi-day-btn"
+                    onClick={() => setIsMultiDayView(true)}
+                  >
+                    <span className="multi-day-chevron">‹</span>
+                    <span>לדווח על היעדרות יותר מיום אחד</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Multi-day View */}
+                  <div className="multi-day-header">
+                    <button
+                      className="multi-day-back-btn"
+                      onClick={() => setIsMultiDayView(false)}
+                    >
+                      <span className="back-chevron">›</span>
+                    </button>
+                    <h3 className="multi-day-title">דיווח היעדרות לפי טווח</h3>
+                  </div>
+
+                  <div className="form-section-title">מלא את הטופס</div>
+
+                  {/* Start Date */}
+                  <div className="date-row" onClick={() => handleToggleCalendar('start')}>
+                    <span className="date-value">{formatDate(startDate)}</span>
+                    <span className="date-label">תאריך התחלה</span>
+                  </div>
+
+                  {/* Start Date Calendar Dropdown */}
+                  {openCalendar === 'start' && (
+                    <div className="calendar-dropdown">
+                      <div className="calendar-dropdown-header">
+                        <span className="calendar-header-date">{formatDateForCalendar(startDate)}</span>
+                        <span className="calendar-header-title">תאריך התחלה</span>
+                      </div>
+                      <div className="calendar-nav">
+                        <button className="calendar-nav-arrow" onClick={handleCalendarNextMonth} aria-label="חודש הבא">
+                          ‹
+                        </button>
+                        <span className="calendar-month-display">
+                          {hebrewMonthsFull[calendarMonth]} {calendarYear}
+                        </span>
+                        <button className="calendar-nav-arrow" onClick={handleCalendarPrevMonth} aria-label="חודש קודם">
+                          ›
+                        </button>
+                      </div>
+                      <div className="calendar-weekdays">
+                        {hebrewDayNamesFull.map((day) => (
+                          <div key={day} className="calendar-weekday">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="calendar-grid">
+                        {generateCalendarDays(calendarMonth, calendarYear).map((day, index) => (
+                          <div
+                            key={index}
+                            className={`calendar-grid-day ${
+                              day === null ? 'calendar-grid-day-empty' : ''
+                            } ${
+                              day !== null && isDateSelected(day) ? 'calendar-grid-day-selected' : ''
+                            }`}
+                            onClick={() => day !== null && handleDateSelect(day)}
+                          >
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* End Date */}
+                  <div className="date-row" onClick={() => handleToggleCalendar('end')}>
+                    <span className="date-value">{formatDate(endDate)}</span>
+                    <span className="date-label">תאריך סיום</span>
+                  </div>
+
+                  {/* End Date Calendar Dropdown */}
+                  {openCalendar === 'end' && (
+                    <div className="calendar-dropdown">
+                      <div className="calendar-dropdown-header">
+                        <span className="calendar-header-date">{formatDateForCalendar(endDate)}</span>
+                        <span className="calendar-header-title">תאריך סיום</span>
+                      </div>
+                      <div className="calendar-nav">
+                        <button className="calendar-nav-arrow" onClick={handleCalendarNextMonth} aria-label="חודש הבא">
+                          ‹
+                        </button>
+                        <span className="calendar-month-display">
+                          {hebrewMonthsFull[calendarMonth]} {calendarYear}
+                        </span>
+                        <button className="calendar-nav-arrow" onClick={handleCalendarPrevMonth} aria-label="חודש קודם">
+                          ›
+                        </button>
+                      </div>
+                      <div className="calendar-weekdays">
+                        {hebrewDayNamesFull.map((day) => (
+                          <div key={day} className="calendar-weekday">
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                      <div className="calendar-grid">
+                        {generateCalendarDays(calendarMonth, calendarYear).map((day, index) => (
+                          <div
+                            key={index}
+                            className={`calendar-grid-day ${
+                              day === null ? 'calendar-grid-day-empty' : ''
+                            } ${
+                              day !== null && isDateSelected(day) ? 'calendar-grid-day-selected' : ''
+                            }`}
+                            onClick={() => day !== null && handleDateSelect(day)}
+                          >
+                            {day}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Days Calculation */}
+                  <div className="days-summary">
+                    סך הכל ימי דיווח: <span className="days-number">{calculateDaysBetween(startDate, endDate)} ימים</span>
+                  </div>
+
+                  {/* File Upload Section (same as single-day) */}
+                  <div className="file-upload-section">
+                    <h3 className="file-upload-title">צירוף קבצים ומסמכים</h3>
+                    <div
+                      className="file-upload-area"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {uploadedFile ? (
+                        <div className="file-uploaded">
+                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                            <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
+                            <path
+                              d="M20 12V20M20 20V28M20 20H28M20 20H12"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                            />
+                          </svg>
+                          <p className="file-name">{uploadedFile.name}</p>
+                          <p className="file-size">
+                            {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                            <rect x="12" y="16" width="40" height="32" rx="2" stroke="#3B82F6" strokeWidth="2" />
+                            <circle cx="32" cy="28" r="4" fill="#3B82F6" />
+                            <path
+                              d="M12 40L20 32L28 40L40 28L52 40"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            />
+                          </svg>
+                          <p className="file-upload-link">לחץ כאן להעלאת הקובץ</p>
+                          <p className="file-upload-hint">סוג הקבצים הנתמכים : JPG / PNG / PDF</p>
+                        </>
+                      )}
+                    </div>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.pdf"
+                      onChange={handleFileUpload}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
         </div>
 
         {/* Modal Footer */}
         <div className="modal-footer">
-          <div className="footer-hours-summary">
-            <div className="hours-reported">
-              <span className="hours-number">{calculateTotalHours()}</span>
-              <span className="hours-text"> מתוך 9 שעות</span>
-            </div>
-            <div className="hours-remaining">
-              חסרות {Math.max(0, 9 - calculateTotalHours())} שעות לדיווח
-            </div>
-          </div>
-          <div className="progress-bar-container">
-            <div
-              className="progress-bar-fill"
-              style={{ width: `${Math.min((calculateTotalHours() / 9) * 100, 100)}%` }}
-            />
-          </div>
-          <button className="footer-save-btn" onClick={handleSave}>
-            שמירה
-          </button>
+          {activeTab === 'work' ? (
+            <>
+              <div className="footer-hours-summary">
+                <div className="hours-reported">
+                  <span className="hours-number">{calculateTotalHours()}</span>
+                  <span className="hours-text"> מתוך 9 שעות</span>
+                </div>
+                <div className="hours-remaining">
+                  חסרות {Math.max(0, 9 - calculateTotalHours())} שעות לדיווח
+                </div>
+              </div>
+              <div className="progress-bar-container">
+                <div
+                  className="progress-bar-fill"
+                  style={{ width: `${Math.min((calculateTotalHours() / 9) * 100, 100)}%` }}
+                />
+              </div>
+              <button className="footer-save-btn" onClick={handleSave}>
+                שמירה
+              </button>
+            </>
+          ) : (
+            <button className="footer-save-btn" onClick={handleSave}>
+              שמירה
+            </button>
+          )}
         </div>
       </div>
     </div>
