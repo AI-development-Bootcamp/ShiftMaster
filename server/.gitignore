@@ -39,3 +39,6 @@ logs/
 *.pid
 *.seed
 *.pid.lock
+
+# Seed data files
+src/db/seeds/
