@@ -1,15 +1,18 @@
-name: Production CI/CD
+name: Feature CI/CD
 
 on:
   push:
     branches:
-      - production
-
+      - 'feature/**'
+  pull_request:
+    branches:
+      - 'feature/**'
 jobs:
   server:
     name: Server - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: stage
 
     steps:
       - name: Checkout code
@@ -38,19 +41,23 @@ jobs:
       - name: Build
         run: npm run build -w server
 
-      - name: Deploy Server
+      - name: Deploy Server to Render
         run: |
-          echo "🚀 Deploying server to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Or deploy to your server infrastructure
+          echo "🚀 Deploying server to Render..."
+          if [ -n "$VITE_RENDER_DEPLOY_URL_SERVER" ]; then
+            curl -X POST "$VITE_RENDER_DEPLOY_URL_SERVER" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          VITE_RENDER_DEPLOY_URL_SERVER: ${{ secrets.VITE_RENDER_DEPLOY_URL_SERVER }}
 
   client:
     name: Client - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: stage
 
     steps:
       - name: Checkout code
@@ -79,19 +86,23 @@ jobs:
       - name: Build
         run: npm run build -w client
 
-      - name: Deploy Client
+      - name: Deploy Client to Render
         run: |
-          echo "🚀 Deploying client to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
+          echo "🚀 Deploying client to Render..."
+          if [ -n "$VITE_RENDER_DEPLOY_URL_CLIENT" ]; then
+            curl -X POST "$VITE_RENDER_DEPLOY_URL_CLIENT" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          VITE_RENDER_DEPLOY_URL_CLIENT: ${{ secrets.VITE_RENDER_DEPLOY_URL_CLIENT }}
 
   admin:
     name: Admin - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: stage
 
     steps:
       - name: Checkout code
@@ -120,14 +131,17 @@ jobs:
       - name: Build
         run: npm run build -w admin
 
-      - name: Deploy Admin
+      - name: Deploy Admin to Render
         run: |
-          echo "🚀 Deploying admin to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
+          echo "🚀 Deploying admin to Render..."
+          if [ -n "$VITE_RENDER_DEPLOY_URL_ADMIN" ]; then
+            curl -X POST "$VITE_RENDER_DEPLOY_URL_ADMIN" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || echo "⚠️  Render API call failed"
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          VITE_RENDER_DEPLOY_URL_ADMIN: ${{ secrets.VITE_RENDER_DEPLOY_URL_ADMIN }}
 
   shared:
     name: Shared - Test & Lint

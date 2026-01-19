@@ -88,31 +88,31 @@ The server SHALL provide isAdmin middleware to restrict routes to admin users on
 
 ### Requirement: Login Endpoint
 
-The server SHALL provide POST /api/auth/login endpoint for user authentication.
+The server SHALL provide POST /api/v1/auth/login endpoint for user authentication.
 
 #### Scenario: Successful login with valid credentials
 
-- **WHEN** POST /api/auth/login is called with valid email and password
+- **WHEN** POST /api/v1/auth/login is called with valid email and password
 - **THEN** a 200 response is returned with JWT token and user data (user_id, full_name, email, role)
 
 #### Scenario: Login failure - invalid email
 
-- **WHEN** POST /api/auth/login is called with non-existent email
+- **WHEN** POST /api/v1/auth/login is called with non-existent email
 - **THEN** a 401 Unauthorized response is returned with error code "INVALID_CREDENTIALS"
 
 #### Scenario: Login failure - incorrect password
 
-- **WHEN** POST /api/auth/login is called with correct email but wrong password
+- **WHEN** POST /api/v1/auth/login is called with correct email but wrong password
 - **THEN** a 401 Unauthorized response is returned with error code "INVALID_CREDENTIALS"
 
 #### Scenario: Login failure - inactive user
 
-- **WHEN** POST /api/auth/login is called with credentials for an inactive user (active=false)
+- **WHEN** POST /api/v1/auth/login is called with credentials for an inactive user (active=false)
 - **THEN** a 401 Unauthorized response is returned with error code "INVALID_CREDENTIALS"
 
 #### Scenario: Login failure - missing fields
 
-- **WHEN** POST /api/auth/login is called without email or password
+- **WHEN** POST /api/v1/auth/login is called without email or password
 - **THEN** a 400 Bad Request response is returned with validation error details
 
 ### Requirement: JWT Secret Configuration
@@ -164,5 +164,5 @@ The server SHALL have comprehensive unit tests for all authentication components
 
 #### Scenario: Login endpoint test coverage
 
-- **WHEN** running tests for POST /api/auth/login
+- **WHEN** running tests for POST /api/v1/auth/login
 - **THEN** tests cover successful login, invalid credentials, missing fields, and inactive users
