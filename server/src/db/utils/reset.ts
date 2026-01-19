@@ -1,11 +1,14 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
-import { logDbOperation, logDbError } from './logger.js';
-// Check if this file is the main module being executed
+import path from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import { logDbOperation, logDbError } from './logger.js';
 
-dotenv.config({ path: '../../.env' }); // Adjust path as needed, or rely on --env-file
+// Compute __dirname from import.meta.url for CWD-independent path resolution
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// Load .env from monorepo root (server/src/db/utils -> ../../.env = server/.env -> ../.env = root/.env)
+dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
 
 const { Pool } = pg;
 
