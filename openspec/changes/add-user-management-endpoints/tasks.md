@@ -2,15 +2,15 @@
 
 ## 1. Setup and Validation
 
-- [ ] 1.1 Create `server/src/validations/userValidation.ts` with Zod schemas
-  - [ ] createUserSchema (full_name, email, password, role, job_title optional)
-  - [ ] updateUserSchema (all fields optional except user_id)
-  - [ ] getUserSchema (user_id validation)
-  - [ ] listUsersSchema (pagination: page, limit)
-- [ ] 1.2 Add email validation (proper email format)
-- [ ] 1.3 Add password validation (minimum 8 characters)
-- [ ] 1.4 Add role validation (enum: admin | regular)
-- [ ] 1.5 Write unit tests for validation schemas
+- [x] 1.1 Create `server/src/validations/userValidation.ts` with Zod schemas
+  - [x] createUserSchema (full_name, email, password, role, job_title optional)
+  - [x] updateUserSchema (all fields optional except user_id)
+  - [x] getUserSchema (user_id validation)
+  - [x] listUsersSchema (pagination: page, limit)
+- [x] 1.2 Add email validation (proper email format)
+- [x] 1.3 Add password validation (minimum 8 characters)
+- [x] 1.4 Add role validation (enum: admin | regular)
+- [x] 1.5 Write unit tests for validation schemas
 
 ## 2. Service Layer
 
