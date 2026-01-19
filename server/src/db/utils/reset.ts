@@ -44,6 +44,13 @@ async function resetDatabase() {
         await pool.query('GRANT ALL ON SCHEMA public TO postgres;');
         await pool.query('GRANT ALL ON SCHEMA public TO public;');
 
+        // Supabase specific grants for the roles: anon, authenticated, service_role
+        // Crucial for RLS and client access
+        await pool.query('GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;');
+        await pool.query('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO postgres, anon, authenticated, service_role;');
+        await pool.query('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO postgres, anon, authenticated, service_role;');
+        await pool.query('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres, anon, authenticated, service_role;');
+
         logDbOperation('Database reset successful. Public schema is empty.');
     } catch (error) {
         logDbError('Database reset failed', error);
@@ -53,4 +60,17 @@ async function resetDatabase() {
     }
 }
 
-resetDatabase();
+// Check if this file is the main module being executed
+import { fileURLToPath } from 'url';
+import fs from 'fs';
+import path from 'path';
+
+const currentFilePath = fileURLToPath(import.meta.url);
+const executedFilePath = process.argv[1];
+
+const isMainModule = currentFilePath === executedFilePath ||
+    currentFilePath === fs.realpathSync(executedFilePath);
+
+if (isMainModule) {
+    resetDatabase();
+}

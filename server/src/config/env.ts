@@ -60,6 +60,12 @@ function extractSupabaseUrl(urlOrConnectionString: string): string {
  * Get the Supabase API URL from environment
  */
 function getSupabaseUrl(): string {
+  // 1. Prefer explicit API URL if set
+  if (process.env.SUPABASE_API_URL) {
+    return process.env.SUPABASE_API_URL;
+  }
+
+  // 2. Fallback to extracting from connection string
   const rawUrl = process.env.SUPABASE_URL;
   if (!rawUrl) {
     return isTest ? 'https://test.supabase.co' : '';
@@ -123,7 +129,7 @@ export function validateEnv(): void {
   // Validate that SUPABASE_URL was successfully parsed
   if (!env.supabaseUrl) {
     throw new Error(
-      'Could not parse SUPABASE_URL. Please provide a valid Supabase URL or PostgreSQL connection string.'
+      'Could not parse SUPABASE_URL and SUPABASE_API_URL is not set. Please provide a valid Supabase URL details.'
     );
   }
 }

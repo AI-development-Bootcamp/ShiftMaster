@@ -97,7 +97,12 @@ export async function runMigrations(): Promise<MigrationResult[]> {
 
 // Allow direct execution if run via node
 // Check if this file is the main module being executed
-const isMainModule = import.meta.url === `file://${process.argv[1]}`;
+const currentFilePath = fileURLToPath(import.meta.url);
+const executedFilePath = process.argv[1];
+
+// Robust comparison that handles symlinks and different path formats
+const isMainModule = currentFilePath === executedFilePath ||
+    currentFilePath === fs.realpathSync(executedFilePath);
 
 if (isMainModule) {
     runMigrations()
