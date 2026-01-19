@@ -7,7 +7,7 @@ import { hashPassword } from '../../utils/password.js';
 
 // Mock Supabase client before importing modules that use it
 vi.mock('../../db/supabase.js', () => ({
-  supabase: {
+  supabaseAdmin: {
     from: vi.fn(),
   },
 }));
@@ -17,7 +17,7 @@ import {
   authenticateUser,
   AuthenticationError,
 } from '../../services/authService.js';
-import { supabase } from '../../db/supabase.js';
+import { supabaseAdmin } from '../../db/supabase.js';
 
 describe('AuthService', () => {
   beforeEach(() => {
@@ -54,7 +54,7 @@ describe('AuthService', () => {
         eq: mockEq,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: mockSelect,
       });
 
@@ -62,7 +62,7 @@ describe('AuthService', () => {
       const result = await authenticateUser('john@example.com', testPassword);
 
       // Verify Supabase was called correctly
-      expect(supabase.from).toHaveBeenCalledWith('users');
+      expect(supabaseAdmin.from).toHaveBeenCalledWith('users');
       expect(mockSelect).toHaveBeenCalledWith(
         'user_id, full_name, email, password_hash, role, active, created_at'
       );
@@ -101,7 +101,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -122,7 +122,7 @@ describe('AuthService', () => {
         error: { message: 'User not found', code: 'PGRST116' },
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -159,7 +159,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -195,7 +195,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -219,7 +219,7 @@ describe('AuthService', () => {
         error: { message: 'Database connection failed', code: 'DB_ERROR' },
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -241,7 +241,7 @@ describe('AuthService', () => {
         error: { message: 'User not found' },
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingleNotFound,
@@ -273,7 +273,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingleWrongPassword,
@@ -301,7 +301,7 @@ describe('AuthService', () => {
         error: { message: 'Invalid input' },
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
@@ -331,7 +331,7 @@ describe('AuthService', () => {
         error: null,
       });
 
-      (supabase.from as ReturnType<typeof vi.fn>).mockReturnValue({
+      (supabaseAdmin.from as ReturnType<typeof vi.fn>).mockReturnValue({
         select: vi.fn().mockReturnValue({
           eq: vi.fn().mockReturnValue({
             single: mockSingle,
