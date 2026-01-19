@@ -118,7 +118,7 @@ describe('Users Routes', () => {
       serviceCreateUser.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'New User',
@@ -139,7 +139,7 @@ describe('Users Routes', () => {
 
     it('should return 401 when not authenticated', async () => {
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .send({
           full_name: 'New User',
           email: 'newuser@example.com',
@@ -155,7 +155,7 @@ describe('Users Routes', () => {
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockRegularUser);
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_USER_TOKEN}`)
         .send({
           full_name: 'New User',
@@ -175,7 +175,7 @@ describe('Users Routes', () => {
       );
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'New User',
@@ -192,7 +192,7 @@ describe('Users Routes', () => {
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockAdminUser);
 
       const response = await request(app)
-        .post('/users')
+        .post('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'New User',
@@ -230,7 +230,7 @@ describe('Users Routes', () => {
       serviceListUsers.mockResolvedValue(mockResult);
 
       const response = await request(app)
-        .get('/users')
+        .get('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -255,7 +255,7 @@ describe('Users Routes', () => {
       serviceListUsers.mockResolvedValue(mockResult);
 
       const response = await request(app)
-        .get('/users?page=2&limit=10')
+        .get('/api/v1/users?page=2&limit=10')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -263,7 +263,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).get('/users');
+      const response = await request(app).get('/api/v1/users');
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -273,7 +273,7 @@ describe('Users Routes', () => {
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockRegularUser);
 
       const response = await request(app)
-        .get('/users')
+        .get('/api/v1/users')
         .set('Authorization', `Bearer ${VALID_USER_TOKEN}`);
 
       expect(response.status).toBe(403);
@@ -297,7 +297,7 @@ describe('Users Routes', () => {
       serviceGetUserById.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .get('/users/me')
+        .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${VALID_USER_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -311,7 +311,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).get('/users/me');
+      const response = await request(app).get('/api/v1/users/me');
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -332,7 +332,7 @@ describe('Users Routes', () => {
       serviceGetUserById.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .get('/users/me')
+        .get('/api/v1/users/me')
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -358,7 +358,7 @@ describe('Users Routes', () => {
       serviceGetUserById.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .get(`/users/${testUserId}`)
+        .get(`/api/v1/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -376,7 +376,7 @@ describe('Users Routes', () => {
       serviceGetUserById.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .get(`/users/${nonExistentId}`)
+        .get(`/api/v1/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(404);
@@ -384,7 +384,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).get(`/users/${testUserId}`);
+      const response = await request(app).get(`/api/v1/users/${testUserId}`);
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -409,7 +409,7 @@ describe('Users Routes', () => {
       serviceUpdateUser.mockResolvedValue(mockUser);
 
       const response = await request(app)
-        .patch(`/users/${testUserId}`)
+        .patch(`/api/v1/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'Updated Name',
@@ -431,7 +431,7 @@ describe('Users Routes', () => {
       serviceUpdateUser.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .patch(`/users/${nonExistentId}`)
+        .patch(`/api/v1/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           full_name: 'Updated Name',
@@ -448,7 +448,7 @@ describe('Users Routes', () => {
       );
 
       const response = await request(app)
-        .patch(`/users/${testUserId}`)
+        .patch(`/api/v1/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`)
         .send({
           email: 'taken@example.com',
@@ -460,7 +460,7 @@ describe('Users Routes', () => {
 
     it('should return 401 when not authenticated', async () => {
       const response = await request(app)
-        .patch(`/users/${testUserId}`)
+        .patch(`/api/v1/users/${testUserId}`)
         .send({
           full_name: 'Updated Name',
         });
@@ -483,7 +483,7 @@ describe('Users Routes', () => {
       serviceDeleteUser.mockResolvedValue(mockResult);
 
       const response = await request(app)
-        .delete(`/users/${testUserId}`)
+        .delete(`/api/v1/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
@@ -499,7 +499,7 @@ describe('Users Routes', () => {
       serviceDeleteUser.mockRejectedValue(new UserNotFoundError(nonExistentId));
 
       const response = await request(app)
-        .delete(`/users/${nonExistentId}`)
+        .delete(`/api/v1/users/${nonExistentId}`)
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(404);
@@ -507,7 +507,7 @@ describe('Users Routes', () => {
     });
 
     it('should return 401 when not authenticated', async () => {
-      const response = await request(app).delete(`/users/${testUserId}`);
+      const response = await request(app).delete(`/api/v1/users/${testUserId}`);
 
       expect(response.status).toBe(401);
       expect(response.body.error.code).toBe('UNAUTHORIZED');
@@ -517,7 +517,7 @@ describe('Users Routes', () => {
       vi.spyOn(jwtUtil, 'verifyToken').mockReturnValue(mockRegularUser);
 
       const response = await request(app)
-        .delete(`/users/${testUserId}`)
+        .delete(`/api/v1/users/${testUserId}`)
         .set('Authorization', `Bearer ${VALID_USER_TOKEN}`);
 
       expect(response.status).toBe(403);
