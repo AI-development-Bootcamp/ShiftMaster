@@ -16,74 +16,74 @@
 
 **Note:** UserRepository exists in separate branch. If not yet merged, create temporary stub that matches the interface.
 
-- [ ] 2.1 Verify `UserRepository` is available or create temporary stub
-  - [ ] Check if `server/src/db/repositories/UserRepository.ts` exists
-  - [ ] If not: Create `server/src/db/repositories/UserRepository.stub.ts` with same interface
-  - [ ] Add TODO comment: "Replace with actual UserRepository after merge"
-- [ ] 2.2 Create `server/src/services/usersService.ts`
-- [ ] 2.3 Import and initialize `UserRepository` instance in service
-- [ ] 2.4 Implement `createUser(userData)` method
-  - [ ] Use `userRepo.findByEmail()` to check email uniqueness
-  - [ ] Hash password using existing password utility (`hashPassword()`)
-  - [ ] Use `userRepo.create()` to insert user with active=true
-  - [ ] Return created user (without password_hash)
-- [ ] 2.5 Implement `listUsers(page, limit)` method
-  - [ ] Use `userRepo.findAll()` to get all users
-  - [ ] Implement pagination logic (slice results)
-  - [ ] Return users without password_hash
-  - [ ] Include total count for pagination
-- [ ] 2.6 Implement `getUserById(userId)` method
-  - [ ] Use `userRepo.findById(userId)`
-  - [ ] Return null/throw if not found
-  - [ ] Exclude password_hash from response
-- [ ] 2.7 Implement `updateUser(userId, updates)` method
-  - [ ] Use `userRepo.findById()` to validate user exists
-  - [ ] If updating email, use `userRepo.findByEmail()` to check uniqueness
-  - [ ] If updating password, hash it first with `hashPassword()`
-  - [ ] Use `userRepo.update()` with only provided fields
-  - [ ] Return updated user (without password_hash)
-- [ ] 2.8 Implement `deleteUser(userId)` method (soft delete)
-  - [ ] Use `userRepo.delete(userId)` (supports soft delete for users)
-  - [ ] Return success confirmation
-- [ ] 2.9 Write unit tests for all service methods
-  - [ ] Test successful operations
-  - [ ] Test error cases (duplicate email, not found, etc.)
-  - [ ] Mock UserRepository methods
+- [x] 2.1 Verify `UserRepository` is available or create temporary stub
+  - [x] Check if `server/src/db/repositories/UserRepository.ts` exists
+  - [x] If not: Create `server/src/db/repositories/UserRepository.stub.ts` with same interface
+  - [x] Add TODO comment: "Replace with actual UserRepository after merge"
+- [x] 2.2 Create `server/src/services/usersService.ts`
+- [x] 2.3 Import and initialize `UserRepository` instance in service
+- [x] 2.4 Implement `createUser(userData)` method
+  - [x] Use `userRepo.findByEmail()` to check email uniqueness
+  - [x] Hash password using existing password utility (`hashPassword()`)
+  - [x] Use `userRepo.create()` to insert user with active=true
+  - [x] Return created user (without password_hash)
+- [x] 2.5 Implement `listUsers(page, limit)` method
+  - [x] Use `userRepo.findAll()` to get all users
+  - [x] Implement pagination logic (slice results)
+  - [x] Return users without password_hash
+  - [x] Include total count for pagination
+- [x] 2.6 Implement `getUserById(userId)` method
+  - [x] Use `userRepo.findById(userId)`
+  - [x] Return null/throw if not found
+  - [x] Exclude password_hash from response
+- [x] 2.7 Implement `updateUser(userId, updates)` method
+  - [x] Use `userRepo.findById()` to validate user exists
+  - [x] If updating email, use `userRepo.findByEmail()` to check uniqueness
+  - [x] If updating password, hash it first with `hashPassword()`
+  - [x] Use `userRepo.update()` with only provided fields
+  - [x] Return updated user (without password_hash)
+- [x] 2.8 Implement `deleteUser(userId)` method (soft delete)
+  - [x] Use `userRepo.delete(userId)` (supports soft delete for users)
+  - [x] Return success confirmation
+- [x] 2.9 Write unit tests for all service methods
+  - [x] Test successful operations
+  - [x] Test error cases (duplicate email, not found, etc.)
+  - [x] Mock UserRepository methods
 
 ## 3. Controller Layer
 
-- [ ] 3.1 Create `server/src/controllers/usersController.ts`
-- [ ] 3.2 Implement `createUser` controller
-  - [ ] Validate request body with Zod schema
-  - [ ] Call usersService.createUser
-  - [ ] Return 201 with created user
-  - [ ] Handle duplicate email error (400)
-  - [ ] Handle validation errors (400)
-- [ ] 3.3 Implement `listUsers` controller
-  - [ ] Validate query parameters (page, limit)
-  - [ ] Set defaults (page=1, limit=20)
-  - [ ] Call usersService.listUsers
-  - [ ] Return 200 with users array and pagination metadata
-- [ ] 3.4 Implement `getUser` controller
-  - [ ] Validate user_id parameter
-  - [ ] Call usersService.getUserById
-  - [ ] Return 200 with user data
-  - [ ] Return 404 if not found
-- [ ] 3.5 Implement `updateUser` controller
-  - [ ] Validate request body and user_id
-  - [ ] Call usersService.updateUser
-  - [ ] Return 200 with updated user
-  - [ ] Handle not found (404)
-  - [ ] Handle duplicate email (400)
-- [ ] 3.6 Implement `deleteUser` controller
-  - [ ] Validate user_id parameter
-  - [ ] Call usersService.deleteUser
-  - [ ] Return 204 or 200 with success message
-  - [ ] Handle not found (404)
-- [ ] 3.7 Write unit tests for all controller methods
-  - [ ] Mock service calls
-  - [ ] Test response formats
-  - [ ] Test error handling
+- [x] 3.1 Create `server/src/controllers/usersController.ts`
+- [x] 3.2 Implement `createUser` controller
+  - [x] Validate request body with Zod schema
+  - [x] Call usersService.createUser
+  - [x] Return 201 with created user
+  - [x] Handle duplicate email error (400)
+  - [x] Handle validation errors (400)
+- [x] 3.3 Implement `listUsers` controller
+  - [x] Validate query parameters (page, limit)
+  - [x] Set defaults (page=1, limit=20)
+  - [x] Call usersService.listUsers
+  - [x] Return 200 with users array and pagination metadata
+- [x] 3.4 Implement `getUser` controller
+  - [x] Validate user_id parameter
+  - [x] Call usersService.getUserById
+  - [x] Return 200 with user data
+  - [x] Return 404 if not found
+- [x] 3.5 Implement `updateUser` controller
+  - [x] Validate request body and user_id
+  - [x] Call usersService.updateUser
+  - [x] Return 200 with updated user
+  - [x] Handle not found (404)
+  - [x] Handle duplicate email (400)
+- [x] 3.6 Implement `deleteUser` controller
+  - [x] Validate user_id parameter
+  - [x] Call usersService.deleteUser
+  - [x] Return 204 or 200 with success message
+  - [x] Handle not found (404)
+- [x] 3.7 Write unit tests for all controller methods
+  - [x] Mock service calls
+  - [x] Test response formats
+  - [x] Test error handling
 
 ## 4. Routes
 

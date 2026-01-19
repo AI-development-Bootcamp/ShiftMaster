@@ -11,7 +11,7 @@ import {
  * Represents a user in the system.
  */
 export interface User {
-  user_id: number;
+  user_id: string; // UUID
   full_name: string;
   email: string;
   role: UserRole;
@@ -39,7 +39,7 @@ export interface Client {
 export interface Project {
   project_id: number;
   client_id: number;
-  manager_user_id: number;
+  manager_user_id: string; // UUID
   name: string;
   description?: string;
   start_date: string;
@@ -69,9 +69,9 @@ export interface Task {
  */
 export interface AdminTaskAssignment {
   admin_task_assignment_id: number;
-  user_id: number;
+  user_id: string; // UUID
   task_id: number;
-  assigned_by: number;
+  assigned_by: string; // UUID - admin user
   assigned_at: string;
   active: boolean;
   revoked_at?: string;
@@ -83,7 +83,7 @@ export interface AdminTaskAssignment {
  */
 export interface Entry {
   entry_id: number;
-  user_id: number;
+  user_id: string; // UUID
   entry_kind: EntryKind;
   work_date: string;
   start_time?: string;
@@ -93,7 +93,7 @@ export interface Entry {
   attachment_path?: string;
   created_at: string;
   updated_at?: string;
-  last_modified_by?: number;
+  last_modified_by?: string; // UUID
   last_modified_at?: string;
 }
 
@@ -122,6 +122,6 @@ export interface MonthLock {
   year: number;
   month: number;
   locked_at: string;
-  locked_by: number;
+  locked_by: string; // UUID - admin user
   unlocked_at?: string;
 }

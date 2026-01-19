@@ -9,7 +9,7 @@ import { comparePassword } from '../utils/password.js';
  * User data returned from the database
  */
 interface UserFromDB {
-  user_id: number;
+  user_id: string; // UUID
   full_name: string;
   email: string;
   password_hash: string;
@@ -22,7 +22,7 @@ interface UserFromDB {
  * User data returned after successful authentication (without password_hash)
  */
 export interface AuthenticatedUser {
-  user_id: number;
+  user_id: string; // UUID
   full_name: string;
   email: string;
   role: 'admin' | 'regular';
