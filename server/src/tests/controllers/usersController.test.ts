@@ -36,7 +36,7 @@ vi.mock('../../services/usersService.js', () => {
     },
     UserNotFoundError: class UserNotFoundError extends Error {
       code = 'USER_NOT_FOUND';
-      constructor(userId: number) {
+      constructor(userId: string) {
         super(`User with ID ${userId} not found`);
       }
     },
@@ -101,7 +101,7 @@ describe('UsersController', () => {
   describe('createUser', () => {
     it('should create user successfully', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'Jane Doe',
         email: 'jane@example.com',
         role: 'admin' as const,
@@ -113,7 +113,7 @@ describe('UsersController', () => {
       mockRequest.body = {
         full_name: 'Jane Doe',
         email: 'jane@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: 'admin',
         job_title: 'Manager',
       };
@@ -154,7 +154,7 @@ describe('UsersController', () => {
       mockRequest.body = {
         full_name: 'Jane Doe',
         email: 'jane@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: 'admin',
       };
 
@@ -177,7 +177,7 @@ describe('UsersController', () => {
       mockRequest.body = {
         full_name: 'Jane Doe',
         email: 'jane@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: 'admin',
       };
 
@@ -271,7 +271,7 @@ describe('UsersController', () => {
   describe('getUser', () => {
     it('should get user by ID successfully', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440001',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -280,12 +280,12 @@ describe('UsersController', () => {
         created_at: '2024-01-01T00:00:00Z',
       };
 
-      mockRequest.params = { id: '1' };
+      mockRequest.params = { id: '550e8400-e29b-41d4-a716-446655440001' };
       mockGetUserById.mockResolvedValue(mockUser);
 
       await getUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockGetUserById).toHaveBeenCalledWith(1);
+      expect(mockGetUserById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440001');
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -296,9 +296,10 @@ describe('UsersController', () => {
     });
 
     it('should return 404 if user not found', async () => {
-      mockRequest.params = { id: '999' };
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440999';
+      mockRequest.params = { id: nonExistentId };
 
-      const notFoundError = new UserNotFoundError(999);
+      const notFoundError = new UserNotFoundError(nonExistentId);
       mockGetUserById.mockRejectedValue(notFoundError);
 
       await getUser(mockRequest as Request, mockResponse as Response);
@@ -332,8 +333,9 @@ describe('UsersController', () => {
 
   describe('updateUser', () => {
     it('should update user successfully', async () => {
+      const userId = '550e8400-e29b-41d4-a716-446655440002';
       const mockUser = {
-        user_id: 1,
+        user_id: userId,
         full_name: 'Updated Name',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -342,7 +344,7 @@ describe('UsersController', () => {
         created_at: '2024-01-01T00:00:00Z',
       };
 
-      mockRequest.params = { id: '1' };
+      mockRequest.params = { id: userId };
       mockRequest.body = {
         full_name: 'Updated Name',
         job_title: 'Senior Engineer',
@@ -352,7 +354,7 @@ describe('UsersController', () => {
 
       await updateUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockUpdateUser).toHaveBeenCalledWith(1, {
+      expect(mockUpdateUser).toHaveBeenCalledWith(userId, {
         full_name: 'Updated Name',
         job_title: 'Senior Engineer',
       });
@@ -366,10 +368,11 @@ describe('UsersController', () => {
     });
 
     it('should return 404 if user not found', async () => {
-      mockRequest.params = { id: '999' };
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440998';
+      mockRequest.params = { id: nonExistentId };
       mockRequest.body = { full_name: 'Updated Name' };
 
-      const notFoundError = new UserNotFoundError(999);
+      const notFoundError = new UserNotFoundError(nonExistentId);
       mockUpdateUser.mockRejectedValue(notFoundError);
 
       await updateUser(mockRequest as Request, mockResponse as Response);
@@ -385,7 +388,8 @@ describe('UsersController', () => {
     });
 
     it('should return 400 for duplicate email', async () => {
-      mockRequest.params = { id: '1' };
+      const userId = '550e8400-e29b-41d4-a716-446655440003';
+      mockRequest.params = { id: userId };
       mockRequest.body = { email: 'taken@example.com' };
 
       const duplicateError = new DuplicateEmailError('taken@example.com');
@@ -423,17 +427,18 @@ describe('UsersController', () => {
 
   describe('deleteUser', () => {
     it('should delete user successfully', async () => {
+      const userId = '550e8400-e29b-41d4-a716-446655440004';
       const mockResult = {
         success: true,
-        message: 'User 1 has been deactivated',
+        message: `User ${userId} has been deactivated`,
       };
 
-      mockRequest.params = { id: '1' };
+      mockRequest.params = { id: userId };
       mockDeleteUser.mockResolvedValue(mockResult);
 
       await deleteUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockDeleteUser).toHaveBeenCalledWith(1);
+      expect(mockDeleteUser).toHaveBeenCalledWith(userId);
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -442,9 +447,10 @@ describe('UsersController', () => {
     });
 
     it('should return 404 if user not found', async () => {
-      mockRequest.params = { id: '999' };
+      const nonExistentId = '550e8400-e29b-41d4-a716-446655440997';
+      mockRequest.params = { id: nonExistentId };
 
-      const notFoundError = new UserNotFoundError(999);
+      const notFoundError = new UserNotFoundError(nonExistentId);
       mockDeleteUser.mockRejectedValue(notFoundError);
 
       await deleteUser(mockRequest as Request, mockResponse as Response);
