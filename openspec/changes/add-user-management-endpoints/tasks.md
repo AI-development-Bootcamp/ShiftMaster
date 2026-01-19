@@ -87,37 +87,37 @@
 
 ## 4. Routes
 
-- [ ] 4.1 Create `server/src/routes/users.ts`
-- [ ] 4.2 Import auth middleware (`isAuthenticated`, `isAdmin`)
-- [ ] 4.3 Define POST /api/v1/users route (requires isAdmin)
-- [ ] 4.4 Define GET /api/v1/users route (requires isAdmin)
-- [ ] 4.5 Define GET /api/v1/users/:id route (requires isAdmin)
-- [ ] 4.6 Define PATCH /api/v1/users/:id route (requires isAdmin)
-- [ ] 4.7 Define DELETE /api/v1/users/:id route (requires isAdmin)
-- [ ] 4.8 Register routes in `server/src/routes/index.ts`
+- [x] 4.1 Create `server/src/routes/users.ts`
+- [x] 4.2 Import auth middleware (`isAuthenticated`, `isAdmin`)
+- [x] 4.3 Define POST /api/v1/users route (requires isAdmin)
+- [x] 4.4 Define GET /api/v1/users route (requires isAdmin)
+- [x] 4.5 Define GET /api/v1/users/:id route (requires isAdmin)
+- [x] 4.6 Define PATCH /api/v1/users/:id route (requires isAdmin)
+- [x] 4.7 Define DELETE /api/v1/users/:id route (requires isAdmin)
+- [x] 4.8 Register routes in `server/src/routes/index.ts`
 
 ## 5. Swagger Documentation
 
-- [ ] 5.1 Add Swagger comments for POST /api/v1/users
-  - [ ] Document request body schema
-  - [ ] Document 201 response
-  - [ ] Document 400 (validation/duplicate) and 403 errors
-- [ ] 5.2 Add Swagger comments for GET /api/v1/users
-  - [ ] Document query parameters (page, limit)
-  - [ ] Document 200 response with pagination
-  - [ ] Document 403 error
-- [ ] 5.3 Add Swagger comments for GET /api/v1/users/:id
-  - [ ] Document path parameter
-  - [ ] Document 200 response
-  - [ ] Document 404 and 403 errors
-- [ ] 5.4 Add Swagger comments for PATCH /api/v1/users/:id
-  - [ ] Document path parameter and request body
-  - [ ] Document 200 response
-  - [ ] Document 400, 403, 404 errors
-- [ ] 5.5 Add Swagger comments for DELETE /api/v1/users/:id
-  - [ ] Document path parameter
-  - [ ] Document 204/200 response
-  - [ ] Document 403, 404 errors
+- [x] 5.1 Add Swagger comments for POST /api/v1/users
+  - [x] Document request body schema
+  - [x] Document 201 response
+  - [x] Document 400 (validation/duplicate) and 403 errors
+- [x] 5.2 Add Swagger comments for GET /api/v1/users
+  - [x] Document query parameters (page, limit)
+  - [x] Document 200 response with pagination
+  - [x] Document 403 error
+- [x] 5.3 Add Swagger comments for GET /api/v1/users/:id
+  - [x] Document path parameter
+  - [x] Document 200 response
+  - [x] Document 404 and 403 errors
+- [x] 5.4 Add Swagger comments for PATCH /api/v1/users/:id
+  - [x] Document path parameter and request body
+  - [x] Document 200 response
+  - [x] Document 400, 403, 404 errors
+- [x] 5.5 Add Swagger comments for DELETE /api/v1/users/:id
+  - [x] Document path parameter
+  - [x] Document 204/200 response
+  - [x] Document 403, 404 errors
 
 ## 6. Integration Tests
 
