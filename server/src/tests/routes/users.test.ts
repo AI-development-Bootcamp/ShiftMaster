@@ -75,7 +75,7 @@ const {
 // Create test app
 const app = express();
 app.use(express.json());
-app.use('/users', usersRouter);
+app.use('/api/v1/users', usersRouter);
 
 // Test constants
 const VALID_ADMIN_TOKEN = 'valid.admin.token';
