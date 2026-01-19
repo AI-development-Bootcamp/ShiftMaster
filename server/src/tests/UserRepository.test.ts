@@ -1,40 +1,16 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { UserRepository } from '../db/repositories/UserRepository.js';
 import { supabase } from '../db/supabase.js';
-
-// Mock Supabase client
-vi.mock('../db/supabase.js', () => ({
-    supabase: {
-        from: vi.fn(() => ({
-            select: vi.fn(() => ({
-                eq: vi.fn(),
-                single: vi.fn()
-            })),
-            insert: vi.fn(() => ({
-                select: vi.fn(() => ({
-                    single: vi.fn()
-                }))
-            })),
-            update: vi.fn(() => ({
-                eq: vi.fn(() => ({
-                    select: vi.fn(() => ({
-                        single: vi.fn()
-                    }))
-                }))
-            })),
-            delete: vi.fn(() => ({
-                eq: vi.fn()
-            }))
-        }))
-    }
-}));
 
 describe('UserRepository', () => {
     let repository: UserRepository;
 
     beforeEach(() => {
         repository = new UserRepository();
-        vi.clearAllMocks();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
     });
 
     it('should find user by email', async () => {
@@ -44,13 +20,12 @@ describe('UserRepository', () => {
         const singleMock = vi.fn().mockResolvedValue({ data: mockUser, error: null });
         const eqMock = vi.fn().mockReturnValue({ single: singleMock });
         const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
-        const fromMock = vi.fn().mockReturnValue({ select: selectMock });
 
-        supabase.from = fromMock;
+        vi.spyOn(supabase, 'from').mockReturnValue({ select: selectMock } as unknown as ReturnType<typeof supabase.from>);
 
         const result = await repository.findByEmail('test@example.com');
 
-        expect(fromMock).toHaveBeenCalledWith('users');
+        expect(supabase.from).toHaveBeenCalledWith('users');
         expect(selectMock).toHaveBeenCalledWith('*');
         expect(eqMock).toHaveBeenCalledWith('email', 'test@example.com');
         expect(result).toEqual(mockUser);
@@ -60,9 +35,8 @@ describe('UserRepository', () => {
         const singleMock = vi.fn().mockResolvedValue({ data: null, error: { code: 'PGRST116' } });
         const eqMock = vi.fn().mockReturnValue({ single: singleMock });
         const selectMock = vi.fn().mockReturnValue({ eq: eqMock });
-        const fromMock = vi.fn().mockReturnValue({ select: selectMock });
 
-        supabase.from = fromMock;
+        vi.spyOn(supabase, 'from').mockReturnValue({ select: selectMock } as unknown as ReturnType<typeof supabase.from>);
 
         const result = await repository.findByEmail('missing@example.com');
 
