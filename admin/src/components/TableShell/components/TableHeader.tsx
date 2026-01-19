@@ -31,7 +31,7 @@ export function TableHeader<T>({ columns, sort, onSortChange }: TableHeaderProps
             }
         }
 
-        let nextSort = [...currentSort];
+        const nextSort = [...currentSort];
 
         if (nextDirection) {
             if (existingIndex >= 0) {

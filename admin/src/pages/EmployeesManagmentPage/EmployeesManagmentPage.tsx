@@ -37,7 +37,7 @@ export function EmployeesManagmentPage() {
 
     // Client-side pagination & sorting logic (similar to other pages)
     const { data, totalItems, totalPages } = useMemo(() => {
-        let processedData = [...users];
+        const processedData = [...users];
 
         // 1. Sort
         if (sort && sort.length > 0) {
@@ -46,10 +46,10 @@ export function EmployeesManagmentPage() {
                     const { key, direction } = sortItem;
                     const aValue = key === 'role'
                         ? (a.role === UserRole.ADMIN ? 'מנהל' : 'עובד')
-                        : (a as any)[key];
+                        : a[key as keyof User];
                     const bValue = key === 'role'
                         ? (b.role === UserRole.ADMIN ? 'מנהל' : 'עובד')
-                        : (b as any)[key];
+                        : b[key as keyof User];
 
                     if (aValue < bValue) return direction === 'asc' ? -1 : 1;
                     if (aValue > bValue) return direction === 'asc' ? 1 : -1;

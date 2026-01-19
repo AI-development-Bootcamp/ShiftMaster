@@ -55,7 +55,7 @@ export function AssignmentPage() {
             };
         });
 
-        let processedData = [...rows];
+        const processedData = [...rows];
 
         // 1. Sort
         if (sort && sort.length > 0) {

@@ -13,7 +13,7 @@
     margin: 0 !important;
     padding: 0 !important;
     background-color: #f3f4f6 !important;
-    background-image: url('../../assets/login_background.svg') !important;
+    background-image: url('../assets/login_background.svg') !important;
     background-size: cover !important;
     background-position: center !important;
     background-repeat: no-repeat !important;
@@ -32,7 +32,7 @@
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     max-width: 400px;
     width: 90%;
-    opacity: 70%;
+    opacity: 90%;
 }
 
 .desktop-only-icon {

@@ -1,5 +1,5 @@
 import { createPortal } from 'react-dom';
-import './DesktopOnlyOverlay.css';
+import '../../styles/DesktopOnlyOverlay.css';
 
 
 export function DesktopOnlyOverlay() {

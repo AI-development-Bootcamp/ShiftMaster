@@ -77,7 +77,7 @@ export function EntriesManagementPage() {
 
     // Data processing (Sorting, Pagination)
     const { data, totalItems, totalPages } = useMemo(() => {
-        let processedData = [...projects];
+        const processedData = [...projects];
 
         // 1. Sort
         if (sort && sort.length > 0) {
