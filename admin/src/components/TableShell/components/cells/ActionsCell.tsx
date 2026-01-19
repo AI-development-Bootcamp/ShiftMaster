@@ -1,5 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { RowActionsConfig, ActionOption } from '../../types';
 import { EditIcon, DeleteIcon } from '../../../../constants/icons';
 
@@ -16,30 +17,65 @@ interface ActionDropdownProps<T> {
 
 function ActionDropdown<T>({ options, row, trigger }: ActionDropdownProps<T>) {
     const [isOpen, setIsOpen] = useState(false);
-    const containerRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLDivElement>(null);
+    const [position, setPosition] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
-                setIsOpen(false);
+            if (triggerRef.current && !triggerRef.current.contains(event.target as Node)) {
+                // If click is not on the trigger, check if it's on the dropdown (which is in a portal)
+                const dropdownMenu = document.querySelector('.table-shell__action-dropdown-menu');
+                if (dropdownMenu && !dropdownMenu.contains(event.target as Node)) {
+                    setIsOpen(false);
+                }
             }
+        };
+
+        const handleScroll = () => {
+            if (isOpen) setIsOpen(false); // Close on scroll to avoid detached menu
         };
 
         if (isOpen) {
             document.addEventListener('mousedown', handleClickOutside);
+            window.addEventListener('scroll', handleScroll, true); // Capture scroll on any element
+            window.addEventListener('resize', handleScroll);
         }
         return () => {
             document.removeEventListener('mousedown', handleClickOutside);
+            window.removeEventListener('scroll', handleScroll, true);
+            window.removeEventListener('resize', handleScroll);
         };
     }, [isOpen]);
 
+    const handleToggle = () => {
+        if (!isOpen && triggerRef.current) {
+            const rect = triggerRef.current.getBoundingClientRect();
+            // Centered below the trigger
+            setPosition({
+                top: rect.bottom + 4,
+                left: rect.left + rect.width / 2,
+            });
+        }
+        setIsOpen(!isOpen);
+    };
+
     return (
-        <div className="table-shell__action-dropdown-container" ref={containerRef}>
-            <div onClick={() => setIsOpen(!isOpen)} style={{ display: 'inline-block' }}>
+        <div className="table-shell__action-dropdown-container" ref={triggerRef}>
+            <div onClick={handleToggle} style={{ display: 'inline-block' }}>
                 {trigger}
             </div>
-            {isOpen && (
-                <div className="table-shell__action-dropdown-menu">
+            {isOpen && createPortal(
+                <div
+                    className="table-shell__action-dropdown-menu"
+                    style={{
+                        position: 'fixed',
+                        top: position.top,
+                        left: position.left,
+                        transform: 'translateX(-50%)', // Center horizontally relative to trigger
+                        zIndex: 9999, // Ensure it's on top of everything
+                        margin: 0 // Override CSS margin
+                    }}
+                >
                     {options.map((option, index) => (
                         <button
                             key={index}
@@ -52,7 +88,8 @@ function ActionDropdown<T>({ options, row, trigger }: ActionDropdownProps<T>) {
                             {option.label}
                         </button>
                     ))}
-                </div>
+                </div>,
+                document.body
             )}
         </div>
     );

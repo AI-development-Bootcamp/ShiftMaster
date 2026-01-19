@@ -1,0 +1,251 @@
+/* TaskEmployeeAssignmentForm.css */
+
+/* === Modal Overlay === */
+.task-employee-form__overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+/* === Modal Container === */
+.task-employee-form {
+    background-color: var(--color-bg-primary, #ffffff);
+    border-radius: var(--radius-lg, 12px);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 90%;
+    max-width: 800px;
+    width: 90%;
+    max-width: 800px;
+    height: 800px;
+    /* Increased height to fit fixed table wrapper without scrolling */
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* === Header === */
+.task-employee-form__header {
+    padding: 24px 24px 16px;
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.task-employee-form__header-top {
+    /* Simplified: just title block on right */
+    display: block;
+}
+
+.task-employee-form__header-bottom {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.task-employee-form__header-search {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+}
+
+.task-employee-form__close-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: var(--color-text-secondary, #6b7280);
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.15s ease;
+    z-index: 10;
+}
+
+.task-employee-form__close-btn:hover {
+    background-color: var(--color-bg-secondary, #f3f4f6);
+    color: var(--color-text-primary, #111827);
+}
+
+.task-employee-form__title {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary, #111827);
+    text-align: right;
+    white-space: nowrap;
+}
+
+.task-employee-form__subtitle {
+    margin: 0;
+    font-size: 14px;
+    color: var(--color-text-secondary, #6b7280);
+    text-align: right;
+}
+
+/* === Context Pills === */
+.task-employee-form__context-pills {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.task-employee-form__pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    /* Reduced padding */
+    background-color: var(--color-primary-light, #e0eaff);
+    color: var(--color-primary, #0052D6);
+    border-radius: 9999px;
+    font-size: 12px;
+    /* Slight reduction */
+    font-weight: 500;
+}
+
+.task-employee-form__pill-separator {
+    color: var(--color-text-secondary, #6b7280);
+    font-size: 12px;
+}
+
+/* === Content === */
+.task-employee-form__content {
+    flex: 1;
+    overflow-y: hidden;
+    /* Changed from auto to hidden to strictly prevent scrolling */
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* === Error Alert === */
+.task-employee-form__error {
+    padding: 12px 16px;
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md, 8px);
+    color: #dc2626;
+    font-size: 14px;
+    text-align: right;
+}
+
+/* === Search === */
+.task-employee-form__search {
+    position: relative;
+    width: 250px;
+    /* Fixed width for header search */
+}
+
+.task-employee-form__search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--color-text-secondary, #6b7280);
+    pointer-events: none;
+}
+
+.task-employee-form__search-input {
+    width: 100%;
+    padding: 6px 32px 6px 12px;
+    /* RTL padding: Right 32px, Left 12px */
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 6px);
+    font-size: 13px;
+    direction: rtl;
+    background-color: var(--color-bg-primary, #ffffff);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.task-employee-form__search-input:focus {
+    outline: none;
+    border-color: var(--color-primary, #0052D6);
+    box-shadow: 0 0 0 3px rgba(0, 82, 214, 0.1);
+}
+
+.task-employee-form__search-input::placeholder {
+    color: var(--color-text-tertiary, #9ca3af);
+}
+
+/* === Table Wrapper === */
+.task-employee-form__table-wrapper {
+    /* flex: 1 removed to prevent stretching to bottom of modal */
+    height: 500px;
+    /* Increased to 500px to ensure plenty of space for 8 rows + header + footer */
+    position: relative;
+    /* margin-bottom to ensure spacing from submit footer if needed */
+}
+
+/* Override TableShell styles for embedded use */
+.task-employee-form__table-wrapper .table-shell-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* Fill the fixed wrapper */
+    min-height: 100%;
+    max-height: none;
+    right: auto;
+    top: auto;
+    box-shadow: none;
+    overflow-y: visible !important;
+    /* Force disable scrollbars */
+}
+
+/* Ensure empty state doesn't overflow/scroll */
+.task-employee-form__table-wrapper .table-shell-container.table-shell-container--empty {
+    overflow-y: hidden !important;
+    /* Force clip for empty state */
+}
+
+/* Force footer to bottom of the fixed-height container */
+.task-employee-form__table-wrapper .table-shell__footer {
+    margin-top: auto;
+}
+
+/* === Footer === */
+.task-employee-form__footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    background-color: var(--color-bg-secondary, #f9fafb);
+}
+
+.task-employee-form__submit-btn {
+    width: 100%;
+    padding: 12px 24px;
+    background-color: var(--color-primary, #0052D6);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+}
+
+.task-employee-form__submit-btn:hover:not(:disabled) {
+    background-color: var(--color-primary-dark, #003da5);
+}
+
+.task-employee-form__submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -1,12 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMonthLocks } from '../hooks/useMonthLocks';
-import { mockMonthLocks } from '../mocks/monthLocks';
 
 describe('useMonthLocks', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.spyOn(console, 'log').mockImplementation(() => {});
+    vi.spyOn(console, 'log').mockImplementation(() => { });
   });
 
   it('returns loading state initially', () => {

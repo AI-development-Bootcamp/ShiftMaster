@@ -8,7 +8,6 @@ import { LoginPage } from './pages/LoginPage';
 import { AssignmentPage } from './pages/AssignmentPage';
 import { EntriesManagementPage } from './pages/EntriesManagementPage';
 import { EmployeesManagementPage } from './pages/EmployeesManagementPage';
-
 import { mockCurrentUser } from './mocks/users';
 import { DesktopOnlyOverlay } from './components/DesktopOnlyOverlay/DesktopOnlyOverlay';
 

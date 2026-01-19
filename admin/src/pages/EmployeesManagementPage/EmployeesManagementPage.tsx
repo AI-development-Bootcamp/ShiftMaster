@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { FormShell, FormValues } from '../../components/FormShell';
-import { createUserForm } from '../../components/forms';
+import { createUserForm, editUserForm } from '../../components/forms';
 import { TableShell, TableColumnDef, SortState } from '../../components/TableShell';
+import { TableSearch } from '../../components/TableShell/TableSearch';
+import { useTableSearch } from '../../hooks/useTableSearch';
 import { mockUsers } from '../../mocks/users';
 import { User, UserRole } from '@abra-shift-master/shared';
 import { useTranslation } from 'react-i18next';
@@ -9,19 +11,19 @@ import '../../styles/EmployeesManagementPage.css';
 
 export function EmployeesManagementPage() {
     const { t } = useTranslation();
-    const [activeForm, setActiveForm] = useState<'user' | null>(null);
+    const [activeForm, setActiveForm] = useState<'create' | 'edit' | null>(null);
+    const [formInitialValues, setFormInitialValues] = useState<FormValues>({});
     const [users, setUsers] = useState<User[]>(mockUsers);
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>(null);
 
-    // Watch users and clamp page if needed
-    const pageSize = 10;
+    // --- Search Logic (Reusable) ---
+    const { searchQuery, setSearchQuery, filteredData } = useTableSearch(users, ['full_name', 'email', 'job_title']);
+
+    // Watch filteredData and clamp page if needed
     useEffect(() => {
-        const totalPages = Math.max(1, Math.ceil(users.length / pageSize));
-        if (page > totalPages) {
-            setPage(totalPages);
-        }
-    }, [users.length, page]);
+        setPage(1); // Reset to page 1 on search or data change
+    }, [searchQuery, users.length]);
 
     // Columns Configuration
     const columns: TableColumnDef<User>[] = [
@@ -41,14 +43,14 @@ export function EmployeesManagementPage() {
     ];
 
     const handleSubmit = (values: FormValues) => {
-        console.log('User Form submitted:', values);
+        console.log(`User Form submitted (${activeForm}):`, values);
         // Here we would normally map form values to User object and update state/backend
         setActiveForm(null);
     };
 
     // Client-side pagination & sorting logic (similar to other pages)
     const { data, totalItems, totalPages } = useMemo(() => {
-        const processedData = [...users];
+        const processedData = [...filteredData];
 
         // 1. Sort
         if (sort && sort.length > 0) {
@@ -70,19 +72,24 @@ export function EmployeesManagementPage() {
         }
 
         // 2. Pagination
-        const pageSize = 10;
+        const pageSize = 11;
         const totalItems = processedData.length;
         const totalPages = Math.ceil(totalItems / pageSize);
         const startIndex = (page - 1) * pageSize;
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [users, page, sort, t]);
+    }, [filteredData, page, sort, t]);
 
-    const handleEdit = (user: User) => {
-        console.log('Edit user:', user);
-        // In a real implementation we would pass 'user' data to the form
-        // setActiveForm('user'); // Disabled as per request
+    const handleEditUser = (user: User) => {
+        setFormInitialValues({
+            fullName: user.full_name,
+            email: user.email,
+            role: user.role === UserRole.ADMIN ? 'admin' : 'regular',
+            jobTitle: user.job_title || '',
+            // Password usually not pre-filled for security
+        });
+        setActiveForm('edit');
     };
 
     const handleDelete = (user: User) => {
@@ -95,13 +102,28 @@ export function EmployeesManagementPage() {
     return (
         <div className="employees-managment-page">
             <div className="employees-page-header">
-                <h1>{t('employeesPage.title')}</h1>
-                <button
-                    className="add-employee-btn"
-                    onClick={() => setActiveForm('user')}
-                >
-                    {t('employeesPage.addEmployee')}
-                </button>
+                {/* Title Section (Right/Start) */}
+                <div className="page-header-title-group">
+                    <h1>{t('employeesPage.title')}</h1>
+                    <p>{t('employeesPage.subtitle')}</p>
+                </div>
+
+                {/* Actions Section (Left/End) */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    {/* Visual Order RTL: [Search] [Button] (Button is Leftmost) */}
+                    <TableSearch
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder={t('common.search', 'חיפוש...')}
+                    />
+
+                    <button
+                        className="admin-action-btn"
+                        onClick={() => setActiveForm('create')}
+                    >
+                        {t('employeesPage.addEmployee')}
+                    </button>
+                </div>
             </div>
 
             <TableShell
@@ -109,7 +131,7 @@ export function EmployeesManagementPage() {
                 data={data}
                 columns={columns}
                 getRowId={(row) => String(row.user_id)}
-                pagination={{ page, pageSize: 10, totalItems, totalPages }}
+                pagination={{ page, pageSize: 11, totalItems, totalPages }}
                 onPageChange={setPage}
                 sort={sort}
                 onSortChange={setSort}
@@ -117,14 +139,34 @@ export function EmployeesManagementPage() {
                 rowActions={{
                     showEdit: true,
                     showDelete: true,
-                    onEdit: handleEdit,
-                    onDelete: handleDelete,
+                    editOptions: [
+                        {
+                            label: t('employeesPage.actions.editEmployee', 'ערוך עובד'),
+                            onClick: (row) => handleEditUser(row)
+                        }
+                    ],
+                    deleteOptions: [
+                        {
+                            label: t('employeesPage.actions.deleteEmployee', 'מחק עובד'),
+                            variant: 'danger',
+                            onClick: (row) => handleDelete(row)
+                        }
+                    ]
                 }}
             />
 
-            {activeForm === 'user' && (
+            {activeForm === 'create' && (
                 <FormShell
                     {...createUserForm}
+                    onSubmit={handleSubmit}
+                    onClose={() => setActiveForm(null)}
+                />
+            )}
+
+            {activeForm === 'edit' && (
+                <FormShell
+                    {...editUserForm}
+                    initialValues={formInitialValues}
                     onSubmit={handleSubmit}
                     onClose={() => setActiveForm(null)}
                 />
@@ -132,4 +174,3 @@ export function EmployeesManagementPage() {
         </div>
     );
 }
-

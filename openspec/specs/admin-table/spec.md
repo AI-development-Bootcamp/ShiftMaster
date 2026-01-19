@@ -300,3 +300,28 @@ The Entries Management Page SHALL display a Month Locks management button in the
 - **WHEN** the Month Locks button is added
 - **THEN** the TableShell component positioning and behavior remain unchanged
 
+
+---
+
+### Requirement: Search Integration
+
+Search functionality SHALL be consistent across all tables.
+
+#### Scenario: Search Component Usage
+
+- **WHEN** implementing search for a table
+- **THEN** the `TableSearch` component SHALL be used
+- **AND** it SHALL be styled consistently with the application design
+
+#### Scenario: Search Logic Hook
+
+- **WHEN** implementing search logic
+- **THEN** the `useTableSearch` hook SHALL be used
+- **AND** it SHALL accept the data source and an array of searchable keys
+- **AND** it SHALL return `searchQuery`, `setSearchQuery`, and `filteredData`
+
+#### Scenario: Search Filtering
+
+- **WHEN** a user types in the search box
+- **THEN** filtering SHALL occur on the *client-side* (for current phase)
+- **AND** filtering SHALL be applied to `filteredData` *before* sorting and pagination

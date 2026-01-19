@@ -1,7 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { TableShell } from '../../components/TableShell';
+import { TableSearch } from '../../components/TableShell/TableSearch';
+import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState, PersonChip } from '../../components/TableShell/types';
+import { TaskEmployeeAssignmentForm, EmployeeRow } from '../../components/task/TaskEmployeeAssignmentForm';
+import { FormShell, FormValues } from '../../components/FormShell';
+import { editClientForm } from '../../components/forms/createClient';
+import { editProjectForm } from '../../components/forms/createProject';
+import { editTaskForm } from '../../components/forms/createTask';
 import { useTranslation } from 'react-i18next';
+import { UserRole } from '@abra-shift-master/shared';
 
 import { mockProjects, mockTasks } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
@@ -12,6 +20,8 @@ import '../../styles/AssignmentPage.css';
 interface AssignmentTableRow {
     id: string;
     task_id: number;
+    client_id: number;
+    project_id: number;
     client_name: string;
     project_name: string;
     task_name: string;
@@ -25,11 +35,58 @@ export function AssignmentPage() {
         { key: 'client_name', direction: 'asc' },
         { key: 'project_name', direction: 'asc' }
     ]);
+    const [editingAssignment, setEditingAssignment] = useState<AssignmentTableRow | null>(null);
 
-    // Data Aggregation
-    const { data, totalItems, totalPages } = useMemo(() => {
-        // Map tasks to row format
-        const rows: AssignmentTableRow[] = mockTasks.map(task => {
+    // --- Edit Form State ---
+    const [activeEditForm, setActiveEditForm] = useState<'client' | 'project' | 'task' | null>(null);
+    const [formInitialValues, setFormInitialValues] = useState<FormValues>({});
+
+    const handleFormSubmit = async (values: FormValues) => {
+        console.log(`Submitted ${activeEditForm} form:`, values);
+        setActiveEditForm(null);
+    };
+
+    const handleEditClient = (row: AssignmentTableRow) => {
+        const client = mockClients.find(c => c.client_id === row.client_id);
+        if (client) {
+            setFormInitialValues({
+                clientName: client.name,
+                contactDetails: client.contact_info || '',
+            });
+            setActiveEditForm('client');
+        }
+    };
+
+    const handleEditProject = (row: AssignmentTableRow) => {
+        const project = mockProjects.find(p => p.project_id === row.project_id);
+        if (project) {
+            setFormInitialValues({
+                projectName: project.name,
+                clientId: String(project.client_id),
+                projectDuration: { start: project.start_date || '', end: '' }, // End date missing in mock
+                description: project.description || '',
+            });
+            setActiveEditForm('project');
+        }
+    };
+
+    const handleEditTask = (row: AssignmentTableRow) => {
+        const task = mockTasks.find(t => t.task_id === row.task_id);
+        if (task) {
+            setFormInitialValues({
+                taskTitle: task.name,
+                projectId: String(task.project_id),
+                assignedTo: '', // Mock data doesn't link task directly to single assignee in this context easily
+                dueDate: '', // Mock Task doesn't have due_date
+                description: task.description || '',
+            });
+            setActiveEditForm('task');
+        }
+    };
+
+    // --- Data Aggregation (Raw Rows) ---
+    const rawRows = useMemo(() => {
+        return mockTasks.map(task => {
             const project = mockProjects.find(p => p.project_id === task.project_id);
             const client = project ? mockClients.find(c => c.client_id === project.client_id) : null;
 
@@ -49,15 +106,30 @@ export function AssignmentPage() {
 
             return {
                 id: String(task.task_id),
-                task_id: task.task_id, // Keep number for reference if needed
+                task_id: task.task_id,
+                client_id: client ? client.client_id : 0,
+                project_id: project ? project.project_id : 0,
                 client_name: client ? client.name : t('common.unknown'),
                 project_name: project ? project.name : t('common.unknown'),
                 task_name: task.name,
                 assignees
             };
         });
+    }, [t]);
 
-        const processedData = [...rows];
+    // --- Search Logic (Reusable) ---
+    // Search by client, project, or task name
+    const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
+
+    // Reset pagination when search/data changes
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery, rawRows.length]);
+
+
+    // --- Sort & Paginate Filtered Data ---
+    const { data, totalItems, totalPages } = useMemo(() => {
+        const processedData = [...filteredData];
 
         // 1. Sort
         if (sort && sort.length > 0) {
@@ -75,14 +147,30 @@ export function AssignmentPage() {
         }
 
         // 2. Pagination
-        const pageSize = 10;
+        const pageSize = 11;
         const totalItems = processedData.length;
         const totalPages = Math.ceil(totalItems / pageSize);
         const startIndex = (page - 1) * pageSize;
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [page, sort, t]);
+    }, [filteredData, page, sort]);
+
+    // Data for the form: All potential available employees
+    const potentialEmployees: EmployeeRow[] = useMemo(() => {
+        return mockUsers.map(user => ({
+            id: String(user.user_id),
+            fullName: user.full_name,
+            type: user.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee'),
+            role: user.job_title || ''
+        }));
+    }, [t]);
+
+    const handleAssignmentSubmit = async (selectedRows: EmployeeRow[]) => {
+        console.log('Updated assignments for task', editingAssignment?.task_name, ':', selectedRows);
+        // Here we would call API to update assignments
+        setEditingAssignment(null);
+    };
 
     // Columns definition
     const columns: TableColumnDef<AssignmentTableRow>[] = [
@@ -127,8 +215,18 @@ export function AssignmentPage() {
     return (
         <div className="assignment-page">
             <div className="assignment-page-header">
-                <h1>{t('assignmentPage.title')}</h1>
-                <p>{t('assignmentPage.subtitle')}</p>
+                {/* Title Section (Right/Start) */}
+                <div className="page-header-title-group">
+                    <h1>{t('assignmentPage.title')}</h1>
+                    <p>{t('assignmentPage.subtitle')}</p>
+                </div>
+
+                {/* Actions/Search Section (Left/End) */}
+                <TableSearch
+                    value={searchQuery}
+                    onChange={setSearchQuery}
+                    placeholder={t('common.search', 'חיפוש...')}
+                />
             </div>
 
             <TableShell
@@ -138,7 +236,7 @@ export function AssignmentPage() {
                 getRowId={(row) => row.id}
                 pagination={{
                     page,
-                    pageSize: 10,
+                    pageSize: 11,
                     totalItems,
                     totalPages
                 }}
@@ -150,18 +248,62 @@ export function AssignmentPage() {
                     showEdit: true,
                     showDelete: true,
                     editOptions: [
-                        { label: t('assignmentPage.actions.editClient'), onClick: () => console.log(1) },
-                        { label: t('assignmentPage.actions.editProject'), onClick: () => console.log(2) },
-                        { label: t('assignmentPage.actions.editTask'), onClick: () => console.log(3) },
-                        { label: t('assignmentPage.actions.editAssignment'), onClick: () => console.log(4) },
+                        { label: t('assignmentPage.actions.editClient'), onClick: (row) => handleEditClient(row) },
+                        { label: t('assignmentPage.actions.editProject'), onClick: (row) => handleEditProject(row) },
+                        { label: t('assignmentPage.actions.editTask'), onClick: (row) => handleEditTask(row) },
+                        {
+                            label: t('assignmentPage.actions.editAssignment'),
+                            onClick: (row) => setEditingAssignment(row)
+                        },
                     ],
                     deleteOptions: [
-                        { label: t('assignmentPage.actions.deleteClient'), onClick: () => console.log(11) },
-                        { label: t('assignmentPage.actions.deleteProject'), onClick: () => console.log(12) },
-                        { label: t('assignmentPage.actions.deleteTask'), onClick: () => console.log(13) },
+                        { label: t('assignmentPage.actions.deleteClient'), onClick: () => console.log('Delete Client') },
+                        { label: t('assignmentPage.actions.deleteProject'), onClick: () => console.log('Delete Project') },
+                        { label: t('assignmentPage.actions.deleteTask'), onClick: () => console.log('Delete Task') },
                     ]
                 }}
             />
+
+            {editingAssignment && (
+                <TaskEmployeeAssignmentForm
+                    contextPath={{
+                        client: { id: String(editingAssignment.client_id), name: editingAssignment.client_name },
+                        project: { id: String(editingAssignment.project_id), name: editingAssignment.project_name },
+                        task: { id: String(editingAssignment.task_id), name: editingAssignment.task_name }
+                    }}
+                    rows={potentialEmployees}
+                    initialSelectedIds={editingAssignment.assignees.map(a => a.id)}
+                    onSubmit={handleAssignmentSubmit}
+                    onClose={() => setEditingAssignment(null)}
+                />
+            )}
+
+            {activeEditForm === 'client' && (
+                <FormShell
+                    {...editClientForm}
+                    initialValues={formInitialValues}
+                    onClose={() => setActiveEditForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeEditForm === 'project' && (
+                <FormShell
+                    {...editProjectForm}
+                    initialValues={formInitialValues}
+                    onClose={() => setActiveEditForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeEditForm === 'task' && (
+                <FormShell
+                    {...editTaskForm}
+                    initialValues={formInitialValues}
+                    onClose={() => setActiveEditForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
         </div>
     );
 }

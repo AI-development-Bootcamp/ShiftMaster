@@ -45,6 +45,7 @@
     },
     "employeesPage": {
         "title": "ניהול עובדים",
+        "subtitle": "כאן תוכל לנהל את רשימת העובדים, להוסיף חדשים ולעדכן פרטים",
         "addEmployee": "+ עובד חדש",
         "tableHeaders": {
             "employeeId": "מספר עובד",

@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
 import { MonthLockModal } from '../components/MonthLocks/MonthLockModal';
-import { UserRole } from '@abra-shift-master/shared';
 
 // Mock useTranslation
 vi.mock('react-i18next', () => ({

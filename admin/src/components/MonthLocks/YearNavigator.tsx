@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useTranslation } from 'react-i18next';
 import '../../styles/MonthLocks.css';
 
@@ -29,9 +29,9 @@ export function YearNavigator({ year, onPreviousYear, onNextYear }: YearNavigato
     <div className="year-navigator">
       <button
         type="button"
-        className="year-nav-button year-nav-button--next"
+        className="year-nav-button year-nav-button--prev"
         onClick={onPreviousYear}
-        aria-label={t('monthLocks.yearNavigator.nextYear')}
+        aria-label={t('monthLocks.yearNavigator.previousYear')}
       >
         ▶
       </button>
@@ -40,9 +40,9 @@ export function YearNavigator({ year, onPreviousYear, onNextYear }: YearNavigato
       </span>
       <button
         type="button"
-        className="year-nav-button year-nav-button--prev"
+        className="year-nav-button year-nav-button--next"
         onClick={onNextYear}
-        aria-label={t('monthLocks.yearNavigator.previousYear')}
+        aria-label={t('monthLocks.yearNavigator.nextYear')}
       >
         ◀
       </button>

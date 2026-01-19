@@ -52,6 +52,19 @@ export function TableHeader<T>({ columns, sort, onSortChange }: TableHeaderProps
         <thead className="table-shell__header">
             <tr>
                 {columns.map((col) => {
+                    // Selection column: empty header, fixed narrow width
+                    if (col.type === 'selection') {
+                        return (
+                            <th
+                                key={col.key}
+                                className="table-shell__header-cell table-shell__header-cell--selection"
+                                style={{ width: '48px', minWidth: '48px', textAlign: 'center' }}
+                            >
+                                {/* Empty header for selection column */}
+                            </th>
+                        );
+                    }
+
                     const sortItem = sort?.find(s => s.key === col.key);
                     const isSorted = !!sortItem;
                     const sortDirection = sortItem?.direction;

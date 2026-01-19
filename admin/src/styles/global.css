@@ -182,3 +182,54 @@ body {
     height: 100% !important;
   }
 }
+
+/* Standardized Admin Action Button (Primary Page Actions) */
+.admin-action-btn {
+  height: 40px;
+  min-width: 140px;
+  padding: 0 16px;
+  background-color: var(--color-primary, #0052D6);
+  color: var(--color-text-on-primary, #ffffff);
+  border: none;
+  border-radius: var(--radius-md, 6px);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.admin-action-btn:hover {
+  background-color: var(--color-primary-hover, #0c69ff);
+  /* Or use a specific darker shade if defined, falling back to hover var */
+}
+
+
+.admin-action-btn:focus-visible,
+.admin-action-btn:focus {
+  outline: 2px solid var(--color-primary, #0052D6);
+  outline-offset: 2px;
+}
+
+/* Standardized Page Header Title Block */
+.page-header-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-header-title-group h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #111827);
+}
+
+.page-header-title-group p {
+  margin: 0;
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 1rem;
+}

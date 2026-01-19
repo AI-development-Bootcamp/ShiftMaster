@@ -1,30 +1,32 @@
 .entries-management-page {
     padding: 2rem;
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Prevent page scroll, let table scroll */
+    display: flex;
+    flex-direction: column;
 }
 
 .entries-management-page-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 2rem;
-    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    /* Fixed and identical spacing */
+    padding-top: 1rem;
+    gap: 16px;
 }
 
-.entries-management-page-header-text {
-    flex: 1;
-}
+
 
 .month-lock-button-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
     position: relative;
 }
 
-.entries-management-page h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #333;
-}
+
 
 .entries-management-page p {
     color: #666;

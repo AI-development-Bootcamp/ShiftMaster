@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { MonthLock } from '@abra-shift-master/shared';
 import { MonthTile } from './MonthTile';

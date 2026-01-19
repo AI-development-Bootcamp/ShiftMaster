@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { User, UserRole } from '@abra-shift-master/shared';
 import '../../styles/MonthLocks.css';
@@ -34,7 +34,7 @@ export const MonthLockButton = forwardRef<HTMLButtonElement, MonthLockButtonProp
       <button
         ref={ref}
         type="button"
-        className="month-lock-button"
+        className="admin-action-btn"
         onClick={onClick}
         aria-label={t('monthLocks.button')}
       >

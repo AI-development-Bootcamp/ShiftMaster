@@ -26,12 +26,14 @@ function shouldFieldBeVisible(
 }
 
 /**
- * Initialize form values from schema
+ * Initialize form values from schema and optional initial values
  */
-function initializeValues(fields: FormFieldSchema[]): FormValues {
+function initializeValues(fields: FormFieldSchema[], initialValues?: FormValues): FormValues {
     const values: FormValues = {};
     fields.forEach((field) => {
-        if (field.type === 'dateRangeBox') {
+        if (initialValues && initialValues[field.id] !== undefined) {
+            values[field.id] = initialValues[field.id];
+        } else if (field.type === 'dateRangeBox') {
             values[field.id] = { start: '', end: '' };
         } else {
             values[field.id] = '';
@@ -56,9 +58,10 @@ export function FormShell({
     fields,
     isSubmitting = false,
     serverError,
+    initialValues,
 }: FormShellProps) {
     const { t } = useTranslation();
-    const [values, setValues] = useState<FormValues>(() => initializeValues(fields));
+    const [values, setValues] = useState<FormValues>(() => initializeValues(fields, initialValues));
     const [errors, setErrors] = useState<FormErrors>({});
     const [clickCount, setClickCount] = useState(0);
     const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);

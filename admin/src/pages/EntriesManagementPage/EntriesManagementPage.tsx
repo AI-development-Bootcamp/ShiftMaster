@@ -1,5 +1,7 @@
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { TableShell } from '../../components/TableShell';
+import { TableSearch } from '../../components/TableShell/TableSearch';
+import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState } from '../../components/TableShell/types';
 import { Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
 import { mockProjects } from '../../mocks/projects';
@@ -45,6 +47,15 @@ export function EntriesManagementPage() {
         });
     };
 
+    // --- Search Logic (Reusable) ---
+    // Search by project name only (client_name is not on Project type)
+    const { searchQuery, setSearchQuery, filteredData } = useTableSearch(projects, ['name']);
+
+    // Reset pagination when search/data changes
+    useEffect(() => {
+        setPage(1);
+    }, [searchQuery, projects.length]);
+
     // Columns definition
     const columns: TableColumnDef<Project>[] = [
         {
@@ -83,7 +94,7 @@ export function EntriesManagementPage() {
 
     // Data processing (Sorting, Pagination)
     const { data, totalItems, totalPages } = useMemo(() => {
-        const processedData = [...projects];
+        const processedData = [...filteredData];
 
         // 1. Sort
         if (sort && sort.length > 0) {
@@ -109,23 +120,33 @@ export function EntriesManagementPage() {
         }
 
         // 2. Pagination
-        const pageSize = 10;
+        const pageSize = 11;
         const totalItems = processedData.length;
         const totalPages = Math.ceil(totalItems / pageSize);
         const startIndex = (page - 1) * pageSize;
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [page, sort, projects]);
+    }, [page, sort, filteredData]);
 
     return (
         <div className="entries-management-page">
             <div className="entries-management-page-header">
-                <div className="entries-management-page-header-text">
+                {/* Title Section (Right/Start) */}
+                <div className="page-header-title-group">
                     <h1>{t('entriesPage.title')}</h1>
                     <p>{t('entriesPage.subtitle')}</p>
                 </div>
+
+                {/* Actions Section (Left/End) */}
                 <div className="month-lock-button-container">
+                    {/* Visual Order RTL: [Search] [Button] (Button is Leftmost) */}
+                    <TableSearch
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder={t('common.search', 'חיפוש...')}
+                    />
+
                     <MonthLockButton
                         ref={buttonRef}
                         user={mockCurrentUser}
@@ -146,7 +167,7 @@ export function EntriesManagementPage() {
                 getRowId={(row) => String(row.project_id)}
                 pagination={{
                     page,
-                    pageSize: 10,
+                    pageSize: 11,
                     totalItems,
                     totalPages
                 }}

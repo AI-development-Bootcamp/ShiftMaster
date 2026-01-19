@@ -12,7 +12,7 @@ export type SortState = SortItem[];
 
 // --- Column Types ---
 export type TableRowId = string;
-export type TableColumnType = 'text' | 'radio' | 'boolean' | 'tags' | 'actions';
+export type TableColumnType = 'text' | 'radio' | 'boolean' | 'tags' | 'actions' | 'selection';
 
 export interface TableColumnDef<T> {
     key: string;
@@ -104,6 +104,10 @@ export interface TableShellProps<T> {
         columnKey: string;
         nextValue: boolean;
     }) => Promise<void> | void;
+
+    // Selection (for multi-row select)
+    selectedRowKeys?: Set<string>;
+    onSelectionChange?: (keys: Set<string>) => void;
 }
 
 // --- Sub-types for Cells ---

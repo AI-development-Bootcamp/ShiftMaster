@@ -1,26 +1,3 @@
-/* Month Lock Button */
-.month-lock-button {
-  padding: 8px 16px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  position: relative;
-}
-
-.month-lock-button:hover {
-  background-color: #1d4ed8;
-}
-
-.month-lock-button:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
 /* Month Lock Overlay - רקע שקוף לסגירה */
 .month-lock-overlay {
   position: fixed;
@@ -197,12 +174,10 @@
 
 /* Skeleton loading state */
 .month-tile--skeleton {
-  background: linear-gradient(
-    90deg,
-    #f3f4f6 25%,
-    #e5e7eb 50%,
-    #f3f4f6 75%
-  );
+  background: linear-gradient(90deg,
+      #f3f4f6 25%,
+      #e5e7eb 50%,
+      #f3f4f6 75%);
   background-size: 200% 100%;
   animation: skeleton-loading 1.5s ease-in-out infinite;
   cursor: default;
@@ -213,6 +188,7 @@
   0% {
     background-position: 200% 0;
   }
+
   100% {
     background-position: -200% 0;
   }

@@ -22,7 +22,7 @@ Admin interfaces require a standardized, reusable table component for displaying
 - Affected code:
   - `/admin/src/components/TableShell/` (new directory)
   - `/admin/src/assets/empty_space.svg` (existing asset)
-  - Pages that will use TableShell (EntriesManagementPage, EmployeesManagementPage)
+  - Pages that will use TableShell (EntriesManagementPage, EmployeesManagmentPage)
 
 ## Non-Goals (Explicit)
 
