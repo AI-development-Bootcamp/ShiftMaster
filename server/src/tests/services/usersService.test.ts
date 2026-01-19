@@ -4,7 +4,6 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UsersService, DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
-import { UserRepository } from '../../db/repositories/UserRepository.js';
 import { User } from '../../db/types/entities.js';
 import * as passwordUtils from '../../utils/password.js';
 
@@ -29,7 +28,14 @@ vi.mock('../../utils/password.js', () => ({
 
 describe('UsersService', () => {
   let usersService: UsersService;
-  let mockUserRepo: any;
+  let mockUserRepo: {
+    create: ReturnType<typeof vi.fn>;
+    findById: ReturnType<typeof vi.fn>;
+    findAll: ReturnType<typeof vi.fn>;
+    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
+    findByEmail: ReturnType<typeof vi.fn>;
+  };
 
   const mockUser: User = {
     user_id: '123e4567-e89b-12d3-a456-426614174000',
@@ -50,8 +56,8 @@ describe('UsersService', () => {
     // Create service instance
     usersService = new UsersService();
 
-    // Get mock repository instance
-    mockUserRepo = (usersService as any).userRepo;
+    // Get mock repository instance (accessing private property for testing)
+    mockUserRepo = (usersService as unknown as { userRepo: typeof mockUserRepo }).userRepo;
 
     // Setup default mock behaviors
     vi.mocked(passwordUtils.hashPassword).mockResolvedValue('hashed_password');
