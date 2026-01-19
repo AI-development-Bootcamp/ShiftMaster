@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { supabase } from '../supabase.js';
+import { supabaseAdmin } from '../supabase.js';
 import { IBaseRepository } from '../types/repositories.js';
 import { logDbError } from '../utils/logger.js';
 
@@ -8,7 +8,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     protected primaryKey: string;
     protected client: SupabaseClient;
 
-    constructor(table: string, primaryKey: string = 'id', client: SupabaseClient = supabase) {
+    constructor(table: string, primaryKey: string = 'id', client: SupabaseClient = supabaseAdmin) {
         this.table = table;
         this.primaryKey = primaryKey;
         this.client = client;

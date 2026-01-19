@@ -2,7 +2,7 @@
  * Authentication service for user login and credential verification
  */
 
-import { supabase } from '../db/supabase.js';
+import { supabaseAdmin } from '../db/supabase.js';
 import { comparePassword } from '../utils/password.js';
 
 /**
@@ -51,7 +51,7 @@ export async function authenticateUser(
   password: string
 ): Promise<AuthenticatedUser> {
   // Query user by email
-  const { data: user, error } = await supabase
+  const { data: user, error } = await supabaseAdmin
     .from('users')
     .select(
       'user_id, full_name, email, password_hash, role, active, created_at'
