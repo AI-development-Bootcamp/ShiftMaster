@@ -25,7 +25,7 @@ export interface User {
  * Represents a client entity.
  */
 export interface Client {
-  client_id: number;
+  client_id: string; // UUID
   name: string;
   contact_info?: string;
   active: boolean;
@@ -37,8 +37,8 @@ export interface Client {
  * Represents a project associated with a client.
  */
 export interface Project {
-  project_id: number;
-  client_id: number;
+  project_id: string; // UUID
+  client_id: string; // UUID
   manager_user_id: string; // UUID
   name: string;
   description?: string;
@@ -54,8 +54,8 @@ export interface Project {
  * Represents a task within a project.
  */
 export interface Task {
-  task_id: number;
-  project_id: number;
+  task_id: string; // UUID
+  project_id: string; // UUID
   name: string;
   description?: string;
   start_date?: string;
@@ -68,9 +68,9 @@ export interface Task {
  * Represents an assignment of a task to a user by an admin.
  */
 export interface AdminTaskAssignment {
-  admin_task_assignment_id: number;
+  admin_task_assignment_id: string; // UUID
   user_id: string; // UUID
-  task_id: number;
+  task_id: string; // UUID
   assigned_by: string; // UUID - admin user
   assigned_at: string;
   active: boolean;
@@ -82,7 +82,7 @@ export interface AdminTaskAssignment {
  * Represents a work entry or absence record.
  */
 export interface Entry {
-  entry_id: number;
+  entry_id: string; // UUID
   user_id: string; // UUID
   entry_kind: EntryKind;
   work_date: string;
@@ -102,9 +102,9 @@ export interface Entry {
  * Represents a specific assignment of time within an entry to a task.
  */
 export interface EntryAssignment {
-  entry_assignment_id: number;
-  entry_id: number;
-  task_id: number;
+  entry_assignment_id: string; // UUID
+  entry_id: string; // UUID
+  task_id: string; // UUID
   location: WorkLocation;
   start_time?: string;
   end_time?: string;
@@ -118,7 +118,7 @@ export interface EntryAssignment {
  * Represents a lock on a specific month to prevent further edits.
  */
 export interface MonthLock {
-  lock_id: number;
+  lock_id: string; // UUID
   year: number;
   month: number;
   locked_at: string;

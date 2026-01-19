@@ -1,4 +1,5 @@
-import pg from 'pg';
+import pkg from 'pg';
+const { Pool } = pkg;
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -9,8 +10,6 @@ import { logDbOperation, logDbError } from './logger.js';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Load .env from monorepo root (server/src/db/utils -> ../../.env = server/.env -> ../.env = root/.env)
 dotenv.config({ path: path.resolve(__dirname, '../../../../.env') });
-
-const { Pool } = pg;
 
 async function resetDatabase() {
     const connectionString = process.env.SUPABASE_URL || process.env.DATABASE_URL;

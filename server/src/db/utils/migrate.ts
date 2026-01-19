@@ -1,4 +1,5 @@
-import pg from 'pg';
+import pkg from 'pg';
+const { Client } = pkg;
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -26,7 +27,7 @@ export async function runMigrations(): Promise<MigrationResult[]> {
         throw new Error('SUPABASE_URL environment variable is not set');
     }
 
-    const client = new pg.Client({
+    const client = new Client({
         connectionString,
         ssl: {
             rejectUnauthorized: false // Supabase connections require SSL but often with self-signed certs in dev
@@ -54,8 +55,8 @@ export async function runMigrations(): Promise<MigrationResult[]> {
             .sort(); // Ensure files are processed in order (YYYYMMDD...)
 
         // Get applied migrations
-        const { rows: appliedRows } = await client.query('SELECT filename FROM _migrations');
-        const appliedMigrations = new Set(appliedRows.map(r => r.filename));
+        const { rows: appliedRows } = await client.query<{ filename: string }>('SELECT filename FROM _migrations');
+        const appliedMigrations = new Set(appliedRows.map((r: { filename: string }) => r.filename));
 
         for (const file of files) {
             if (appliedMigrations.has(file)) {
