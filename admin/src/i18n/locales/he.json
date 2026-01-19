@@ -1,0 +1,110 @@
+{
+    "common": {
+        "unknown": "לא ידוע",
+        "unknownUser": "משתמש לא ידוע",
+        "actions": "פעולות",
+        "appName": "Shift Master",
+        "show": "הצג",
+        "hide": "הסתר"
+    },
+    "desktopOnlyOverlay": {
+        "title": "מערכת למחשב שולחני בלבד",
+        "message": "מערכת זו מותאמת לעבודה על מחשב בלבד.<br />אנא התחבר דרך דפדפן במחשב שולחני או לפטופ."
+    },
+    "navigation": {
+        "home": "עמוד הבית",
+        "assignment": "ניהול לקוחות/פרויקטים",
+        "entries": "הגדרת דיווחי שעות",
+        "employees": "ניהול עובדים"
+    },
+    "assignmentPage": {
+        "title": "שיוך עובד למשימה",
+        "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
+        "searchBarHint": "חיפוש לפי שם עובד",
+        "tableHeaders": {
+            "clientName": "שם לקוח",
+            "projectName": "שם הפרויקט",
+            "taskName": "שם משימה",
+            "assignees": "עובדים משויכים"
+        },
+        "actions": {
+            "editClient": "ערוך לקוח",
+            "editProject": "ערוך פרוייקט",
+            "editTask": "ערוך משימה",
+            "editAssignment": "ערוך שיוך עובדים",
+            "deleteClient": "מחק לקוח",
+            "deleteProject": "מחק פרויקט",
+            "deleteTask": "מחק משימה"
+        },
+        "dropDownTitle": "יצירה",
+        "dropDownOptions": {
+            "addClient": "צור לקוח חדש",
+            "addProject": "צור פרויקט חדש",
+            "addTask": "צור משימה חדשה"
+        }
+    },
+    "employeesPage": {
+        "title": "ניהול עובדים",
+        "addEmployee": "+ עובד חדש",
+        "tableHeaders": {
+            "employeeId": "מספר עובד",
+            "fullName": "שם מלא",
+            "email": "כתובת מייל",
+            "role": "סוג עובד",
+            "jobTitle": "תואר תפקיד"
+        },
+        "roles": {
+            "admin": "מנהל",
+            "employee": "עובד"
+        },
+        "confirmDelete": "האם למחוק את העובד"
+    },
+    "formShell": {
+        "dateBox": {
+            "placeholder": "בחר תאריך"
+        },
+        "dateRangeBox": {
+            "startDateLabel": "מתאריך",
+            "endDateLabel": "עד תאריך",
+            "startDatePlaceholder": "בחר תאריך התחלה",
+            "endDatePlaceholder": "בחר תאריך סיום",
+            "validationError": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
+        },
+        "dropdownBox": {
+            "placeholder": "בחר אפשרות"
+        },
+        "textBox": {
+            "showPassword": "הצג סיסמה",
+            "hidePassword": "הסתר סיסמה"
+        },
+        "closeForm": "סגור טופס",
+        "validation": {
+            "required": "שדה חובה",
+            "endDateAfterStartDate": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
+        }
+    },
+    "login": {
+        "welcomeTitle": "👋 ברוכים הבאים למערכת הניהול של אברא",
+        "emailLabel": "כתובת מייל",
+        "emailPlaceholder": "name@example.com",
+        "passwordLabel": "סיסמה",
+        "submitButton": "התחברות",
+        "submittingButton": "מתחבר...",
+        "showPassword": "הצג סיסמה",
+        "hidePassword": "הסתר סיסמה"
+    },
+    "entriesPage": {
+        "title": "הגדרת דיווחי שעות",
+        "subtitle": "כאן תוכל להגדיר את סוג דיווחי השעות של העובדים בפרויקטים השונים.",
+        "searchBarHint": " פרויקט/חיפוש לפי שם לקוח",
+        "tableHeaders": {
+            "clientName": "שם לקוח",
+            "projectName": "שם הפרויקט",
+            "reportType": "סוג הדיווח"
+        },
+        "reportTypes": {
+            "sum": "סכום שעות",
+            "startEnd": "כניסה /יציאה"
+        }
+    }
+}

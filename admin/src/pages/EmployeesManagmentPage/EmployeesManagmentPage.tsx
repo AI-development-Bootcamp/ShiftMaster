@@ -4,9 +4,11 @@ import { createUserForm } from '../../components/forms';
 import { TableShell, TableColumnDef, SortState } from '../../components/TableShell';
 import { mockUsers } from '../../mocks/users';
 import { User, UserRole } from '@abra-shift-master/shared';
+import { useTranslation } from 'react-i18next';
 import '../../styles/EmployeesManagmentPage.css';
 
 export function EmployeesManagmentPage() {
+    const { t } = useTranslation();
     const [activeForm, setActiveForm] = useState<'user' | null>(null);
     const [users, setUsers] = useState<User[]>(mockUsers);
     const [page, setPage] = useState(1);
@@ -14,19 +16,19 @@ export function EmployeesManagmentPage() {
 
     // Columns Configuration
     const columns: TableColumnDef<User>[] = [
-        { key: 'user_id', header: 'מספר עובד', type: 'text', sortable: true, width: '10%' },
-        { key: 'full_name', header: 'שם מלא', type: 'text', sortable: true, width: '20%' },
-        { key: 'email', header: 'כתובת מייל', type: 'text', sortable: true, width: '25%' },
+        { key: 'user_id', header: t('employeesPage.tableHeaders.employeeId'), type: 'text', sortable: true, width: '10%' },
+        { key: 'full_name', header: t('employeesPage.tableHeaders.fullName'), type: 'text', sortable: true, width: '20%' },
+        { key: 'email', header: t('employeesPage.tableHeaders.email'), type: 'text', sortable: true, width: '25%' },
         {
             key: 'role',
-            header: 'סוג עובד',
+            header: t('employeesPage.tableHeaders.role'),
             type: 'text',
             sortable: true,
             width: '15%',
-            accessor: (row) => row.role === UserRole.ADMIN ? 'מנהל' : 'עובד'
+            accessor: (row) => row.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee')
         },
-        { key: 'job_title', header: 'תואר תפקיד', type: 'text', sortable: true, width: '15%' },
-        { key: 'actions', header: 'פעולות', type: 'actions', width: '10%' }
+        { key: 'job_title', header: t('employeesPage.tableHeaders.jobTitle'), type: 'text', sortable: true, width: '15%' },
+        { key: 'actions', header: t('common.actions'), type: 'actions', width: '10%' }
     ];
 
     const handleSubmit = (values: FormValues) => {
@@ -45,10 +47,10 @@ export function EmployeesManagmentPage() {
                 for (const sortItem of sort) {
                     const { key, direction } = sortItem;
                     const aValue = key === 'role'
-                        ? (a.role === UserRole.ADMIN ? 'מנהל' : 'עובד')
+                        ? (a.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee'))
                         : a[key as keyof User];
                     const bValue = key === 'role'
-                        ? (b.role === UserRole.ADMIN ? 'מנהל' : 'עובד')
+                        ? (b.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee'))
                         : b[key as keyof User];
 
                     if (aValue < bValue) return direction === 'asc' ? -1 : 1;
@@ -66,7 +68,7 @@ export function EmployeesManagmentPage() {
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [users, page, sort]);
+    }, [users, page, sort, t]);
 
     const handleEdit = (user: User) => {
         console.log('Edit user:', user);
@@ -76,7 +78,7 @@ export function EmployeesManagmentPage() {
 
     const handleDelete = (user: User) => {
         console.log('Delete user:', user);
-        if (window.confirm(`האם למחוק את העובד ${user.full_name}?`)) {
+        if (window.confirm(`${t('employeesPage.confirmDelete')} ${user.full_name}?`)) {
             setUsers(prev => prev.filter(u => u.user_id !== user.user_id));
         }
     };
@@ -84,12 +86,12 @@ export function EmployeesManagmentPage() {
     return (
         <div className="employees-managment-page">
             <div className="employees-page-header">
-                <h1>ניהול עובדים</h1>
+                <h1>{t('employeesPage.title')}</h1>
                 <button
                     className="add-employee-btn"
                     onClick={() => setActiveForm('user')}
                 >
-                    + עובד חדש
+                    {t('employeesPage.addEmployee')}
                 </button>
             </div>
 

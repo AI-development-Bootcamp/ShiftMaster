@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableColumnDef, SortState, PersonChip } from '../../components/TableShell/types';
+import { useTranslation } from 'react-i18next';
 
 import { mockProjects, mockTasks } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
@@ -18,6 +19,7 @@ interface AssignmentTableRow {
 }
 
 export function AssignmentPage() {
+    const { t } = useTranslation();
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>([
         { key: 'client_name', direction: 'asc' },
@@ -41,15 +43,15 @@ export function AssignmentPage() {
                 const user = mockUsers.find(u => u.user_id === assignment.user_id);
                 return {
                     id: String(assignment.user_id),
-                    name: user ? user.full_name : 'משתמש לא ידוע'
+                    name: user ? user.full_name : t('common.unknownUser')
                 };
             });
 
             return {
                 id: String(task.task_id),
                 task_id: task.task_id, // Keep number for reference if needed
-                client_name: client ? client.name : 'לא ידוע',
-                project_name: project ? project.name : 'לא ידוע',
+                client_name: client ? client.name : t('common.unknown'),
+                project_name: project ? project.name : t('common.unknown'),
                 task_name: task.name,
                 assignees
             };
@@ -80,13 +82,13 @@ export function AssignmentPage() {
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [page, sort]);
+    }, [page, sort, t]);
 
     // Columns definition
     const columns: TableColumnDef<AssignmentTableRow>[] = [
         {
             key: 'client_name',
-            header: 'שם לקוח',
+            header: t('assignmentPage.tableHeaders.clientName'),
             type: 'text',
             sortable: true,
             disableSortClearing: true,
@@ -94,7 +96,7 @@ export function AssignmentPage() {
         },
         {
             key: 'project_name',
-            header: 'שם הפרויקט',
+            header: t('assignmentPage.tableHeaders.projectName'),
             type: 'text',
             sortable: true,
             disableSortClearing: true,
@@ -102,21 +104,21 @@ export function AssignmentPage() {
         },
         {
             key: 'task_name',
-            header: 'שם משימה',
+            header: t('assignmentPage.tableHeaders.taskName'),
             type: 'text',
             sortable: true,
             width: '20%',
         },
         {
             key: 'assignees',
-            header: 'עובדים משויכים',
+            header: t('assignmentPage.tableHeaders.assignees'),
             type: 'tags',
             width: '25%',
             accessor: (row) => row.assignees
         },
         {
             key: 'actions',
-            header: 'פעולות',
+            header: t('common.actions'),
             type: 'actions',
             width: '15%',
         }
@@ -125,8 +127,8 @@ export function AssignmentPage() {
     return (
         <div className="assignment-page">
             <div className="assignment-page-header">
-                <h1> שיוך עובד למשימה</h1>
-                <p>כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות</p>
+                <h1>{t('assignmentPage.title')}</h1>
+                <p>{t('assignmentPage.subtitle')}</p>
             </div>
 
             <TableShell
@@ -148,15 +150,15 @@ export function AssignmentPage() {
                     showEdit: true,
                     showDelete: true,
                     editOptions: [
-                        { label: 'ערוך לקוח', onClick: () => console.log(1) },
-                        { label: 'ערוך פרוייקט', onClick: () => console.log(2) },
-                        { label: 'ערוך משימה', onClick: () => console.log(3) },
-                        { label: 'ערוך שיוך עובדים', onClick: () => console.log(4) },
+                        { label: t('assignmentPage.actions.editClient'), onClick: () => console.log(1) },
+                        { label: t('assignmentPage.actions.editProject'), onClick: () => console.log(2) },
+                        { label: t('assignmentPage.actions.editTask'), onClick: () => console.log(3) },
+                        { label: t('assignmentPage.actions.editAssignment'), onClick: () => console.log(4) },
                     ],
                     deleteOptions: [
-                        { label: 'מחק לקוח', onClick: () => console.log(11) },
-                        { label: 'מחק פרויקט', onClick: () => console.log(12) },
-                        { label: 'מחק משימה', onClick: () => console.log(13) },
+                        { label: t('assignmentPage.actions.deleteClient'), onClick: () => console.log(11) },
+                        { label: t('assignmentPage.actions.deleteProject'), onClick: () => console.log(12) },
+                        { label: t('assignmentPage.actions.deleteTask'), onClick: () => console.log(13) },
                     ]
                 }}
             />

@@ -78,13 +78,6 @@ export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps
       <div className="sidebar-footer" role="contentinfo">
         <div className="user-profile">
           <div className="user-avatar" role="img" aria-label={`תמונת פרופיל של ${user.full_name}`}>
-            {/* TODO: Add avatar URL support to User model if needed, currently not in shared type based on recent view, but let's check. 
-                Wait, shared model User DOES NOT have avatarUrl. It has full_name, role, job_title. 
-                I will use a placeholder or check if I need to add avatar field. 
-                For now I'll use the default logo as avatar or initials. 
-                The previous code used user.avatarUrl. The shared User doesn't have it.
-                I will remove the check for avatarUrl and just use default for now, or use a consistent placeholder.
-             */}
             <img src={abraLogo} alt="" />
           </div>
           <div className="user-info">

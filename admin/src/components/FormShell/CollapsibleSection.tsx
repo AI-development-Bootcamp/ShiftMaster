@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CollapsibleSectionProps {
     children: ReactNode;
@@ -16,6 +17,7 @@ export function CollapsibleSection({
     collapsible = false,
     defaultCollapsed = false,
 }: CollapsibleSectionProps) {
+    const { t } = useTranslation();
     const [isCollapsed, setIsCollapsed] = useState(defaultCollapsed);
     const [height, setHeight] = useState<number | 'auto'>('auto');
     const contentRef = useRef<HTMLDivElement>(null);
@@ -53,7 +55,7 @@ export function CollapsibleSection({
                     <span className={`collapsible-section__icon ${isCollapsed ? '' : 'collapsible-section__icon--expanded'}`}>
                         ▶
                     </span>
-                    <span>{isCollapsed ? 'הצג' : 'הסתר'}</span>
+                    <span>{isCollapsed ? t('common.show') : t('common.hide')}</span>
                 </button>
             )}
             <div

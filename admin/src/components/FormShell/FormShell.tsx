@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { parseLocalDate } from '@abra-shift-master/shared';
 import { FormShellProps, FormFieldSchema, FormValues, FormErrors, DateRangeValue } from './types';
 import { FormHeader } from './FormHeader';
@@ -56,6 +57,7 @@ export function FormShell({
     isSubmitting = false,
     serverError,
 }: FormShellProps) {
+    const { t } = useTranslation();
     const [values, setValues] = useState<FormValues>(() => initializeValues(fields));
     const [errors, setErrors] = useState<FormErrors>({});
     const [clickCount, setClickCount] = useState(0);
@@ -151,19 +153,19 @@ export function FormShell({
                 if (field.type === 'dateRangeBox') {
                     const rangeValue = value as DateRangeValue;
                     if (!rangeValue.start || !rangeValue.end) {
-                        newErrors[field.id] = 'שדה חובה';
+                        newErrors[field.id] = t('formShell.validation.required');
                         isValid = false;
                     } else {
                         const startDate = parseLocalDate(rangeValue.start);
                         const endDate = parseLocalDate(rangeValue.end);
 
                         if (startDate && endDate && endDate < startDate) {
-                            newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                            newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                             isValid = false;
                         }
                     }
                 } else if (!value || (typeof value === 'string' && !value.trim())) {
-                    newErrors[field.id] = 'שדה חובה';
+                    newErrors[field.id] = t('formShell.validation.required');
                     isValid = false;
                 }
             } else if (field.type === 'dateRangeBox') {
@@ -174,7 +176,7 @@ export function FormShell({
                     const startDate = parseLocalDate(rangeValue.start);
                     const endDate = parseLocalDate(rangeValue.end);
                     if (startDate && endDate && endDate < startDate) {
-                        newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                        newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                         isValid = false;
                     }
                 }
@@ -183,7 +185,7 @@ export function FormShell({
 
         setErrors(newErrors);
         return isValid;
-    }, [fields, values]);
+    }, [fields, values, t]);
 
     // Handle submit
     const handleSubmit = useCallback(() => {

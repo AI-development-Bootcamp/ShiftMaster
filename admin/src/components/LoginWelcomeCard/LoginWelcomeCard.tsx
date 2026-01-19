@@ -2,6 +2,8 @@ import { useState, FormEvent, FocusEvent } from 'react';
 import abraLogo from '../../assets/abra_logo_text.svg';
 import { isValidEmail } from '@abra-shift-master/shared';
 import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES } from '../../constants';
+import { EyeIcon, EyeOffIcon } from '../../constants/icons';
+import { useTranslation } from 'react-i18next';
 import '../../styles/LoginWelcomeCard.css';
 
 interface LoginWelcomeCardProps {
@@ -17,8 +19,10 @@ interface FormErrors {
 }
 
 export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   // Effect to sync external error to local state if needed, or just specific error render
@@ -128,21 +132,20 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
       </div>
 
       <div className="login-card__welcome">
-        <h1 className="login-card__welcome-title">ברוכים הבאים למערכת 👋</h1>
-        <p className="login-card__welcome-subtitle">הניהול של אברא</p>
+        <h1 className="login-card__welcome-title">{t('login.welcomeTitle')}</h1>
       </div>
 
       <form className="login-card__form" onSubmit={handleSubmit} noValidate>
         <div className="login-card__field">
           <label htmlFor="email" className="login-card__label">
-            כתובת מייל
+            {t('login.emailLabel')}
           </label>
           <input
             id="email"
             type="email"
             className={`login-card__input login-card__input--ltr ${touched.email && errors.email ? 'login-card__input--error' : ''
               }`}
-            placeholder="name@example.com"
+            placeholder={t('login.emailPlaceholder')}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={handleEmailBlur}
@@ -159,19 +162,42 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
 
         <div className="login-card__field">
           <label htmlFor="password" className="login-card__label">
-            סיסמה
+            {t('login.passwordLabel')}
           </label>
-          <input
-            id="password"
-            type="password"
-            className={`login-card__input ${touched.password && errors.password ? 'login-card__input--error' : ''
-              }`}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onBlur={handlePasswordBlur}
-            disabled={isLoading}
-            autoComplete="current-password"
-          />
+          <div className="login-card__password-wrapper" style={{ position: 'relative' }}>
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              className={`login-card__input ${touched.password && errors.password ? 'login-card__input--error' : ''
+                }`}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onBlur={handlePasswordBlur}
+              disabled={isLoading}
+              autoComplete="current-password"
+            />
+            <button
+              type="button"
+              className="login-card__password-toggle"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
+              tabIndex={-1}
+              style={{
+                position: 'absolute',
+                left: '10px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                color: '#666'
+              }}
+            >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          </div>
           {touched.password && errors.password && (
             <span className="login-card__error" role="alert">
               {errors.password}
@@ -196,7 +222,7 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
           className="login-card__button"
           disabled={isSubmitDisabled}
         >
-          {isLoading ? 'מתחבר...' : 'התחברות'}
+          {isLoading ? t('login.submittingButton') : t('login.submitButton')}
         </button>
       </form>
     </div>
