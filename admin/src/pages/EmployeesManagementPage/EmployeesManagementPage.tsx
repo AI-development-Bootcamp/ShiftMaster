@@ -83,7 +83,7 @@ export function EmployeesManagementPage() {
 
     const handleEditUser = (user: User) => {
         setFormInitialValues({
-            fullName: user.full_name,
+            full_name: user.full_name,
             email: user.email,
             role: user.role === UserRole.ADMIN ? 'admin' : 'regular',
             jobTitle: user.job_title || '',
