@@ -59,19 +59,17 @@ import {
   updateUser,
   deleteUser,
 } from '../../controllers/usersController.js';
-import {
-  DuplicateEmailError,
-  UserNotFoundError,
-  __mocks,
-} from '../../services/usersService.js';
+import { DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
 
+// Get mocks from the mocked module
+const usersServiceModule = await vi.importMock<typeof import('../../services/usersService.js')>('../../services/usersService.js');
 const {
   mockCreateUser,
   mockListUsers,
   mockGetUserById,
   mockUpdateUser,
   mockDeleteUser,
-} = __mocks;
+} = (usersServiceModule as unknown as { __mocks: Record<string, ReturnType<typeof vi.fn>> }).__mocks;
 
 describe('UsersController', () => {
   let mockRequest: Partial<Request>;
