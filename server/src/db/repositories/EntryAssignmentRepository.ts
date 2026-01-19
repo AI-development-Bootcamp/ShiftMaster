@@ -10,7 +10,7 @@ export class EntryAssignmentRepository extends BaseRepository<EntryAssignment, N
     }
 
     async findByEntryId(entryId: string): Promise<EntryAssignment[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('entry_id', entryId);

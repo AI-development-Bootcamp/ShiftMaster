@@ -10,7 +10,7 @@ export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock,
     }
 
     async findByYearAndMonth(year: number, month: number): Promise<MonthLock | null> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('year', year)

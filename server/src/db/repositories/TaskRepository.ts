@@ -11,7 +11,7 @@ export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> im
     }
 
     async findByProjectId(projectId: string): Promise<Task[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('project_id', projectId)

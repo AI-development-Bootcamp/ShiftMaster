@@ -11,7 +11,7 @@ export class ClientRepository extends BaseRepository<Client, NewClient, UpdateCl
     }
 
     async findActive(): Promise<Client[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('active', true)

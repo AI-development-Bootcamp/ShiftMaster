@@ -10,7 +10,7 @@ export class UserRepository extends BaseRepository<User, NewUser, UpdateUser> im
     }
 
     async findByEmail(email: string): Promise<User | null> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('email', email)

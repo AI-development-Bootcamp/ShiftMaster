@@ -6,16 +6,16 @@ import { logDbError } from '../utils/logger.js';
 export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepository<T, NewT, UpdateT> {
     protected table: string;
     protected primaryKey: string;
-    protected client: SupabaseClient;
+    protected dbConnection: SupabaseClient;
 
-    constructor(table: string, primaryKey: string = 'id', client: SupabaseClient = supabaseAdmin) {
+    constructor(table: string, primaryKey: string = 'id', dbConnection: SupabaseClient = supabaseAdmin) {
         this.table = table;
         this.primaryKey = primaryKey;
-        this.client = client;
+        this.dbConnection = dbConnection;
     }
 
     async create(data: NewT): Promise<T> {
-        const { data: created, error } = await this.client
+        const { data: created, error } = await this.dbConnection
             .from(this.table)
             .insert(data)
             .select()
@@ -30,7 +30,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     }
 
     async findById(id: string): Promise<T | null> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq(this.primaryKey, id)
@@ -48,7 +48,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     }
 
     async findAll(): Promise<T[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*');
 
@@ -61,7 +61,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     }
 
     async update(id: string, data: UpdateT): Promise<T> {
-        const { data: updated, error } = await this.client
+        const { data: updated, error } = await this.dbConnection
             .from(this.table)
             .update(data)
             .eq(this.primaryKey, id)
@@ -81,7 +81,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         const softDeleteTables = ['users', 'clients', 'projects', 'tasks', 'admin_task_assignments'];
 
         if (softDeleteTables.includes(this.table)) {
-            const { data, error } = await this.client
+            const { data, error } = await this.dbConnection
                 .from(this.table)
                 .update({ active: false })
                 .eq(this.primaryKey, id)
@@ -96,7 +96,7 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
         }
 
         // Hard-delete for other tables
-        const { error, count } = await this.client
+        const { error, count } = await this.dbConnection
             .from(this.table)
             .delete({ count: 'exact' })
             .eq(this.primaryKey, id);

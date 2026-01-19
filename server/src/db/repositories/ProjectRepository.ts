@@ -11,7 +11,7 @@ export class ProjectRepository extends BaseRepository<Project, NewProject, Updat
     }
 
     async findByClientId(clientId: string): Promise<Project[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('client_id', clientId)
@@ -26,7 +26,7 @@ export class ProjectRepository extends BaseRepository<Project, NewProject, Updat
     }
 
     async findActive(): Promise<Project[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('active', true)
