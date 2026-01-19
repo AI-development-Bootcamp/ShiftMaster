@@ -273,6 +273,15 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
     setUploadedFile(file);
   };
 
+  // Handle file remove
+  const handleRemoveFile = () => {
+    setUploadedFile(null);
+    // Reset the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
 
   // Validate project times
   const validateProjectTime = (projectId: string, startTime: TimeValue, endTime: TimeValue) => {
@@ -1087,7 +1096,21 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {uploadedFile ? (
-                        <div className="file-uploaded">
+                        <div className="file-uploaded" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="file-remove-btn"
+                            onClick={handleRemoveFile}
+                            aria-label="הסר קובץ"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <path
+                                d="M15 5L5 15M5 5L15 15"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
                           <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                             <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
                             <path
@@ -1271,7 +1294,21 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {uploadedFile ? (
-                        <div className="file-uploaded">
+                        <div className="file-uploaded" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            className="file-remove-btn"
+                            onClick={handleRemoveFile}
+                            aria-label="הסר קובץ"
+                          >
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                              <path
+                                d="M15 5L5 15M5 5L15 15"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                              />
+                            </svg>
+                          </button>
                           <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                             <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
                             <path

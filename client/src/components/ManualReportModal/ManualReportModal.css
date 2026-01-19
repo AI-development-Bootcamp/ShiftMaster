@@ -778,10 +778,40 @@
 }
 
 .file-uploaded {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
+}
+
+.file-remove-btn {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: #EE2662;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 0;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(238, 38, 98, 0.3);
+}
+
+.file-remove-btn:hover {
+  background: #d91d56;
+  transform: scale(1.05);
+}
+
+.file-remove-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .file-name {
