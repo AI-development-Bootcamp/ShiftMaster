@@ -101,7 +101,7 @@ The server SHALL use Vitest for unit and integration testing.
 
 ### Requirement: Environment Variables
 
-The server SHALL load environment variables including JWT_SECRET, SUPABASE_URL, SUPABASE_URL, and SUPABASE_ANON_KEY.
+The server SHALL load environment variables including JWT_SECRET, SUPABASE_URL, and SUPABASE_ANON_KEY.
 
 #### Scenario: JWT configuration
 

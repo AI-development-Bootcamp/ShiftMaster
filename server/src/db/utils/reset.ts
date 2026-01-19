@@ -14,9 +14,22 @@ async function resetDatabase() {
         process.exit(1);
     }
 
+    // Safety check: Require explicit consent to reset
+    if (process.env.ALLOW_SCHEMA_RESET !== 'true') {
+        logDbError('Database reset aborted', new Error('ALLOW_SCHEMA_RESET environment variable must be set to "true"'));
+        process.exit(1);
+    }
+
+    // Safety check: Prevent accidental reset in production unless explicitly overridden
+    if (process.env.NODE_ENV === 'production' && process.env.FORCE_RESET_PROD !== 'true') {
+        logDbError('Database reset aborted', new Error('Cannot reset database in production without FORCE_RESET_PROD="true"'));
+        process.exit(1);
+    }
+
+    const isSupabase = connectionString.includes('supabase');
     const pool = new Pool({
         connectionString,
-        ssl: { rejectUnauthorized: false }, // Required for Supabase connection
+        ssl: isSupabase ? { rejectUnauthorized: false } : false, // Only use SSL for Supabase/remote connections
     });
 
     try {

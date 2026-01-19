@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, afterEach } from 'vitest';
+import { beforeAll, afterEach, afterAll } from 'vitest';
 
 // Global test setup
 beforeAll(async () => {

@@ -13,7 +13,9 @@ DECLARE
   is_admin BOOLEAN;
 BEGIN
   -- Check if the user exists in the public.users table with role 'admin'
-  -- The auth.uid() function returns the ID of the authenticated user
+  -- NOTE: We rely on a custom claim 'user_id' (integer) in the JWT, not the standard UUID auth.uid().
+  -- This architecture uses integer IDs for users.
+  -- Ensure that your auth service mints tokens with this 'user_id' claim.
   SELECT EXISTS (
     SELECT 1
     FROM public.users

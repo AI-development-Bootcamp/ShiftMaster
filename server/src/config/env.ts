@@ -8,18 +8,52 @@ const isTest = process.env.NODE_ENV === 'test';
  * Extract Supabase API URL from SUPABASE_URL
  * Handles both formats:
  * - If already https:// URL, returns as-is
- * - If postgresql:// connection string, extracts the API URL
- *   Converts: postgresql://postgres:pass@db.xxxxx.supabase.co:5432/postgres
- *   To: https://xxxxx.supabase.co
+ * - If postgresql:// connection string, extracts the project ref and constructs the HTTPS URL
+ *   Supports standard db.project.supabase.co and pooler strings (postgres.project.pooler...)
  */
 function extractSupabaseUrl(urlOrConnectionString: string): string {
   // If it's already an https URL, return as-is
   if (urlOrConnectionString.startsWith('https://')) {
     return urlOrConnectionString;
   }
-  // Extract from postgresql connection string
-  const match = urlOrConnectionString.match(/db\.([^.]+)\.supabase\.co/);
-  return match ? `https://${match[1]}.supabase.co` : '';
+
+  try {
+    // Try to parse as URL (works for postgresql://...)
+    // If it's just a host string it might fail, so we catch
+    const url = new URL(urlOrConnectionString);
+    const host = url.hostname; // e.g., db.ref.supabase.co or aws-0-region.pooler.supabase.com
+
+    // 1. Try standard pattern: db.<ref>.supabase.co
+    const dbMatch = host.match(/^db\.([^.]+)\.supabase\.co$/);
+    if (dbMatch) {
+      return `https://${dbMatch[1]}.supabase.co`;
+    }
+
+    // 2. Try pooler pattern where ref is in the hostname sometimes, but more reliably
+    // we might need to extract from multiple potential formats.
+    // However, for poolers, the ref is often NOT in the hostname in a simple way 
+    // (e.g., aws-0-eu-central-1.pooler.supabase.com).
+    // But commonly it IS like: postgres.<ref>.pooler.supabase.com
+    const poolerMatch = host.match(/^postgres\.([^.]+)\.pooler\.supabase\.com$/);
+    if (poolerMatch) {
+      return `https://${poolerMatch[1]}.supabase.co`;
+    }
+
+    // Fallback: If we can't parse the host easily, try a regex on the full string
+    // looking for the project ref pattern which is 20 chars usually
+  } catch (e) {
+    // ignore invalid URL errors and fall through to regex
+  }
+
+  // Fallback regex for various connection string formats
+  // Matches: db.REF.supabase.co or postgres.REF.pooler.supabase
+  const refMatch = urlOrConnectionString.match(/(?:db|postgres)\.([a-z0-9]{20})\.(?:supabase\.co|pooler\.supabase\.com)/);
+  if (refMatch) {
+    return `https://${refMatch[1]}.supabase.co`;
+  }
+
+  // If we really can't find it, return empty string (validation will catch it)
+  return '';
 }
 
 /**

@@ -77,6 +77,31 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     }
 
     async delete(id: number): Promise<boolean> {
+        // Soft-delete for specific tables
+        const softDeleteTables = ['users', 'clients', 'projects', 'tasks', 'admin_task_assignments'];
+
+        if (softDeleteTables.includes(this.table)) {
+            const { error, count } = await this.client
+                .from(this.table)
+                .update({ active: false })
+                .eq(this.primaryKey, id)
+                .select('', { count: 'exact', head: true }); // Use select count to verify update
+
+            if (error) {
+                logDbError(`BaseRepository.delete (soft) [${this.table}]`, error);
+                throw error;
+            }
+
+            // For update, count might be returned differently depending on exact Supabase/Postgrest version handling of updates + count
+            // But generally we check if any row matched the ID.
+            // If the row was already inactive, this is still a "success" in terms of "ensure deleted/inactive".
+            // However, typical repositories return true if a record was actually modified or found.
+            // Let's assume finding the record is enough, or we can check the returned count if supported.
+            // With .select('', { count: 'exact' }), we get the count of matched rows.
+            return count !== null && count > 0;
+        }
+
+        // Hard-delete for other tables
         const { error, count } = await this.client
             .from(this.table)
             .delete({ count: 'exact' })

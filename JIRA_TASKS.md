@@ -30,7 +30,7 @@ Set up the complete monorepo structure with all workspaces, tooling, and basic c
 - All config files created and working
 - `npm install` runs successfully at root
 - ESLint and Prettier work across all workspaces
-- .env.example includes: VITE_API_URL, JWT_SECRET, SUPABASE_URL, SUPABASE_URL, SUPABASE_ANON_KEY
+- .env.example includes: VITE_API_URL, JWT_SECRET, SUPABASE_URL, SUPABASE_ANON_KEY
 
 ---
 
