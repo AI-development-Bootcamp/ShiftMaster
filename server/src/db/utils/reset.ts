@@ -1,6 +1,9 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
 import { logDbOperation, logDbError } from './logger.js';
+// Check if this file is the main module being executed
+import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 dotenv.config({ path: '../../.env' }); // Adjust path as needed, or rely on --env-file
 
@@ -60,9 +63,7 @@ async function resetDatabase() {
     }
 }
 
-// Check if this file is the main module being executed
-import { fileURLToPath } from 'url';
-import fs from 'fs';
+
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const executedFilePath = process.argv[1];
