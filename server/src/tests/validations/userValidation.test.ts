@@ -17,7 +17,7 @@ describe('User Validation Schemas', () => {
       const validData = {
         full_name: 'John Doe',
         email: 'john@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: UserRole.REGULAR,
       };
 
@@ -32,7 +32,7 @@ describe('User Validation Schemas', () => {
       const validData = {
         full_name: 'Jane Doe',
         email: 'jane@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: UserRole.ADMIN,
         job_title: 'Software Engineer',
       };
@@ -47,7 +47,7 @@ describe('User Validation Schemas', () => {
     it('should fail when full_name is missing', () => {
       const invalidData = {
         email: 'john@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: UserRole.REGULAR,
       };
 
@@ -62,7 +62,7 @@ describe('User Validation Schemas', () => {
       const invalidData = {
         full_name: 'John Doe',
         email: 'not-an-email',
-        password: 'password123',
+        password: 'Password123!',
         role: UserRole.REGULAR,
       };
 
@@ -92,14 +92,16 @@ describe('User Validation Schemas', () => {
       const invalidData = {
         full_name: 'John Doe',
         email: 'john@example.com',
-        password: 'password123',
+        password: 'Password123!',
         role: 'invalid_role',
       };
 
       const result = createUserSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('admin or regular');
+        // The error message will be about role, not password
+        const roleError = result.error.issues.find(issue => issue.path.includes('role'));
+        expect(roleError?.message).toContain('admin or regular');
       }
     });
   });
@@ -127,7 +129,7 @@ describe('User Validation Schemas', () => {
 
     it('should validate password update', () => {
       const validData = {
-        password: 'newpassword123',
+        password: 'NewPassword123!',
       };
 
       const result = updateUserSchema.safeParse(validData);
@@ -178,31 +180,31 @@ describe('User Validation Schemas', () => {
   describe('getUserSchema', () => {
     it('should validate a valid user ID', () => {
       const validData = {
-        id: '123',
+        id: '550e8400-e29b-41d4-a716-446655440000',
       };
 
       const result = getUserSchema.safeParse(validData);
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.id).toBe('123');
+        expect(result.data.id).toBe('550e8400-e29b-41d4-a716-446655440000');
       }
     });
 
-    it('should fail when ID is not numeric', () => {
+    it('should fail when ID is not a valid UUID', () => {
       const invalidData = {
-        id: 'abc',
+        id: 'not-a-uuid',
       };
 
       const result = getUserSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('positive integer');
+        expect(result.error.issues[0].message).toContain('UUID');
       }
     });
 
-    it('should fail when ID is negative', () => {
+    it('should fail when ID is numeric instead of UUID', () => {
       const invalidData = {
-        id: '-1',
+        id: '123',
       };
 
       const result = getUserSchema.safeParse(invalidData);
