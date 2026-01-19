@@ -26,8 +26,8 @@ export function BoolCell<T>({
             className="table-shell__checkbox"
             checked={value}
             onChange={handleChange}
-            aria-label={`Toggle ${columnKey}`}
-            aria-labelledby={`${columnKey}-header`} // Best effort if we knew the header ID, fallback to basic label
+            aria-label={columnKey ? `Toggle ${columnKey}` : 'Toggle'}
+            aria-labelledby={columnKey ? `${columnKey}-header` : undefined}
         />
     );
 }

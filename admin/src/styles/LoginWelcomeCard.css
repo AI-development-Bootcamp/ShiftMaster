@@ -214,7 +214,15 @@
     font-size: var(--font-size-xl);
   }
 
-  .login-card__welcome-subtitle {
-    font-size: var(--font-size-base);
+
+  .login-card__password-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    height: 100%;
   }
 }
