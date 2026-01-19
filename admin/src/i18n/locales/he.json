@@ -20,6 +20,7 @@
     "assignmentPage": {
         "title": "שיוך עובד למשימה",
         "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
+        "searchBarHint": "חיפוש לפי שם עובד",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -34,6 +35,12 @@
             "deleteClient": "מחק לקוח",
             "deleteProject": "מחק פרויקט",
             "deleteTask": "מחק משימה"
+        },
+        "dropDownTitle": "יצירה",
+        "dropDownOptions": {
+            "addClient": "צור לקוח חדש",
+            "addProject": "צור פרויקט חדש",
+            "addTask": "צור משימה חדשה"
         }
     },
     "employeesPage": {
@@ -76,9 +83,20 @@
             "endDateAfterStartDate": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
         }
     },
+    "login": {
+        "welcomeTitle": "👋 ברוכים הבאים למערכת הניהול של אברא",
+        "emailLabel": "כתובת מייל",
+        "emailPlaceholder": "name@example.com",
+        "passwordLabel": "סיסמה",
+        "submitButton": "התחברות",
+        "submittingButton": "מתחבר...",
+        "showPassword": "הצג סיסמה",
+        "hidePassword": "הסתר סיסמה"
+    },
     "entriesPage": {
-        "title": "ניהול רשומות",
-        "subtitle": "כאן יופיע מסך ניהול הרשומות והנתונים.",
+        "title": "הגדרת דיווחי שעות",
+        "subtitle": "כאן תוכל להגדיר את סוג דיווחי השעות של העובדים בפרויקטים השונים.",
+        "searchBarHint": " פרויקט/חיפוש לפי שם לקוח",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -86,7 +104,7 @@
         },
         "reportTypes": {
             "sum": "סכום שעות",
-            "startEnd": "כניסה ויציאה"
+            "startEnd": "כניסה /יציאה"
         }
     }
 }
