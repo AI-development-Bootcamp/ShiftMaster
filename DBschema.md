@@ -161,7 +161,6 @@ Prevents duplicate assignment of the same user to the same task.
 
 **Restrictions**
 
-- One entry per user per day (recommended unique constraint: user_id + work_date)
 - If month is locked → entry is read-only
 
 ---
