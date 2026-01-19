@@ -13,7 +13,7 @@ CREATE TABLE entry_assignments (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   CONSTRAINT chk_time_format CHECK (
-    (start_time IS NOT NULL AND end_time IS NOT NULL AND duration_minutes IS NULL) OR
+    (start_time IS NOT NULL AND end_time IS NOT NULL) OR
     (start_time IS NULL AND end_time IS NULL AND duration_minutes IS NOT NULL)
   ),
   CONSTRAINT chk_duration_positive CHECK (duration_minutes IS NULL OR duration_minutes > 0)
@@ -30,5 +30,21 @@ COMMENT ON COLUMN entry_assignments.location IS 'Work location: Office, Client, 
 COMMENT ON COLUMN entry_assignments.start_time IS 'Start time (required for start_end format projects)';
 COMMENT ON COLUMN entry_assignments.end_time IS 'End time (required for start_end format projects)';
 COMMENT ON COLUMN entry_assignments.duration_minutes IS 'Duration in minutes (required for sum format projects)';
-COMMENT ON CONSTRAINT chk_time_format ON entry_assignments IS 'Ensure either start/end times OR duration is set, not both';
+COMMENT ON CONSTRAINT chk_time_format ON entry_assignments IS 'Ensure start/end times are used together, or duration is set manually';
 COMMENT ON CONSTRAINT chk_duration_positive ON entry_assignments IS 'Ensure duration is positive when set';
+
+-- Trigger to automaticlly calculate duration
+CREATE OR REPLACE FUNCTION calculate_assignment_duration()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.start_time IS NOT NULL AND NEW.end_time IS NOT NULL THEN
+    NEW.duration_minutes := EXTRACT(EPOCH FROM (NEW.end_time - NEW.start_time)) / 60;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER calc_duration_trigger
+BEFORE INSERT OR UPDATE ON entry_assignments
+FOR EACH ROW
+EXECUTE FUNCTION calculate_assignment_duration();

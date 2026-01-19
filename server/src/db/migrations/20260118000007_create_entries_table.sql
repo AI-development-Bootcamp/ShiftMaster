@@ -20,6 +20,9 @@ CREATE TABLE entries (
   CONSTRAINT chk_absence_type CHECK (
     (entry_kind = 'absence' AND absence_type IS NOT NULL) OR
     (entry_kind = 'work' AND absence_type IS NULL)
+  ),
+  CONSTRAINT chk_work_start_time CHECK (
+    entry_kind != 'work' OR start_time IS NOT NULL
   )
 );
 
@@ -35,3 +38,4 @@ COMMENT ON COLUMN entries.absence_type IS 'Type of absence (required when entry_
 COMMENT ON COLUMN entries.attachment_path IS 'Path to attachment file (e.g., medical certificate for sick leave)';
 
 COMMENT ON CONSTRAINT chk_absence_type ON entries IS 'Ensure absence_type is set only for absence entries';
+COMMENT ON CONSTRAINT chk_work_start_time ON entries IS 'Ensure start_time is set for work entries';
