@@ -36,7 +36,6 @@ interface DateValue {
 }
 
 type TimePickerItem = number | 'AM' | 'PM';
-type DatePickerItem = number;
 
 function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
