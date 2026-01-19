@@ -63,7 +63,6 @@ async function resetDatabase() {
 // Check if this file is the main module being executed
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import path from 'path';
 
 const currentFilePath = fileURLToPath(import.meta.url);
 const executedFilePath = process.argv[1];

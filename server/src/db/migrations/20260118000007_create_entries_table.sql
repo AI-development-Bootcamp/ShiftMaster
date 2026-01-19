@@ -1,6 +1,6 @@
 -- Migration: Create entries table
 -- Created: 2026-01-18
--- Description: Create entries table for unified work and absence entries (one row per user per day)
+-- Description: Create entries table for unified work and absence entries
 
 CREATE TABLE entries (
   entry_id BIGSERIAL PRIMARY KEY,
