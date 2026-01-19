@@ -40,7 +40,13 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     }
 
     // Create user
-    const user = await usersService.createUser(validationResult.data);
+    const user = await usersService.createUser(validationResult.data as {
+      full_name: string;
+      email: string;
+      password: string;
+      role: 'admin' | 'regular';
+      job_title?: string;
+    });
 
     // Return success response
     res.status(201).json({
@@ -270,7 +276,14 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
     const userId = paramValidation.data.id; // UUID string
 
     // Update user
-    const user = await usersService.updateUser(userId, bodyValidation.data);
+    const user = await usersService.updateUser(userId, bodyValidation.data as {
+      full_name?: string;
+      email?: string;
+      password?: string;
+      role?: 'admin' | 'regular';
+      job_title?: string;
+      active?: boolean;
+    });
 
     // Return success response
     res.status(200).json({

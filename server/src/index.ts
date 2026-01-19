@@ -4,8 +4,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// Load .env from monorepo root (parent of server folder)
-dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+// Load .env from server folder (parent of src folder)
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 // Now dynamically import modules that depend on env vars
 async function main() {

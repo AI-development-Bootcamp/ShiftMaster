@@ -150,11 +150,11 @@
 
 ## 7. Post-Merge Integration (if stub was used)
 
-- [ ] 7.1 Wait for UserRepository branch merge
-- [ ] 7.2 Remove temporary `UserRepository.stub.ts` if created
-- [ ] 7.3 Update imports to use actual `UserRepository`
-- [ ] 7.4 Verify all repository methods work as expected
-- [ ] 7.5 Re-run all tests with actual repository
+- [x] 7.1 Wait for UserRepository branch merge
+- [x] 7.2 Remove temporary `UserRepository.stub.ts` if created
+- [x] 7.3 Update imports to use actual `UserRepository`
+- [x] 7.4 Verify all repository methods work as expected
+- [x] 7.5 Re-run all tests with actual repository
 
 ## 8. Documentation & Cleanup
 

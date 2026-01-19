@@ -10,6 +10,7 @@ const router = Router();
  *     summary: User login
  *     description: Authenticate user with email and password, returns JWT token and user data
  *     tags: [Authentication]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:

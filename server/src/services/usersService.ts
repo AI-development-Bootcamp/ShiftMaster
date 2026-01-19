@@ -3,7 +3,8 @@
  * Business logic for user CRUD operations
  */
 
-import { UserRepository, User, NewUser, UpdateUser } from '../db/repositories/UserRepository.stub.js';
+import { UserRepository } from '../db/repositories/UserRepository.js';
+import { User, NewUser, UpdateUser } from '../db/types/entities.js';
 import { hashPassword } from '../utils/password.js';
 
 /**

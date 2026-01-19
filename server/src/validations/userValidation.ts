@@ -3,7 +3,6 @@
  */
 
 import { z } from 'zod';
-import { UserRole } from '@abra-shift-master/shared';
 
 /**
  * XSS Protection: Rejects strings containing HTML/script tags
@@ -44,7 +43,7 @@ export const createUserSchema = z
       .toLowerCase()
       .trim(),
     password: passwordSchema,
-    role: z.nativeEnum(UserRole, {
+    role: z.enum(['admin', 'regular'], {
       errorMap: () => ({ message: 'Role must be either admin or regular' }),
     }),
     job_title: z
@@ -82,7 +81,7 @@ export const updateUserSchema = z
       .optional(),
     password: passwordSchema.optional(),
     role: z
-      .nativeEnum(UserRole, {
+      .enum(['admin', 'regular'], {
         errorMap: () => ({ message: 'Role must be either admin or regular' }),
       })
       .optional(),

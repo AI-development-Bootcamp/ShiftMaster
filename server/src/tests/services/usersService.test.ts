@@ -4,11 +4,12 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { UsersService, DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
-import { UserRepository, User } from '../../db/repositories/UserRepository.stub.js';
+import { UserRepository } from '../../db/repositories/UserRepository.js';
+import { User } from '../../db/types/entities.js';
 import * as passwordUtils from '../../utils/password.js';
 
 // Mock the UserRepository
-vi.mock('../../db/repositories/UserRepository.stub.js', () => {
+vi.mock('../../db/repositories/UserRepository.js', () => {
   return {
     UserRepository: vi.fn(() => ({
       create: vi.fn(),
@@ -31,7 +32,8 @@ describe('UsersService', () => {
   let mockUserRepo: any;
 
   const mockUser: User = {
-    user_id: 1,
+    user_id: '123e4567-e89b-12d3-a456-426614174000',
+    last_modified_by: null,
     full_name: 'John Doe',
     email: 'john@example.com',
     password_hash: 'hashed_password',
@@ -68,7 +70,7 @@ describe('UsersService', () => {
       mockUserRepo.findByEmail.mockResolvedValue(null);
       mockUserRepo.create.mockResolvedValue({
         ...mockUser,
-        user_id: 2,
+        user_id: '223e4567-e89b-12d3-a456-426614174001',
         full_name: newUserData.full_name,
         email: newUserData.email,
         role: newUserData.role,
@@ -120,11 +122,11 @@ describe('UsersService', () => {
 
   describe('listUsers', () => {
     const mockUsers: User[] = [
-      { ...mockUser, user_id: 1, email: 'user1@example.com' },
-      { ...mockUser, user_id: 2, email: 'user2@example.com' },
-      { ...mockUser, user_id: 3, email: 'user3@example.com' },
-      { ...mockUser, user_id: 4, email: 'user4@example.com' },
-      { ...mockUser, user_id: 5, email: 'user5@example.com' },
+      { ...mockUser, user_id: '123e4567-e89b-12d3-a456-426614174001', email: 'user1@example.com' },
+      { ...mockUser, user_id: '123e4567-e89b-12d3-a456-426614174002', email: 'user2@example.com' },
+      { ...mockUser, user_id: '123e4567-e89b-12d3-a456-426614174003', email: 'user3@example.com' },
+      { ...mockUser, user_id: '123e4567-e89b-12d3-a456-426614174004', email: 'user4@example.com' },
+      { ...mockUser, user_id: '123e4567-e89b-12d3-a456-426614174005', email: 'user5@example.com' },
     ];
 
     it('should return paginated users with default pagination', async () => {
@@ -148,8 +150,8 @@ describe('UsersService', () => {
       const result = await usersService.listUsers(2, 2);
 
       expect(result.users).toHaveLength(2);
-      expect(result.users[0].user_id).toBe(3);
-      expect(result.users[1].user_id).toBe(4);
+      expect(result.users[0].user_id).toBe('123e4567-e89b-12d3-a456-426614174003');
+      expect(result.users[1].user_id).toBe('123e4567-e89b-12d3-a456-426614174004');
       expect(result.pagination).toEqual({
         total: 5,
         page: 2,
@@ -183,18 +185,18 @@ describe('UsersService', () => {
     it('should return user by ID', async () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
 
-      const result = await usersService.getUserById(1);
+      const result = await usersService.getUserById('123e4567-e89b-12d3-a456-426614174000');
 
-      expect(mockUserRepo.findById).toHaveBeenCalledWith(1);
+      expect(mockUserRepo.findById).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
       expect(result).not.toHaveProperty('password_hash');
-      expect(result.user_id).toBe(1);
+      expect(result.user_id).toBe('123e4567-e89b-12d3-a456-426614174000');
       expect(result.email).toBe(mockUser.email);
     });
 
     it('should throw UserNotFoundError if user does not exist', async () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
-      await expect(usersService.getUserById(999)).rejects.toThrow(
+      await expect(usersService.getUserById('999e4567-e89b-12d3-a456-426614174999')).rejects.toThrow(
         UserNotFoundError
       );
     });
@@ -210,10 +212,10 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue({ ...mockUser, ...updates });
 
-      const result = await usersService.updateUser(1, updates);
+      const result = await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', updates);
 
-      expect(mockUserRepo.findById).toHaveBeenCalledWith(1);
-      expect(mockUserRepo.update).toHaveBeenCalledWith(1, updates);
+      expect(mockUserRepo.findById).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
+      expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', updates);
       expect(result).not.toHaveProperty('password_hash');
       expect(result.full_name).toBe(updates.full_name);
     });
@@ -221,7 +223,7 @@ describe('UsersService', () => {
     it('should throw UserNotFoundError if user does not exist', async () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
-      await expect(usersService.updateUser(999, updates)).rejects.toThrow(
+      await expect(usersService.updateUser('999e4567-e89b-12d3-a456-426614174999', updates)).rejects.toThrow(
         UserNotFoundError
       );
       expect(mockUserRepo.update).not.toHaveBeenCalled();
@@ -231,10 +233,10 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue(mockUser);
 
-      await usersService.updateUser(1, { password: 'newpassword123' });
+      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { password: 'newpassword123' });
 
       expect(passwordUtils.hashPassword).toHaveBeenCalledWith('newpassword123');
-      expect(mockUserRepo.update).toHaveBeenCalledWith(1, {
+      expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', {
         password_hash: 'hashed_password',
       });
     });
@@ -245,19 +247,19 @@ describe('UsersService', () => {
       mockUserRepo.findByEmail.mockResolvedValue(null);
       mockUserRepo.update.mockResolvedValue({ ...mockUser, email: newEmail });
 
-      await usersService.updateUser(1, { email: newEmail });
+      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: newEmail });
 
       expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(newEmail);
-      expect(mockUserRepo.update).toHaveBeenCalledWith(1, { email: newEmail });
+      expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', { email: newEmail });
     });
 
     it('should throw DuplicateEmailError if email already exists', async () => {
-      const existingUser = { ...mockUser, user_id: 2 };
+      const existingUser = { ...mockUser, user_id: '223e4567-e89b-12d3-a456-426614174002' };
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.findByEmail.mockResolvedValue(existingUser);
 
       await expect(
-        usersService.updateUser(1, { email: 'taken@example.com' })
+        usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: 'taken@example.com' })
       ).rejects.toThrow(DuplicateEmailError);
       expect(mockUserRepo.update).not.toHaveBeenCalled();
     });
@@ -266,7 +268,7 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue(mockUser);
 
-      await usersService.updateUser(1, { email: mockUser.email });
+      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: mockUser.email });
 
       expect(mockUserRepo.findByEmail).not.toHaveBeenCalled();
     });
@@ -277,10 +279,10 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.delete.mockResolvedValue(true);
 
-      const result = await usersService.deleteUser(1);
+      const result = await usersService.deleteUser('123e4567-e89b-12d3-a456-426614174000');
 
-      expect(mockUserRepo.findById).toHaveBeenCalledWith(1);
-      expect(mockUserRepo.delete).toHaveBeenCalledWith(1);
+      expect(mockUserRepo.findById).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
+      expect(mockUserRepo.delete).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
       expect(result.success).toBe(true);
       expect(result.message).toContain('deactivated');
     });
@@ -288,7 +290,7 @@ describe('UsersService', () => {
     it('should throw UserNotFoundError if user does not exist', async () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
-      await expect(usersService.deleteUser(999)).rejects.toThrow(
+      await expect(usersService.deleteUser('999e4567-e89b-12d3-a456-426614174999')).rejects.toThrow(
         UserNotFoundError
       );
       expect(mockUserRepo.delete).not.toHaveBeenCalled();
