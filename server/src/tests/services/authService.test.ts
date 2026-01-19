@@ -31,7 +31,7 @@ describe('AuthService', () => {
       const passwordHash = await hashPassword(testPassword);
 
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         password_hash: passwordHash,
@@ -71,7 +71,7 @@ describe('AuthService', () => {
 
       // Verify returned user data
       expect(result).toEqual({
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular',
@@ -87,7 +87,7 @@ describe('AuthService', () => {
       const passwordHash = await hashPassword(testPassword);
 
       const mockAdmin = {
-        user_id: 2,
+        user_id: '550e8400-e29b-41d4-a716-446655440001',
         full_name: 'Admin User',
         email: 'admin@example.com',
         password_hash: passwordHash,
@@ -112,7 +112,7 @@ describe('AuthService', () => {
       const result = await authenticateUser('admin@example.com', testPassword);
 
       expect(result.role).toBe('admin');
-      expect(result.user_id).toBe(2);
+      expect(result.user_id).toBe('550e8400-e29b-41d4-a716-446655440001');
     });
 
     it('should throw AuthenticationError when user is not found', async () => {
@@ -145,7 +145,7 @@ describe('AuthService', () => {
       const passwordHash = await hashPassword(correctPassword);
 
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         password_hash: passwordHash,
@@ -181,7 +181,7 @@ describe('AuthService', () => {
       const passwordHash = await hashPassword(testPassword);
 
       const mockInactiveUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'Inactive User',
         email: 'inactive@example.com',
         password_hash: passwordHash,
@@ -259,7 +259,7 @@ describe('AuthService', () => {
       // Test 2: Wrong password
       const passwordHash = await hashPassword('DifferentPassword');
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         password_hash: passwordHash,
@@ -317,7 +317,7 @@ describe('AuthService', () => {
     it('should handle empty password', async () => {
       const passwordHash = await hashPassword('ActualPassword');
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         password_hash: passwordHash,
