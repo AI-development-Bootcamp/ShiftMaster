@@ -70,11 +70,7 @@ function LoginPage() {
       {/* Login card */}
       <div className="login-card">
         {/* Abra Logo */}
-        <img
-          src={abraLogo}
-          alt="Abra Logo"
-          className="login-logo"
-        />
+        <img src={abraLogo} alt="Abra Logo" className="login-logo" />
 
         {/* Welcome illustration */}
         <img
@@ -98,7 +94,9 @@ function LoginPage() {
         {/* Login form */}
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
-            <label htmlFor="email-input" className="visually-hidden">אימייל</label>
+            <label htmlFor="email-input" className="visually-hidden">
+              אימייל
+            </label>
             <input
               id="email-input"
               type="email"
@@ -118,7 +116,9 @@ function LoginPage() {
             )}
           </div>
           <div className="login-input-group">
-            <label htmlFor="password-input" className="visually-hidden">סיסמה</label>
+            <label htmlFor="password-input" className="visually-hidden">
+              סיסמה
+            </label>
             <input
               id="password-input"
               type="password"

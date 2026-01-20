@@ -1,0 +1,71 @@
+/* Status Badge Component */
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  direction: rtl;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: currentColor;
+}
+
+.status-icon {
+  width: 12px;
+  height: 12px;
+  flex-shrink: 0;
+}
+
+.status-label {
+  line-height: 1;
+}
+
+/* Missing - Red/Pink */
+.status-badge--missing {
+  --badge-bg: #fde8e8;
+  background-color: var(--badge-bg);
+  color: #dc2626;
+}
+
+/* Complete - Green */
+.status-badge--complete {
+  --badge-bg: #dcfce7;
+  background-color: var(--badge-bg);
+  color: #16a34a;
+}
+
+/* Partial - Yellow/Orange */
+.status-badge--partial {
+  --badge-bg: #fef3c7;
+  background-color: var(--badge-bg);
+  color: #d97706;
+}
+
+/* Sick - Blue */
+.status-badge--sick {
+  --badge-bg: #dbeafe;
+  background-color: var(--badge-bg);
+  color: #2563eb;
+}
+
+/* Weekend - Gray */
+.status-badge--weekend {
+  --badge-bg: #f3f4f6;
+  background-color: var(--badge-bg);
+  color: #6b7280;
+}
+
+/* Half Vacation - Purple */
+.status-badge--half-vacation {
+  --badge-bg: #f3e8f0;
+  background-color: var(--badge-bg);
+  color: #ae0088;
+}

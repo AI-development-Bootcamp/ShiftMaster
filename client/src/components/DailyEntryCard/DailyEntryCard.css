@@ -1,0 +1,133 @@
+/* Daily Entry Card Component */
+
+.daily-entry-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  margin: 8px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+}
+
+/* Header row (collapsed state) */
+.entry-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  direction: rtl;
+  gap: 12px;
+  transition: background-color 0.2s ease;
+}
+
+.entry-header:hover {
+  background-color: #f9fafb;
+}
+
+/* Calendar icon - far right in RTL */
+.calendar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+  order: 1;
+}
+
+/* Date display - right side */
+.entry-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  order: 2;
+}
+
+/* Status badge - left-center */
+.entry-header .status-badge {
+  order: 3;
+  margin-right: auto;
+}
+
+/* Chevron - far left in RTL */
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+  order: 4;
+}
+
+.chevron--expanded {
+  transform: rotate(180deg);
+}
+
+.date-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #141e3e;
+}
+
+.day-name {
+  font-size: 13px;
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Expanded content */
+.entry-content {
+  padding: 0 16px 16px 16px;
+  background-color: #fafbfc;
+  border-top: 1px solid #f0f0f0;
+}
+
+.entry-content--empty {
+  padding: 16px;
+}
+
+.time-entries-list {
+  padding: 8px 0;
+}
+
+/* Add report link */
+.add-report-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  background: none;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #3b82f6;
+  width: 100%;
+  margin-top: 8px;
+  transition: all 0.2s ease;
+  direction: rtl;
+}
+
+.add-report-link:hover:not(:disabled) {
+  background-color: #eff6ff;
+  border-color: #3b82f6;
+}
+
+.add-report-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #9ca3af;
+  border-color: #e5e7eb;
+}
+
+/* Animation for expand/collapse */
+.daily-entry-card--expanded {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
