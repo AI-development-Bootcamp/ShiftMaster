@@ -16,6 +16,10 @@ import { generateToken } from '../utils/jwt.js';
 const loginSchema = z.object({
   email: z.string().email('Invalid email format'),
   password: z.string().min(1, 'Password is required'),
+  source: z.enum(['admin', 'client'], {
+    required_error: 'Source is required',
+    invalid_type_error: "Source must be either 'admin' or 'client'",
+  }),
 });
 
 /**
@@ -39,10 +43,24 @@ export async function login(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { email, password } = validationResult.data;
+    const { email, password, source } = validationResult.data;
 
     // Authenticate user
     const user = await authenticateUser(email, password);
+
+    // Role Enforcement: Check source against user role
+    // Only admins can login to admin source
+    // Regular users logging into admin source is forbidden
+    if (source === 'admin' && user.role !== 'admin') {
+      res.status(403).json({
+        success: false,
+        error: {
+          message: 'Access denied: Regular users cannot access Admin application',
+          code: 'ACCESS_DENIED',
+        },
+      });
+      return;
+    }
 
     // Generate JWT token
     const token = generateToken({
@@ -65,20 +83,35 @@ export async function login(req: Request, res: Response): Promise<void> {
       },
     });
   } catch (error) {
-    // Handle authentication errors
-    if (error instanceof AuthenticationError) {
-      res.status(401).json({
+    // Handle specific authentication errors
+    const errorResponse = (status: number, message: string, code: string) => {
+      res.status(status).json({
         success: false,
-        error: {
-          message: 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS',
-        },
+        error: { message, code },
       });
-      return;
+    };
+
+    const err = error as any;
+
+    if (err instanceof AuthenticationError || err.name === 'AuthenticationError') {
+      return errorResponse(401, 'Invalid credentials', 'INVALID_CREDENTIALS');
+    }
+
+    // Check error names directly as classes might be imported from modified file
+    if (err.name === 'UserNotFoundError') {
+      return errorResponse(404, 'User not found', 'USER_NOT_FOUND');
+    }
+
+    if (err.name === 'AccountInactiveError') {
+      return errorResponse(401, 'Account is inactive', 'ACCOUNT_INACTIVE');
+    }
+
+    if (err.name === 'InvalidPasswordError') {
+      return errorResponse(401, 'Invalid password', 'INVALID_PASSWORD'); // Or keep INVALID_CREDENTIALS if strict security preferred
     }
 
     // Handle unexpected errors
-    console.error('Login error:', error);
+    console.error('Login error:', err);
     res.status(500).json({
       success: false,
       error: {
