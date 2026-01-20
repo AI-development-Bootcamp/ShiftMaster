@@ -50,6 +50,10 @@ export function TaskEmployeeAssignmentForm({
         };
 
         calculatePageSize();
+        if (typeof ResizeObserver === 'undefined') {
+            console.error({ code: 'TASK_EMP_ASSIGN_RESIZE_OBSERVER_UNSUPPORTED' });
+            return;
+        }
         const observer = new ResizeObserver(calculatePageSize);
         if (tableWrapperRef.current) {
             observer.observe(tableWrapperRef.current);
