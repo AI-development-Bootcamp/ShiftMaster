@@ -9,7 +9,7 @@ import '../../styles/manualReportModal.css';
 function ManualReportModal({
   isOpen,
   onClose,
-  currentDayAbsenceType = null,
+  currentDayAbsenceType: _currentDayAbsenceType = null,
   selectedDate = new Date(),
 }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');

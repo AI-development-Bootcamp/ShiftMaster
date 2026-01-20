@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { TimeValue, ProjectEntry } from '../../types/manualReport';
+import { TimeValue } from '../../types/manualReport';
 import { formatDateDisplay } from '../../utils/date';
 import { DAILY_QUOTA_HOURS } from '../../constants/time';
 import { useTimePicker, useProjectEntries } from '../../hooks';

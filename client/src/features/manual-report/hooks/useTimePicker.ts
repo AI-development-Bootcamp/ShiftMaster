@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { TimeValue, TimePickerItem, TimePickerRefs } from '../types/manualReport';
-import { HOURS, MINUTES, PERIODS, TIME_PICKER_ITEM_HEIGHT } from '../constants/time';
+import { HOURS, PERIODS, TIME_PICKER_ITEM_HEIGHT } from '../constants/time';
 
 interface UseTimePickerProps {
   currentTime: TimeValue;
