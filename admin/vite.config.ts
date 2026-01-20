@@ -4,8 +4,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let __dirname;
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} catch (error) {
+  throw new Error(`ERR_FILEURL_RESOLUTION: Failed to resolve file paths. ${error}`);
+}
 
 // Resolve shared package - prefer dist (for production builds), fallback to source (for dev)
 // The prebuild script ensures dist exists before vite build runs

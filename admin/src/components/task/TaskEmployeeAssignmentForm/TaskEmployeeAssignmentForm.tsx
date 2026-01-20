@@ -34,6 +34,7 @@ export function TaskEmployeeAssignmentForm({
     // Sync selectedKeys with initialSelectedIds prop
     useEffect(() => {
         setSelectedKeys(new Set(initialSelectedIds));
+        setError(null);
     }, [initialSelectedIds]);
 
     // --- Dynamic Page Size Logic ---
