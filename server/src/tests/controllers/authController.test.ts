@@ -11,7 +11,13 @@ vi.mock('../../db/supabase.js', () => ({
     from: vi.fn(),
   },
 }));
-vi.mock('../../services/authService.js');
+vi.mock('../../services/authService.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/authService.js')>();
+  return {
+    ...actual,
+    authenticateUser: vi.fn(),
+  };
+});
 vi.mock('../../utils/jwt.js');
 
 // Import after mocking
@@ -154,7 +160,7 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: {
-          message: 'Access denied: Admin privileges required',
+          message: 'Access denied: Regular users cannot access Admin application',
           code: 'ACCESS_DENIED',
         },
       });
@@ -324,16 +330,37 @@ describe('AuthController', () => {
       });
     });
 
-    it('should return 401 for invalid credentials', async () => {
+    it('should return 404 for user not found', async () => {
       mockRequest.body = {
-        email: 'john@example.com',
-        password: 'WrongPassword',
+        email: 'nonexistent@example.com',
+        password: 'password123',
         source: 'client',
       };
 
-      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(
-        new authService.AuthenticationError('Invalid credentials')
-      );
+      const error = new authService.UserNotFoundError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(404);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'User not found',
+          code: 'USER_NOT_FOUND',
+        },
+      });
+    });
+
+    it('should return 401 for inactive account', async () => {
+      mockRequest.body = {
+        email: 'inactive@example.com',
+        password: 'password123',
+        source: 'client',
+      };
+
+      const error = new authService.AccountInactiveError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -341,8 +368,30 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: {
-          message: 'Invalid credentials',
-          code: 'INVALID_CREDENTIALS',
+          message: 'Account is inactive',
+          code: 'ACCOUNT_INACTIVE',
+        },
+      });
+    });
+
+    it('should return 401 for invalid password', async () => {
+      mockRequest.body = {
+        email: 'john@example.com',
+        password: 'WrongPassword',
+        source: 'client',
+      };
+
+      const error = new authService.InvalidPasswordError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Invalid password',
+          code: 'INVALID_PASSWORD',
         },
       });
     });

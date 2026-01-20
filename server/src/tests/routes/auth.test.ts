@@ -12,7 +12,13 @@ vi.mock('../../db/supabase.js', () => ({
     from: vi.fn(),
   },
 }));
-vi.mock('../../services/authService.js');
+vi.mock('../../services/authService.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/authService.js')>();
+  return {
+    ...actual,
+    authenticateUser: vi.fn(),
+  };
+});
 vi.mock('../../utils/jwt.js');
 
 import authRouter from '../../routes/auth.js';
@@ -46,6 +52,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'SecurePassword123!',
+      source: 'client',
     });
 
     expect(response.status).toBe(200);
@@ -63,9 +70,22 @@ describe('POST /auth/login', () => {
     });
   });
 
+  it('should return 400 for missing source', async () => {
+    const response = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+    expect(response.body.error.details).toHaveProperty('source');
+  });
+
   it('should return 400 for missing email', async () => {
     const response = await request(app).post('/auth/login').send({
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -78,6 +98,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'not-an-email',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -89,6 +110,7 @@ describe('POST /auth/login', () => {
   it('should return 400 for missing password', async () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -105,6 +127,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'WrongPassword',
+      source: 'client',
     });
 
     expect(response.status).toBe(401);
@@ -120,7 +143,7 @@ describe('POST /auth/login', () => {
   it('should return 500 for server errors', async () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
     vi.spyOn(authService, 'authenticateUser').mockRejectedValue(
       new Error('Database connection failed')
@@ -129,6 +152,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(500);
@@ -158,6 +182,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.headers['content-type']).toMatch(/application\/json/);
@@ -182,6 +207,7 @@ describe('POST /auth/login', () => {
         JSON.stringify({
           email: 'john@example.com',
           password: 'password123',
+          source: 'client',
         })
       );
 
