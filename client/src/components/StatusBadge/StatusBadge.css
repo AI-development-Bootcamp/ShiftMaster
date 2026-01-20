@@ -30,30 +30,42 @@
 
 /* Missing - Red/Pink */
 .status-badge--missing {
-  background-color: #fde8e8;
+  --badge-bg: #fde8e8;
+  background-color: var(--badge-bg);
   color: #dc2626;
 }
 
 /* Complete - Green */
 .status-badge--complete {
-  background-color: #dcfce7;
+  --badge-bg: #dcfce7;
+  background-color: var(--badge-bg);
   color: #16a34a;
 }
 
 /* Partial - Yellow/Orange */
 .status-badge--partial {
-  background-color: #fef3c7;
+  --badge-bg: #fef3c7;
+  background-color: var(--badge-bg);
   color: #d97706;
 }
 
 /* Sick - Blue */
 .status-badge--sick {
-  background-color: #dbeafe;
+  --badge-bg: #dbeafe;
+  background-color: var(--badge-bg);
   color: #2563eb;
 }
 
 /* Weekend - Gray */
 .status-badge--weekend {
-  background-color: #f3f4f6;
+  --badge-bg: #f3f4f6;
+  background-color: var(--badge-bg);
   color: #6b7280;
+}
+
+/* Half Vacation - Purple */
+.status-badge--half-vacation {
+  --badge-bg: #f3e8f0;
+  background-color: var(--badge-bg);
+  color: #ae0088;
 }

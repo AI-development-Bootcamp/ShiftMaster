@@ -35,15 +35,16 @@ const mockEntries: DailyEntry[] = [
     id: '2',
     date: '15/10/25',
     dayName: "יום ד'",
-    status: 'partial',
-    hours: 7,
+    status: 'half-vacation',
+    hours: 4.5,
+    absenceType: 'vacation-half',
     timeEntries: [
       {
         id: '2-1',
         projectName: 'פרויקט גאמא',
         startTime: '09:00',
-        endTime: '16:00',
-        hours: '07:00',
+        endTime: '13:30',
+        hours: '04:30',
       },
     ],
   },
@@ -116,6 +117,67 @@ const mockEntries: DailyEntry[] = [
   },
 ];
 
+// Mock data for November testing
+const mockNovemberEntries: DailyEntry[] = [
+  {
+    id: 'nov-1',
+    date: '20/11/25',
+    dayName: "יום ה'",
+    status: 'half-vacation',
+    hours: 4.5,
+    absenceType: 'vacation-half',
+    timeEntries: [
+      {
+        id: 'nov-1-1',
+        projectName: 'פרויקט אלפא',
+        startTime: '09:00',
+        endTime: '13:30',
+        hours: '04:30',
+      },
+    ],
+  },
+  {
+    id: 'nov-2',
+    date: '19/11/25',
+    dayName: "יום ד'",
+    status: 'complete',
+    hours: 9,
+    timeEntries: [
+      {
+        id: 'nov-2-1',
+        projectName: 'פרויקט בטא',
+        startTime: '08:00',
+        endTime: '17:00',
+        hours: '09:00',
+      },
+    ],
+  },
+  {
+    id: 'nov-3',
+    date: '18/11/25',
+    dayName: "יום ג'",
+    status: 'partial',
+    hours: 6,
+    timeEntries: [
+      {
+        id: 'nov-3-1',
+        projectName: 'פרויקט גאמא',
+        startTime: '10:00',
+        endTime: '16:00',
+        hours: '06:00',
+      },
+    ],
+  },
+  {
+    id: 'nov-4',
+    date: '17/11/25',
+    dayName: "יום ב'",
+    status: 'sick',
+    absenceType: 'sick',
+    timeEntries: [],
+  },
+];
+
 const HEBREW_MONTHS = [
   'ינואר',
   'פברואר',
@@ -134,9 +196,12 @@ const HEBREW_MONTHS = [
 // Function to load entries for a specific month/year
 // TODO: Replace with actual API call to backend
 const loadEntriesForMonth = (month: number, year: number): DailyEntry[] => {
-  // For now, only return mock data for October 2025
+  // For now, return mock data for October and November 2025
   if (month === 9 && year === 2025) {
     return mockEntries;
+  }
+  if (month === 10 && year === 2025) {
+    return mockNovemberEntries;
   }
   // Return empty array for other months (will be replaced with API call)
   return [];
@@ -155,9 +220,9 @@ const isFutureMonth = (month: number, year: number): boolean => {
 
 function HomePage() {
   const navigate = useNavigate();
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
   const [currentYear, setCurrentYear] = useState(2025);
-  const [prevMonthIndex, setPrevMonthIndex] = useState(9);
+  const [prevMonthIndex, setPrevMonthIndex] = useState(10);
   const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(null);
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const [isTimerRunning, setIsTimerRunning] = useState(false);

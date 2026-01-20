@@ -5,6 +5,7 @@ import SelectionModal, { SelectionType, SelectionGroup } from '../SelectionModal
 interface ManualReportModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentDayAbsenceType?: 'vacation-half' | 'vacation-full' | 'sick' | 'reserves' | null;
 }
 
 interface TimeValue {
@@ -37,7 +38,7 @@ interface DateValue {
 
 type TimePickerItem = number | 'AM' | 'PM';
 
-function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
+function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
   const [editingField, setEditingField] = useState<'entry' | 'exit' | string | null>(null);
   const [entryTime, setEntryTime] = useState<TimeValue>({ hours: 9, minutes: 41, period: 'AM' });
@@ -321,9 +322,16 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
         return;
       }
 
-      // Check if total hours is less than 9
       const totalHours = calculateTotalHours();
-      if (totalHours < 9) {
+
+      // Check if day has half-vacation and work hours exceed 4.5
+      if (currentDayAbsenceType === 'vacation-half' && totalHours > 4.5) {
+        alert('לא ניתן לדווח יותר מ-4.5 שעות עבודה ביום חצי חופש');
+        return;
+      }
+
+      // Check if total hours is less than 9 (only for non-vacation days)
+      if (currentDayAbsenceType !== 'vacation-half' && totalHours < 9) {
         setShowMissingHoursAlert(true);
         return;
       }

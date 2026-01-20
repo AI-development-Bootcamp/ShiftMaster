@@ -1,6 +1,6 @@
 import './StatusBadge.css';
 
-export type EntryStatus = 'missing' | 'complete' | 'partial' | 'sick' | 'weekend';
+export type EntryStatus = 'missing' | 'complete' | 'partial' | 'sick' | 'weekend' | 'half-vacation';
 
 interface StatusBadgeProps {
   status: EntryStatus;
@@ -13,11 +13,17 @@ const statusConfig: Record<EntryStatus, { label: string; icon: string }> = {
   partial: { label: "ש'", icon: 'warning' },
   sick: { label: 'מחלה', icon: 'dot' },
   weekend: { label: 'סופ"ש', icon: 'dot' },
+  'half-vacation': { label: "ש'", icon: 'circle-slash' },
 };
 
 function StatusBadge({ status, hours }: StatusBadgeProps) {
   const config = statusConfig[status];
-  const displayLabel = hours !== undefined ? `${hours} ${config.label}` : config.label;
+  let displayLabel = hours !== undefined ? `${hours} ${config.label}` : config.label;
+
+  // Special display for half-vacation: "חצי חופש\4.5 ש'"
+  if (status === 'half-vacation' && hours !== undefined) {
+    displayLabel = `חצי חופש\\${hours} ${config.label}`;
+  }
 
   const renderIcon = () => {
     switch (config.icon) {
@@ -42,6 +48,21 @@ function StatusBadge({ status, hours }: StatusBadgeProps) {
               strokeWidth="1.5"
               strokeLinecap="round"
               strokeLinejoin="round"
+            />
+          </svg>
+        );
+      case 'circle-slash':
+        return (
+          <svg className="status-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <circle cx="6" cy="6" r="5" fill="currentColor" />
+            <line
+              x1="9"
+              y1="3"
+              x2="3"
+              y2="9"
+              stroke="var(--badge-bg)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
             />
           </svg>
         );

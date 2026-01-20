@@ -3,6 +3,8 @@ import StatusBadge, { EntryStatus } from '../StatusBadge/StatusBadge';
 import TimeEntryItem, { TimeEntry } from '../TimeEntryItem/TimeEntryItem';
 import './DailyEntryCard.css';
 
+export type AbsenceType = 'vacation-half' | 'vacation-full' | 'sick' | 'reserves' | null;
+
 export interface DailyEntry {
   id: string;
   date: string;
@@ -10,6 +12,7 @@ export interface DailyEntry {
   status: EntryStatus;
   hours?: number;
   timeEntries: TimeEntry[];
+  absenceType?: AbsenceType;
 }
 
 interface DailyEntryCardProps {
