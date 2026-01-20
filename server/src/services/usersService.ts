@@ -90,8 +90,15 @@ function isUniqueConstraintError(err: unknown): boolean {
  * Remove password_hash from user object
  */
 function sanitizeUser(user: User): UserResponse {
-  const { password_hash: _password_hash, ...userWithoutPassword } = user;
-  return userWithoutPassword;
+  return {
+    user_id: user.user_id,
+    full_name: user.full_name,
+    email: user.email,
+    role: user.role,
+    job_title: user.job_title,
+    active: user.active,
+    created_at: user.created_at,
+  };
 }
 
 /**
