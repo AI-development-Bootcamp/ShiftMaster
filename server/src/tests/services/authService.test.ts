@@ -15,7 +15,6 @@ vi.mock('../../db/supabase.js', () => ({
 // Import after mocking
 import {
   authenticateUser,
-  AuthenticationError,
   UserNotFoundError,
   AccountInactiveError,
   InvalidPasswordError,
