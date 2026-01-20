@@ -6,7 +6,7 @@ import DailyEntryCard, {
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
-import './HomePage.css';
+import '../../styles/HomePage.css';
 
 // Mock data for testing
 

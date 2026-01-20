@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { isValidEmail } from '@abra-shift-master/shared';
-import './LoginPage.css';
+import '../../styles/LoginPage.css';
 
 // Assets
 import welcomeIllustration from '../../assets/images/welcome-illustration.svg';

@@ -1,4 +1,4 @@
-import './StatusBadge.css';
+import '../../styles/StatusBadge.css';
 
 export type EntryStatus =
   | 'missing'
