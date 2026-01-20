@@ -590,8 +590,8 @@ A: Yes, good practice. Add `revokeAllUserSessions(userId)` to authService.
 - [x] POST /api/v1/auth/refresh rotates refresh token (old one invalid)
 - [x] POST /api/v1/auth/refresh detects reuse and revokes session
 - [x] POST /api/v1/auth/logout clears cookies and revokes session
-- [ ] Client and Admin frontends store access token in-memory only
-- [ ] Client and Admin frontends call /refresh on app start
+- [x] Client and Admin frontends store access token in-memory only
+- [x] Client and Admin frontends call /refresh on app start
 - [ ] API client retries 401 with /refresh, prevents refresh storms
 - [ ] All tests pass (backend + frontend)
 - [ ] No tokens stored in localStorage or sessionStorage
