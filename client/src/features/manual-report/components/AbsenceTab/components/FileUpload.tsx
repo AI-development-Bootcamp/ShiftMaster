@@ -24,6 +24,7 @@ function FileUpload({
         className="file-upload-area"
         role="button"
         tabIndex={0}
+        aria-label="העלאת קובץ"
         onKeyDown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
@@ -64,7 +65,7 @@ function FileUpload({
         onChange={onFileUpload}
         style={{ display: 'none' }}
       />
-      {fileUploadError.code && (
+      {fileUploadError.message && (
         <div
           className="file-upload-error"
           role="alert"

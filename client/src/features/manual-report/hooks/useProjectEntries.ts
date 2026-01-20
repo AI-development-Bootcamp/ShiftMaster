@@ -42,9 +42,7 @@ export function useProjectEntries() {
     []
   );
 
-// ...existing code...
-
-const updateProjectTime = useCallback(
+  const updateProjectTime = useCallback(
   (projectId: string, field: 'startTime' | 'endTime', newTime: TimeValue) => {
     setProjectEntries((prev) =>
       prev.map((p) => {
@@ -76,8 +74,6 @@ const updateProjectTime = useCallback(
   },
   []
 );
-
-// ...existing code...
 
   const deleteProject = useCallback((projectId: string) => {
     setProjectEntries((prev) => prev.filter((p) => p.id !== projectId));

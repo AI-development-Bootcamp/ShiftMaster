@@ -212,7 +212,7 @@ The refactoring maintains full backward compatibility:
 ### New Import (Recommended)
 ```typescript
 import { ManualReportModal } from '@/features/manual-report';
-````
+```
 
 ### Old Import (Still Works)
 
