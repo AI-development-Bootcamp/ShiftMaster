@@ -559,7 +559,7 @@ npm run redis:stop
 
 ## QUESTIONS & CONSIDERATIONS
 
-### Q: Why not store refresh tokens in database?
+### Q: Why not store refresh tokens in database??
 
 A: Redis is faster and has built-in TTL. Database is optional for audit trails but adds complexity.
 
