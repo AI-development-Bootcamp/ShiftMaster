@@ -7,6 +7,20 @@ import { MonthTile } from '../components/MonthLocks/MonthTile';
 describe('MonthTile', () => {
   const mockOnClick = vi.fn();
 
+  // Override the global mock for this suite to return specific translations
+  vi.mock('react-i18next', () => ({
+    useTranslation: () => ({
+      t: (key: string) => {
+        if (key === 'monthLocks.status.locked') return 'נעול';
+        if (key === 'monthLocks.status.unlocked') return 'פתוח';
+        return key;
+      },
+      i18n: {
+        changeLanguage: () => Promise.resolve(),
+      },
+    }),
+  }));
+
   it('renders month name', () => {
     render(
       <MonthTile monthName="ינואר" isLocked={false} onClick={mockOnClick} />
