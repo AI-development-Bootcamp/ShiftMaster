@@ -36,6 +36,7 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
   const [year, setYear] = useState(currentYear);
   const { locks, isLoading, toggleLock, saveChanges } = useMonthLocks(year);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Handle ESC key press
   useEffect(() => {
@@ -137,12 +138,23 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
         </div>
 
         <div className="month-lock-dropdown-footer">
+          {saveError && (
+            <div className="month-lock-error-message" role="alert" style={{ marginBottom: '8px', color: 'red', fontSize: '14px' }}>
+              {saveError}
+            </div>
+          )}
           <button
             type="button"
             className="month-lock-save-button"
-            onClick={() => {
-              saveChanges();
-              onClose();
+            onClick={async () => {
+              try {
+                setSaveError(null);
+                await saveChanges();
+                onClose();
+              } catch (error) {
+                console.error({ code: 'MONTH_LOCK_SAVE_FAIL', error });
+                setSaveError(t('monthLocks.errors.saveFailed') || 'Failed to save changes');
+              }
             }}
           >
             {t('monthLocks.actions.save')}

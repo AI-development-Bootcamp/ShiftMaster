@@ -20,7 +20,7 @@ const initI18n = async () => {
                 }
             });
     } catch (error) {
-        console.error('Failed to initialize i18n:', error);
+        console.error({ code: 'I18N_INIT_FAIL', message: 'Failed to initialize i18n', error });
     }
 };
 

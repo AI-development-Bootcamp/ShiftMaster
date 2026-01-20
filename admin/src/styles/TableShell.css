@@ -4,8 +4,8 @@
 .table-shell-container {
     /* Flex-based sizing to fill parent container width */
     width: 100%;
-    /* Restored original fixed height preference */
-    height: 75vh;
+    /* Height according to spec */
+    height: 80.185vh;
 
     /* Flex column for header/body/footer stacking */
     display: flex;

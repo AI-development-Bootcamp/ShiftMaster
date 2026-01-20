@@ -1,6 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
 import { useMonthLocks } from '../hooks/useMonthLocks';
+import { apiClient } from '../api';
+
+vi.mock('../api', () => ({
+  apiClient: {
+    batchUpdateMonthLocks: vi.fn(),
+  },
+}));
 
 describe('useMonthLocks', () => {
   beforeEach(() => {
@@ -101,15 +108,13 @@ describe('useMonthLocks', () => {
       });
 
       // Verify console log payload
-      expect(console.log).toHaveBeenCalledWith(
-        '[MonthLock] Batch Update:',
+      // Verify API call payload
+      expect(apiClient.batchUpdateMonthLocks).toHaveBeenCalledWith(
         expect.objectContaining({
-          payload: expect.objectContaining({
-            year: 2024,
-            operations: expect.objectContaining({
-              lock: [3],
-              unlock: [1]
-            })
+          year: 2024,
+          operations: expect.objectContaining({
+            lock: [3],
+            unlock: [1]
           })
         })
       );

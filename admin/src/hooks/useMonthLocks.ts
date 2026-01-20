@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MonthLock } from '@abra-shift-master/shared';
 import { mockMonthLocks } from '../mocks/monthLocks';
+import { apiClient as api } from '../api';
 
 /**
  * Hook for managing month locks data and operations.
@@ -99,14 +100,19 @@ export function useMonthLocks(year: number) {
       }
     };
 
-    console.log('[MonthLock] Batch Update:', {
-      payload,
-      note: 'This will be sent to: POST /api/v1/month-locks/batch'
-    });
-
     // Optimistically update "server" state to match pending
+    const previousServerLocks = serverLocks;
     setServerLocks(pendingLocks);
-    // In a real app we would wait for API response here
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (api as any).batchUpdateMonthLocks(payload);
+    } catch (error) {
+      // Rollback on failure
+      setServerLocks(previousServerLocks);
+      setPendingLocks(previousServerLocks);
+      throw error;
+    }
   }, [pendingLocks, serverLocks, year]);
 
   /**

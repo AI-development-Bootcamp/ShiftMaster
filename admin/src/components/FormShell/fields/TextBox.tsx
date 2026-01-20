@@ -28,6 +28,15 @@ export function TextBox({
     const inputType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
     const isPassword = type === 'password';
 
+    const safeT = (key: string) => {
+        try {
+            return t(key);
+        } catch (err) {
+            console.error({ code: 'TEXTBOX_I18N_MISSING', message: 'Translation failed', error: err, key });
+            return key;
+        }
+    };
+
     return (
         <div className="form-field">
             <label htmlFor={id} className="form-field__label">
@@ -53,7 +62,7 @@ export function TextBox({
                         type="button"
                         className="form-field__password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? t('formShell.textBox.hidePassword') : t('formShell.textBox.showPassword')}
+                        aria-label={showPassword ? safeT('formShell.textBox.hidePassword') : safeT('formShell.textBox.showPassword')}
                         tabIndex={-1}
                     >
                         {showPassword ? (

@@ -153,4 +153,4 @@ All Month Lock UI text SHALL be translated using the i18n system with Hebrew tra
 #### Scenario: UI labels in Hebrew
 
 - **WHEN** viewing the modal and button
-- **THEN** all UI text (button label, modal title, etc.) uses Hebrew translations from `admin/src/locales/he/translation.json`
+- **THEN** all UI text (button label, modal title, etc.) uses Hebrew translations from `admin/src/i18n/locales/he.json`

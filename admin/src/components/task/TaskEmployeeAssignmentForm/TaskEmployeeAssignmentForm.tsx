@@ -100,13 +100,19 @@ export function TaskEmployeeAssignmentForm({
         setError(null);
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (selectedKeys.size === 0) {
             setError(t('taskEmployeeAssignmentForm.errors.selectAtLeastOne'));
             return;
         }
-        const selectedRows = rows.filter(r => selectedKeys.has(r.id));
-        onSubmit(selectedRows);
+        setError(null);
+        try {
+            const selectedRows = rows.filter(r => selectedKeys.has(r.id));
+            await onSubmit(selectedRows);
+        } catch (error) {
+            console.error({ code: 'TASK_EMP_ASSIGN_SUBMIT_FAIL', error });
+            setError(t('taskEmployeeAssignmentForm.errors.submitFailed', { code: 'TASK_EMP_ASSIGN_SUBMIT_FAIL' }));
+        }
     };
 
     // --- Keyboard Support ---

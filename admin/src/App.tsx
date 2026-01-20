@@ -3,17 +3,20 @@ import './styles/reset.css';
 import './styles/global.css';
 import './styles/App.css';
 import { RightSidebarTaskbar } from './components/RightSidebarTaskbar';
-import { navigationItems } from './config/navigation';
+import { getNavigationItems } from './config/navigation';
 import { LoginPage } from './pages/LoginPage';
 import { AssignmentPage } from './pages/AssignmentPage';
 import { EntriesManagementPage } from './pages/EntriesManagementPage';
 import { EmployeesManagementPage } from './pages/EmployeesManagementPage';
 import { mockCurrentUser } from './mocks/users';
 import { DesktopOnlyOverlay } from './components/DesktopOnlyOverlay/DesktopOnlyOverlay';
+import { useTranslation } from 'react-i18next';
 
 function AppContent() {
+  const { t } = useTranslation();
   const location = useLocation();
   const isLoginPage = location.pathname === '/';
+  const navigationItems = getNavigationItems(t);
 
   return (
     <div className="app" dir="rtl">

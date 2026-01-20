@@ -57,13 +57,15 @@ export function ConfirmActionModal({
         if (isOpen && closeOnEsc) {
             const handleKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') {
-                    onCancel();
+                    if (!isLoading || !disableCancelOnLoading) {
+                        onCancel();
+                    }
                 }
             };
             document.addEventListener('keydown', handleKeyDown);
             return () => document.removeEventListener('keydown', handleKeyDown);
         }
-    }, [isOpen, closeOnEsc, onCancel]);
+    }, [isOpen, closeOnEsc, onCancel, isLoading, disableCancelOnLoading]);
 
     // Focus trap minimal implementation
     useEffect(() => {
@@ -124,7 +126,14 @@ export function ConfirmActionModal({
                     </button>
                     <button
                         className={`confirm-modal__btn confirm-modal__btn--${variant}`}
-                        onClick={() => onConfirm()}
+                        onClick={async () => {
+                            try {
+                                await onConfirm();
+                            } catch (error) {
+                                // Report error using project's error reporting if available or console
+                                console.error({ code: 'CONFIRM_ACTION_FAIL', error });
+                            }
+                        }}
                         disabled={isLoading}
                     >
                         {isLoading ? 'טוען...' : confirmLabel}

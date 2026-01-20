@@ -30,8 +30,13 @@ export function EntriesManagementPage() {
     const [activeForm, setActiveForm] = useState<'createClient' | 'createProject' | 'createTask' | null>(null);
 
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeForm} form:`, values);
-        setActiveForm(null);
+        try {
+            console.log(`Submitted ${activeForm} form:`, values);
+            setActiveForm(null);
+        } catch (error) {
+            console.error('Form submission failed:', error);
+            // Ideally trigger a notification here
+        }
     };
 
     const createDropdownOptions = useMemo(() => [
