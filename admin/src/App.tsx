@@ -11,10 +11,19 @@ import { EmployeesManagementPage } from './pages/EmployeesManagementPage';
 import { mockCurrentUser } from './mocks/users';
 import { DesktopOnlyOverlay } from './components/DesktopOnlyOverlay/DesktopOnlyOverlay';
 import { useTranslation } from 'react-i18next';
+import { useEffect } from 'react';
+import { useAppDispatch } from './store';
+import { initializeAuth } from './store/slices/authSlice';
 
 function AppContent() {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const location = useLocation();
+
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
+
   const isLoginPage = location.pathname === '/';
   const navigationItems = getNavigationItems(t);
 

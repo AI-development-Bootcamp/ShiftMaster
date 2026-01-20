@@ -20,6 +20,7 @@ const router = Router();
  *             required:
  *               - email
  *               - password
+ *               - source
  *             properties:
  *               email:
  *                 type: string
@@ -31,6 +32,11 @@ const router = Router();
  *                 format: password
  *                 description: User's password
  *                 example: SecurePassword123!
+ *               source:
+ *                 type: string
+ *                 enum: [admin, client]
+ *                 description: Application source of the login request
+ *                 example: admin
  *     responses:
  *       200:
  *         description: Login successful
@@ -67,7 +73,7 @@ const router = Router();
  *                           enum: [admin, regular]
  *                           example: regular
  *       400:
- *         description: Validation error
+ *         description: Validation error (e.g., missing source or invalid format)
  *         content:
  *           application/json:
  *             schema:
@@ -81,7 +87,7 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Validation error
+ *                       example: "Validation error"
  *                     code:
  *                       type: string
  *                       example: VALIDATION_ERROR
@@ -90,7 +96,7 @@ const router = Router();
  *                       description: Field-level validation errors
  *                       example:
  *                         email: ["Invalid email format"]
- *                         password: ["Password is required"]
+ *                         source: ["Source is required"]
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -106,10 +112,29 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Invalid credentials
+ *                       example: "Invalid credentials"
  *                     code:
  *                       type: string
  *                       example: INVALID_CREDENTIALS
+ *       403:
+ *         description: Access denied (e.g., regular user trying to login to admin app)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Access denied: Admin privileges required"
+ *                     code:
+ *                       type: string
+ *                       example: ACCESS_DENIED
  *       500:
  *         description: Internal server error
  *         content:
@@ -125,7 +150,7 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Internal server error
+ *                       example: "Internal server error"
  *                     code:
  *                       type: string
  *                       example: INTERNAL_SERVER_ERROR

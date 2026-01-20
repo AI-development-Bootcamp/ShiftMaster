@@ -1,26 +1,22 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LoginWelcomeCard } from '../../components/LoginWelcomeCard';
+import { useAppSelector } from '../../store';
 import '../../styles/LoginPage.css';
 
 export function LoginPage() {
     const navigate = useNavigate();
+    const { isAuthenticated } = useAppSelector((state) => state.auth);
 
-    const [error, setError] = useState<string | null>(null);
-
-    const handleLogin = (email: string, password?: string) => {
-        // Visual-only flow requested by user:
-        // Just navigate to the next page if fields are present.
-        if (email && password) {
+    useEffect(() => {
+        if (isAuthenticated) {
             navigate('/assignment');
-        } else {
-            setError('אנא הזן אימייל וסיסמה');
         }
-    };
+    }, [isAuthenticated, navigate]);
 
     return (
         <div className="login-page">
-            <LoginWelcomeCard onLogin={handleLogin} error={error} />
+            <LoginWelcomeCard />
         </div>
     );
 }

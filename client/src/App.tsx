@@ -6,7 +6,17 @@ import './styles/global.css';
 import LoginPage from './pages/Login/LoginPage';
 import HomePage from './pages/Home/HomePage';
 
+import { useEffect } from 'react';
+import { useAppDispatch } from './store';
+import { initializeAuth } from './store/slices/authSlice';
+
 function App() {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
+
   return (
     <BrowserRouter>
       <div className="app" dir="rtl">

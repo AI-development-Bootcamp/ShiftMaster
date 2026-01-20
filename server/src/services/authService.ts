@@ -30,8 +30,30 @@ export interface AuthenticatedUser {
 }
 
 /**
- * Custom error class for authentication failures
+ * Custom error classes for authentication failures
  */
+export class UserNotFoundError extends Error {
+  constructor(message = 'User not found') {
+    super(message);
+    this.name = 'UserNotFoundError';
+  }
+}
+
+export class AccountInactiveError extends Error {
+  constructor(message = 'Account is inactive') {
+    super(message);
+    this.name = 'AccountInactiveError';
+  }
+}
+
+export class InvalidPasswordError extends Error {
+  constructor(message = 'Invalid password') {
+    super(message);
+    this.name = 'InvalidPasswordError';
+  }
+}
+
+// Keep generic for backward compatibility or catch-all
 export class AuthenticationError extends Error {
   constructor(message: string) {
     super(message);
@@ -44,7 +66,7 @@ export class AuthenticationError extends Error {
  * @param email - User's email address
  * @param password - User's plain-text password
  * @returns Authenticated user data (without password hash)
- * @throws AuthenticationError if authentication fails
+ * @throws UserNotFoundError, AccountInactiveError, InvalidPasswordError
  */
 export async function authenticateUser(
   email: string,
@@ -60,9 +82,9 @@ export async function authenticateUser(
     .single();
 
   // Handle database errors
-  if (error) {
-    // User not found (or other database error)
-    throw new AuthenticationError('Invalid credentials');
+  if (error || !user) {
+    // Specific error for user not found
+    throw new UserNotFoundError();
   }
 
   // Type assertion since we know the structure from the query
@@ -70,7 +92,7 @@ export async function authenticateUser(
 
   // Check if user account is active
   if (!userFromDB.active) {
-    throw new AuthenticationError('Invalid credentials');
+    throw new AccountInactiveError();
   }
 
   // Verify password
@@ -80,7 +102,7 @@ export async function authenticateUser(
   );
 
   if (!passwordMatch) {
-    throw new AuthenticationError('Invalid credentials');
+    throw new InvalidPasswordError();
   }
 
   // Return user data without password hash
