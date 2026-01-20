@@ -22,12 +22,15 @@ const HEBREW_MONTHS = [
   'אוקטובר',
   'נובמבר',
   'דצמבר',
-];
+];``
 
 // Function to load entries for a specific month/year
 // TODO: Replace with actual API call to backend
 const loadEntriesForMonth = (month: number, year: number): DailyEntry[] => {
   // For now, return mock data for October and November 2025
+ 
+  if (month === 10 && year === 2025) {
+  }
   // Return empty array for other months (will be replaced with API call)
   return [];
 };
