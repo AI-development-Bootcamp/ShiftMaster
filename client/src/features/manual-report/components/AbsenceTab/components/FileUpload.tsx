@@ -36,6 +36,7 @@ function FileUpload({
         {uploadedFile ? (
           <div className="file-uploaded" onClick={(e) => e.stopPropagation()}>
             <button
+              type="button"
               className="file-remove-btn"
               onClick={onRemoveFile}
               aria-label="הסר קובץ"
