@@ -28,6 +28,13 @@ export interface IUserRepository extends IBaseRepository<User, NewUser, UpdateUs
 
 export interface IClientRepository extends IBaseRepository<Client, NewClient, UpdateClient> {
     findActive(): Promise<Client[]>;
+    findPaginated(
+        page: number,
+        limit: number,
+        search?: string,
+        sort?: 'asc' | 'desc',
+        includeInactive?: boolean
+    ): Promise<{ data: Client[]; count: number }>;
 }
 
 export interface IProjectRepository extends IBaseRepository<Project, NewProject, UpdateProject> {
