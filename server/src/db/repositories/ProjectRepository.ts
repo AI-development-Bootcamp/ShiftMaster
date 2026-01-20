@@ -39,4 +39,41 @@ export class ProjectRepository extends BaseRepository<Project, NewProject, Updat
 
         return data as Project[];
     }
+
+    async findPaginated(
+        page: number,
+        limit: number,
+        search?: string,
+        sort: 'asc' | 'desc' = 'asc',
+        includeInactive: boolean = false
+    ): Promise<{ data: Project[]; count: number }> {
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
+
+        let query = this.dbConnection
+            .from(this.table)
+            .select('*', { count: 'exact' });
+
+        if (search) {
+            query = query.ilike('name', `%${search}%`);
+        }
+
+        if (!includeInactive) {
+            query = query.eq('active', true);
+        }
+
+        query = query.order('name', { ascending: sort === 'asc' }).range(from, to);
+
+        const { data, error, count } = await query;
+
+        if (error) {
+            logDbError('ProjectRepository.findPaginated', error);
+            throw error;
+        }
+
+        return {
+            data: (data as Project[]) || [],
+            count: count || 0
+        };
+    }
 }
