@@ -782,7 +782,7 @@ function ManualReportModal({
     if (halfVacationError.code) {
       setHalfVacationError({ code: null });
     }
-  }, [projectEntries, entryTime, exitTime, activeTab]);
+  }, [projectEntries, entryTime, exitTime, activeTab, halfVacationError.code]);
 
   // Click outside to close dropdown
   useEffect(() => {
