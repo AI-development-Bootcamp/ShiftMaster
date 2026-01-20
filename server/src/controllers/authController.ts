@@ -91,7 +91,7 @@ export async function login(req: Request, res: Response): Promise<void> {
       });
     };
 
-    const err = error as any;
+    const err = error as Error;
 
     if (err instanceof AuthenticationError || err.name === 'AuthenticationError') {
       return errorResponse(401, 'Invalid credentials', 'INVALID_CREDENTIALS');

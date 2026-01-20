@@ -1,4 +1,4 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 interface User {
     user_id: string;
@@ -24,12 +24,14 @@ const initialState: AuthState = {
 };
 
 // Async thunk for login
-export const loginUser = createAsyncThunk(
+// Async thunk for login
+export const loginUser = createAsyncThunk<
+    { token: string; user: User },
+    { email: string; password: string; source: 'admin' | 'client' },
+    { rejectValue: { code: string; message: string } }
+>(
     'auth/login',
-    async (
-        credentials: { email: string; password: string; source: 'admin' | 'client' },
-        { rejectWithValue }
-    ) => {
+    async (credentials, { rejectWithValue }) => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
                 method: 'POST',
@@ -42,7 +44,7 @@ export const loginUser = createAsyncThunk(
             const data = await response.json();
 
             if (!response.ok) {
-                return rejectWithValue(data.error);
+                return rejectWithValue(data.error as { code: string; message: string });
             }
 
             // Persist to localStorage
@@ -98,10 +100,11 @@ const authSlice = createSlice({
                 state.token = action.payload.token;
                 state.user = action.payload.user;
             })
-            .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+            .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
                 state.isAuthenticated = false;
-                state.error = action.payload?.code || 'UNKNOWN_ERROR';
+                // Safely access code if payload exists
+                state.error = action.payload?.code || 'NETWORK_ERROR';
             });
     },
 });
