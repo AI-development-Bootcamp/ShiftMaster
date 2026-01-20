@@ -3,6 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { SupabaseClient } from '@supabase/supabase-js';
 import {
   UsersService,
   DuplicateEmailError,
@@ -58,7 +59,7 @@ describe('UsersService', () => {
     vi.clearAllMocks();
 
     // Create mock Supabase client
-    const mockSupabaseClient = {} as any;
+    const mockSupabaseClient = {} as SupabaseClient;
 
     // Create service instance with mock client
     usersService = new UsersService(mockSupabaseClient);
