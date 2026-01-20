@@ -4,7 +4,7 @@ import { TableHeader } from './components/TableHeader';
 import { TableBody } from './components/TableBody';
 import { TableFooter } from './components/TableFooter';
 import emptySpaceImg from '../../assets/empty_space.svg';
-import './TableShell.css';
+import '../../styles/TableShell.css';
 
 /**
  * TableShell

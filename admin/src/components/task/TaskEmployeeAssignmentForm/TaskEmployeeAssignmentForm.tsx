@@ -3,7 +3,7 @@ import { TaskEmployeeAssignmentFormProps, EmployeeRow } from './TaskEmployeeAssi
 import { TableShell, SortState } from '../../TableShell';
 import { TableSearch } from '../../TableShell/TableSearch';
 import { useTableSearch } from '../../../hooks/useTableSearch';
-import './TaskEmployeeAssignmentForm.css';
+import '../../../styles/TaskEmployeeAssignmentForm.css';
 
 const DEFAULT_PAGE_SIZE = 8;
 

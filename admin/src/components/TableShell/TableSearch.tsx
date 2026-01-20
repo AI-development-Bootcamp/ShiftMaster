@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import './TableSearch.css';
+import '../../styles/TableSearch.css';
 
 interface TableSearchProps {
     value: string;
