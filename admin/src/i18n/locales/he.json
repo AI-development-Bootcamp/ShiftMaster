@@ -132,6 +132,9 @@
             "previousYear": "שנה קודמת",
             "nextYear": "שנה הבאה"
         },
+        "actions": {
+            "save": "שמור שינויים"
+        },
         "closeModal": "סגור",
         "loading": "טוען נתוני נעילה...",
         "locked": "נעול",

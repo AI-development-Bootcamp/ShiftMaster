@@ -194,6 +194,37 @@
   }
 }
 
+/* Footer and Save Button */
+.month-lock-dropdown-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+}
+
+.month-lock-save-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 32px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 120px;
+}
+
+.month-lock-save-button:hover {
+  background-color: #2563eb;
+}
+
+.month-lock-save-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 640px) {
   .month-grid {
@@ -205,6 +236,10 @@
   }
 
   .month-lock-dropdown-body {
+    padding: 12px;
+  }
+  
+  .month-lock-dropdown-footer {
     padding: 12px;
   }
 }

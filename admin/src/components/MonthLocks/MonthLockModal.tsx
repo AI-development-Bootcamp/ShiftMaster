@@ -34,7 +34,7 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const { locks, isLoading, toggleLock } = useMonthLocks(year);
+  const { locks, isLoading, toggleLock, saveChanges } = useMonthLocks(year);
   const [position, setPosition] = useState({ top: 0, left: 0 });
 
   // Handle ESC key press
@@ -134,6 +134,19 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
             onToggleLock={toggleLock}
             isLoading={isLoading}
           />
+        </div>
+
+        <div className="month-lock-dropdown-footer">
+          <button
+            type="button"
+            className="month-lock-save-button"
+            onClick={() => {
+              saveChanges();
+              onClose();
+            }}
+          >
+            {t('monthLocks.actions.save')}
+          </button>
         </div>
       </div>
     </>

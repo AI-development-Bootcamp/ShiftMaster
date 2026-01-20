@@ -1,27 +1,22 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { MonthLock } from '@abra-shift-master/shared';
 import { mockMonthLocks } from '../mocks/monthLocks';
 
 /**
  * Hook for managing month locks data and operations.
  *
- * This hook provides an API-ready interface for month lock management.
- * Currently uses mock data, but can be swapped for real API calls without
- * changing component code.
+ * This hook provides a batch-update interface for month lock management.
+ * Users can toggle locks locally (pending state) and then save all changes
+ * in a single operation.
  *
  * @param year - The year to load month locks for
- * @returns Object containing locks data, loading state, and toggle function
- *
- * @example
- * ```tsx
- * const { locks, isLoading, toggleLock } = useMonthLocks(2024);
- *
- * // Toggle a month lock
- * toggleLock(2024, 1); // Toggle January 2024
- * ```
+ * @returns Object containing locks, pending state, operations, and status
  */
 export function useMonthLocks(year: number) {
-  const [locks, setLocks] = useState<MonthLock[]>([]);
+  // serverLocks reflects the true state from the API/Mock
+  const [serverLocks, setServerLocks] = useState<MonthLock[]>([]);
+  // pendingLocks reflects the local state in the UI before saving
+  const [pendingLocks, setPendingLocks] = useState<MonthLock[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Load locks for the specified year
@@ -31,7 +26,8 @@ export function useMonthLocks(year: number) {
     // Simulate async data fetch (mock data)
     const timer = setTimeout(() => {
       const yearLocks = mockMonthLocks.filter(lock => lock.year === year);
-      setLocks(yearLocks);
+      setServerLocks(yearLocks);
+      setPendingLocks(yearLocks); // Pending starts synced with server
       setIsLoading(false);
     }, 150); // Small delay to show loading state
 
@@ -39,68 +35,93 @@ export function useMonthLocks(year: number) {
   }, [year]);
 
   /**
-   * Toggles a month lock state.
-   *
-   * If the month is unlocked, prepares a "create" payload and logs it.
-   * If the month is locked, prepares a "delete" payload and logs it.
-   *
-   * The UI is updated optimistically (immediately) without waiting for server response.
-   *
-   * Future API integration:
-   * - Create: POST /api/v1/month-locks with { year, month, lockedByUserId }
-   * - Delete: DELETE /api/v1/month-locks/{lockId}
-   *
-   * @param year - The year of the month to toggle
-   * @param month - The month number (1-12) to toggle
+   * Toggles a month lock in the local pending state.
+   * Does NOT trigger an API call.
    */
   const toggleLock = useCallback((year: number, month: number) => {
-    const existingLock = locks.find(lock => lock.year === year && lock.month === month);
+    setPendingLocks(currentLocks => {
+      const existingTx = currentLocks.find(lock => lock.year === year && lock.month === month);
 
-    if (existingLock) {
-      // Month is currently locked - prepare DELETE
-      console.log('[MonthLock] Prepare DELETE:', {
-        operation: 'delete',
-        lockId: existingLock.lock_id,
-        year,
-        month,
-        note: 'This will be sent to: DELETE /api/v1/month-locks/{lockId}'
-      });
+      if (existingTx) {
+        // Unlock: remove from pending
+        return currentLocks.filter(lock => lock.lock_id !== existingTx.lock_id);
+      } else {
+        // Lock: add to pending
+        const mockAdminUserId = 1; // TODO: Replace with actual admin user ID
+        const newLock: MonthLock = {
+          lock_id: Date.now() + Math.random(), // Temp ID
+          year,
+          month,
+          locked_at: new Date().toISOString(),
+          locked_by: mockAdminUserId
+        };
+        return [...currentLocks, newLock];
+      }
+    });
+  }, []);
 
-      // Optimistic update: remove lock
-      setLocks(prevLocks => prevLocks.filter(lock => lock.lock_id !== existingLock.lock_id));
-    } else {
-      // Month is currently unlocked - prepare CREATE
-      // Note: lockedByUserId should come from auth context in real implementation
-      const mockAdminUserId = 1; // TODO: Replace with actual admin user ID from auth context
+  /**
+   * Checks if there are uncommitted changes.
+   */
+  const hasChanges = useMemo(() => {
+    if (serverLocks.length !== pendingLocks.length) return true;
 
-      const newLockPayload = {
-        year,
-        month,
-        lockedByUserId: mockAdminUserId
-      };
+    // Check if every server lock is still in pending (by ID or month match for existing)
+    // Simpler: Check simply by month/year set comparison since we only care about "is locked" status
+    const serverSet = new Set(serverLocks.map(l => `${l.year}-${l.month}`));
+    const pendingSet = new Set(pendingLocks.map(l => `${l.year}-${l.month}`));
 
-      console.log('[MonthLock] Prepare CREATE:', {
-        operation: 'create',
-        payload: newLockPayload,
-        note: 'This will be sent to: POST /api/v1/month-locks'
-      });
-
-      // Optimistic update: add new lock
-      const newLock: MonthLock = {
-        lock_id: Date.now(), // Temporary ID until server responds
-        year,
-        month,
-        locked_at: new Date().toISOString(),
-        locked_by: mockAdminUserId
-      };
-
-      setLocks(prevLocks => [...prevLocks, newLock]);
+    if (serverSet.size !== pendingSet.size) return true;
+    for (const key of serverSet) {
+      if (!pendingSet.has(key)) return true;
     }
-  }, [locks]);
+    return false;
+  }, [serverLocks, pendingLocks]);
+
+  /**
+   * Commits all pending changes to the "server".
+   */
+  const saveChanges = useCallback(async () => {
+    // Calculate delta for API payload
+    const initialMonths = new Set(serverLocks.map(l => l.month));
+    const finalMonths = new Set(pendingLocks.map(l => l.month));
+
+    const toLock = [...finalMonths].filter(m => !initialMonths.has(m)).sort((a, b) => a - b);
+    const toUnlock = [...initialMonths].filter(m => !finalMonths.has(m)).sort((a, b) => a - b);
+
+    if (toLock.length === 0 && toUnlock.length === 0) return;
+
+    const payload = {
+      year,
+      operations: {
+        lock: toLock,
+        unlock: toUnlock
+      }
+    };
+
+    console.log('[MonthLock] Batch Update:', {
+      payload,
+      note: 'This will be sent to: POST /api/v1/month-locks/batch'
+    });
+
+    // Optimistically update "server" state to match pending
+    setServerLocks(pendingLocks);
+    // In a real app we would wait for API response here
+  }, [pendingLocks, serverLocks, year]);
+
+  /**
+   * Discards local changes and reverts to server state.
+   */
+  const discardChanges = useCallback(() => {
+    setPendingLocks(serverLocks);
+  }, [serverLocks]);
 
   return {
-    locks,
+    locks: pendingLocks, // UI should render pending state
     isLoading,
-    toggleLock
+    toggleLock,
+    saveChanges,
+    discardChanges,
+    hasChanges
   };
 }

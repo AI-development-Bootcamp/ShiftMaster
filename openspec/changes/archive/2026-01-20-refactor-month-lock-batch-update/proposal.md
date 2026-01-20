@@ -25,12 +25,11 @@ Change the Month Lock feature from an "instant save" model (where clicking a mon
 ### 2. `MonthLockModal` Component
 -   **Footer**: Add a footer section to the modal.
 -   **Save Button**:
-    -   Label: "שמור שינויים" (Save Changes).
-    -   Action: Calls `saveChanges()` and then closes the modal (or keeps open with success toast?). *Assumption: Close on save.*
-    -   State: Disabled if `!hasChanges`.
--   **Cancel Button**:
-    -   Label: "ביטול" (Cancel) or just use the "Close" (X) button logic.
-    -   Action: Closes the modal. Since state is local to the modal (via hook), closing effectively discards changes.
+    -   Label: "שמור" (Save).
+    -   Design: Standard button styles (identical to others), Centered in the footer.
+    -   Action: Calls `saveChanges()` and closes the modal.
+-   **Close Behavior**:
+    -   Clicking outside the modal or the 'X' button immediately closes the modal without saving (changes are discarded). No confirmation dialog.
 
 ### 3. API interaction (Mock)
 -   The current `console.log` in `toggleLock` will be moved to `saveChanges`.

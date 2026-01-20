@@ -15,8 +15,8 @@ We are moving from an optimistic, per-action persistence model to a transactiona
     -   `initialLocks` becomes `pendingLocks`.
 
 ### UX Considerations
--   **Discards**: Since the modal is transient, closing it without saving is an implicit discard. This is standard pattern for modals with "Save"/"Cancel" buttons.
--   **Feedback**: Loading state during "Save" is important if the API is slow.
+-   **Footer**: Single "Save" button, centered.
+-   **Discards**: Closing the modal (click outside / X) immediately discards changes without confirmation.
 
 ### API Schema (Mock)
 ```typescript
@@ -36,13 +36,7 @@ New keys to be added to `monthLocks` in `he.json`:
 {
   "monthLocks": {
     "actions": {
-        "save": "שמור שינויים",
-        "cancel": "ביטול",
-        "discard": "בטל שינויים"
-    },
-    "messages": {
-        "unsavedChanges": "ישנם שינויים שלא נשמרו",
-        "confirmDiscard": "האם אתה בטוח שברצונך לצאת? השינויים יאבדו."
+        "save": "שמור שינויים"
     }
 }
 ```
