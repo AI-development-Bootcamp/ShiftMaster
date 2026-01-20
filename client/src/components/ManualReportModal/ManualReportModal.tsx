@@ -95,18 +95,7 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
   // Mock data for selections
   const projectGroups: SelectionGroup[] = [
-    {
-      title: 'אברה',
-      items: ['פרויקט א', 'פרויקט ב', 'פרויקט ג']
-    },
-    {
-      title: 'חברת הייטק',
-      items: ['מערכת ניהול', 'אפליקציה מובייל', 'אתר אינטרנט']
-    },
-    {
-      title: 'לקוח פרטי',
-      items: ['יעוץ', 'פיתוח', 'תחזוקה']
-    }
+    
   ];
 
   const taskGroups: SelectionGroup[] = [
