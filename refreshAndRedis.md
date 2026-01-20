@@ -9,6 +9,7 @@
 ## CONTEXT
 
 ### Current State
+
 - **Access JWT**: Stored in localStorage, 24h expiry (configurable via JWT_EXPIRY env var)
 - **Backend**: Express + TypeScript, Supabase database, JWT-based auth
 - **Frontends**: Two separate applications (client PWA, admin web) with independent Redux stores
@@ -17,11 +18,13 @@
 - **Key Mismatch**: authSlice uses 'token' key, shared ApiClient reads 'auth_token' key
 
 ### Production Environment
+
 - **Redis**: Render Key Value (Redis) already provisioned
 - **Backend**: Receives REDIS_URL environment variable from Render
 - **Database**: Supabase PostgreSQL (users table with user_id, email, password_hash, role, active)
 
 ### Project Architecture
+
 - **Monorepo**: npm workspaces (server, client, admin, shared)
 - **Development**: Direct development (no Docker for app services), Docker Compose for Redis only
 - **API Convention**: `/api/v1` prefix, standardized response format
@@ -33,6 +36,7 @@
 ## HIGH-LEVEL GOALS
 
 ### 1. Local Redis Setup (Docker Compose)
+
 - Add `docker-compose.yml` in project root with Redis service (port 6379)
 - Add npm scripts to start/stop Redis: `npm run redis:start`, `npm run redis:stop`
 - Update `.env.example` with `REDIS_URL=redis://localhost:6379` for dev
@@ -40,6 +44,7 @@
 - Production uses Render's `REDIS_URL` environment variable (no code changes needed)
 
 ### 2. Secure Authentication Refactor
+
 - **Access Token (JWT)**: 15-minute expiry, stored in-memory only (never localStorage)
 - **Refresh Token**: Opaque random token (32 bytes), HttpOnly+Secure cookie
 - **Token Rotation**: New refresh token issued on each refresh, old one invalidated
@@ -66,6 +71,7 @@
 ```
 
 **Requirements**:
+
 - Use `ioredis` package (better TypeScript support than `redis`)
 - Singleton pattern (one connection per server process)
 - Graceful error handling (log errors, don't crash on Redis failures)
@@ -73,6 +79,7 @@
 - TTL: 30 days (2592000 seconds)
 
 **Add to** `server/src/config/env.ts`:
+
 ```typescript
 REDIS_URL: string; // Required in production, optional in dev
 ```
@@ -86,7 +93,9 @@ REDIS_URL: string; // Required in production, optional in dev
 Update existing routes, add new ones:
 
 #### POST /api/v1/auth/login
+
 **Update existing endpoint**:
+
 - Keep current validation (credentials, source: 'admin' | 'client', role checks)
 - Reduce access token expiry: 15 minutes (update JWT_EXPIRY default in .env)
 - Generate refresh token: 32 bytes random (crypto.randomBytes)
@@ -116,7 +125,9 @@ Update existing routes, add new ones:
   ```
 
 #### POST /api/v1/auth/refresh (new endpoint)
+
 **Create new endpoint**:
+
 - Read cookies: `refreshToken`, `refreshSessionId`
 - Validate both present, return 401 if missing
 - Fetch session from Redis: `refresh:${refreshSessionId}`
@@ -138,13 +149,16 @@ Update existing routes, add new ones:
 - Include `credentials: true` in CORS for this endpoint
 
 #### POST /api/v1/auth/logout (new endpoint)
+
 **Create new endpoint**:
+
 - Read `refreshSessionId` cookie
 - Delete session from Redis: `DEL refresh:${sessionSessionId}`
 - Clear cookies: `refreshToken`, `refreshSessionId` (set maxAge: 0)
 - Return 204 No Content
 
 **Error Codes** (add to existing error handling):
+
 - `TOKEN_REUSE_DETECTED`: Refresh token was already used (possible theft)
 - `REFRESH_SESSION_NOT_FOUND`: Session expired or invalid
 - `REFRESH_TOKEN_INVALID`: Token doesn't match session
@@ -156,6 +170,7 @@ Update existing routes, add new ones:
 **File**: `server/src/services/authService.ts`
 
 Add new functions:
+
 - `createRefreshSession(userId, userAgent?, ipAddress?): Promise<{ sessionId, refreshToken }>`
 - `validateRefreshSession(sessionId, refreshToken): Promise<{ userId, valid }>`
 - `rotateRefreshToken(sessionId): Promise<{ refreshToken }>`
@@ -168,19 +183,23 @@ Use Redis client helpers from `server/src/db/redis.ts`.
 ### D. Security & Utilities
 
 **Cookies** (`server/src/utils/cookies.ts` - new file):
+
 - Helper to set/clear refresh cookies consistently
 - Environment-aware Secure flag (true in prod, false in local dev)
 - Domain configuration for production
 
 **Hashing** (`server/src/utils/crypto.ts` - new file):
+
 - SHA-256 hashing for refresh tokens
 - Random token generation (crypto.randomBytes)
 
 **JWT Updates** (`server/src/utils/jwt.ts`):
+
 - Update default expiry to 15 minutes
 - Keep payload structure: `{ userId, email, role }`
 
 **Middleware** (`server/src/middleware/auth.ts`):
+
 - Keep existing `isAuthenticated` and `isAdmin` middleware (unchanged)
 - Add `requireRefreshCookie` middleware for refresh endpoint
 
@@ -191,11 +210,12 @@ Use Redis client helpers from `server/src/db/redis.ts`.
 **File**: `server/src/app.ts` (or wherever CORS is configured)
 
 Update CORS settings:
+
 ```typescript
 cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:3000',
   credentials: true, // CRITICAL: Allow cookies
-})
+});
 ```
 
 Ensure frontend URLs are whitelisted (both client and admin origins).
@@ -205,6 +225,7 @@ Ensure frontend URLs are whitelisted (both client and admin origins).
 ### G. Environment Variables
 
 Update `server/.env.example`:
+
 ```bash
 # Existing
 JWT_SECRET=your-secret-key-here
@@ -223,6 +244,7 @@ FRONTEND_URL=http://localhost:3000  # Comma-separated for multiple origins
 ## FRONTEND REQUIREMENTS
 
 ### Overview
+
 - **Two frontends**: Client (mobile PWA) and Admin (web) - update BOTH identically
 - **Remove localStorage**: Access tokens stored in-memory only
 - **Fix key mismatch**: Align authSlice and shared ApiClient to use same token storage
@@ -240,12 +262,17 @@ let accessToken: string | null = null;
 
 export const tokenStore = {
   getAccessToken: () => accessToken,
-  setAccessToken: (token: string | null) => { accessToken = token; },
-  clearAccessToken: () => { accessToken = null; },
+  setAccessToken: (token: string | null) => {
+    accessToken = token;
+  },
+  clearAccessToken: () => {
+    accessToken = null;
+  },
 };
 ```
 
 **Why in-memory?**
+
 - XSS cannot steal token from memory
 - Refresh token in HttpOnly cookie protects against XSS
 - Token lost on page reload → triggers refresh flow automatically
@@ -258,6 +285,7 @@ export const tokenStore = {
 **Admin**: `admin/src/store/slices/authSlice.ts`
 
 Changes:
+
 1. **Remove** `token` from Redux state (keep `user`, `isAuthenticated`, `loading`, `error`)
 2. **Remove** localStorage.setItem/getItem for token
 3. **Update** login thunk:
@@ -281,10 +309,12 @@ Changes:
 **Shared**: `shared/src/api/client.ts`
 
 Current issues:
+
 - Uses localStorage.getItem('auth_token') (mismatched key)
 - No refresh-on-401 logic
 
 Changes:
+
 1. **Import tokenStore** (needs to be passed as dependency or use separate client/admin token stores)
 2. **Request Interceptor**:
    - Read token from tokenStore.getAccessToken()
@@ -306,6 +336,7 @@ Changes:
 **Admin**: `admin/src/pages/LoginPage/LoginPage.tsx`
 
 Changes:
+
 - No changes needed (authSlice handles token storage internally)
 - Ensure `credentials: 'include'` in fetch options (for cookies)
 
@@ -317,6 +348,7 @@ Changes:
 **Admin**: `admin/src/App.tsx`
 
 Add on mount:
+
 ```typescript
 useEffect(() => {
   dispatch(initializeAuth()); // Calls /auth/refresh silently
@@ -330,7 +362,9 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ## DELIVERABLES
 
 ### Backend Files (server/)
+
 **New Files**:
+
 - `src/db/redis.ts` - Redis client singleton
 - `src/utils/cookies.ts` - Cookie helpers
 - `src/utils/crypto.ts` - Hashing and token generation
@@ -338,6 +372,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 - `src/routes/auth.ts` - Add /refresh and /logout endpoints
 
 **Modified Files**:
+
 - `src/config/env.ts` - Add REDIS_URL validation
 - `src/controllers/authController.ts` - Update login, add refresh/logout
 - `src/utils/jwt.ts` - Update default expiry to 15m
@@ -345,6 +380,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 - `.env.example` - Add REDIS_URL, update JWT_EXPIRY
 
 **Tests**:
+
 - `src/services/authService.test.ts` - Test refresh session CRUD
 - `src/routes/auth.test.ts` - Integration tests for refresh, logout, rotation, reuse detection
 
@@ -353,18 +389,22 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ### Frontend Files (client/ and admin/)
 
 **New Files** (both frontends):
+
 - `src/auth/tokenStore.ts` - In-memory token storage
 - `src/api/client.ts` - Frontend-specific API client (optional, or modify shared)
 
 **Modified Files** (both frontends):
+
 - `src/store/slices/authSlice.ts` - Remove token from state, use tokenStore
 - `src/App.tsx` - Initialize auth on mount
 - `src/pages/Login/*.tsx` - Ensure credentials: 'include'
 
 **Shared**:
+
 - `shared/src/api/client.ts` - Add refresh-on-401 interceptor, use tokenStore
 
 **Tests**:
+
 - `src/store/slices/authSlice.test.ts` - Test initializeAuth refresh flow
 - `src/api/client.test.ts` - Test 401 retry with refresh
 
@@ -373,12 +413,14 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ### Infrastructure
 
 **New Files**:
+
 - `docker-compose.yml` - Redis service for local development
 - Root `package.json` - Add Redis npm scripts (redis:start, redis:stop, redis:logs)
 
 ### Documentation
 
 **Update**:
+
 - `README.md` - Add Docker Compose Redis setup instructions
 - `openspec/project.md` - Document new auth endpoints (/refresh, /logout), refresh_sessions schema (if used)
 
@@ -389,6 +431,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ### Backend Tests (Colocated)
 
 **`server/src/services/authService.test.ts`**:
+
 - ✓ createRefreshSession creates session in Redis with TTL
 - ✓ validateRefreshSession succeeds with valid token
 - ✓ validateRefreshSession fails with wrong token (reuse detection)
@@ -396,6 +439,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 - ✓ revokeRefreshSession deletes from Redis
 
 **`server/src/routes/auth.test.ts`**:
+
 - ✓ POST /auth/login sets refresh cookies and returns access token
 - ✓ POST /auth/refresh returns new access token with valid cookies
 - ✓ POST /auth/refresh rotates token (old token fails next time)
@@ -408,11 +452,13 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ### Frontend Tests (Colocated)
 
 **`client/src/store/slices/authSlice.test.ts`**:
+
 - ✓ initializeAuth calls /auth/refresh and sets isAuthenticated on success
 - ✓ initializeAuth clears auth state on refresh failure
 - ✓ logout calls /auth/logout and clears tokenStore
 
 **`client/src/api/client.test.ts`** (or shared):
+
 - ✓ API client retries 401 with /auth/refresh
 - ✓ Single-flight refresh prevents multiple simultaneous refreshes
 
@@ -421,6 +467,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ## IMPLEMENTATION NOTES
 
 ### ShiftMaster Project Conventions
+
 1. **TypeScript Strict**: All code must pass strict type checking
 2. **Code Style**: 2-space indent, single quotes, semicolons (ESLint + Prettier)
 3. **Error Handling**: Use project's error code system (INVALID_CREDENTIALS, TOKEN_REUSE_DETECTED, etc.)
@@ -431,6 +478,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 8. **Documentation**: Update project.md with new endpoints and schemas
 
 ### Security Best Practices
+
 - Never log tokens (access or refresh)
 - Hash refresh tokens before storing (SHA-256)
 - Use crypto.randomBytes (not Math.random) for token generation
@@ -441,6 +489,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 - Reuse detection catches stolen tokens
 
 ### Migration Strategy
+
 1. **Phase 1**: Add Redis client and refresh endpoints (backward compatible)
 2. **Phase 2**: Update frontend to use refresh flow (users can still use old flow)
 3. **Phase 3**: Reduce access token expiry to 15min (forces refresh adoption)
@@ -449,6 +498,7 @@ If refresh fails, user sees login page. If succeeds, user bypasses login.
 ### Redis Setup (Docker Compose)
 
 **Create `docker-compose.yml` in project root**:
+
 ```yaml
 version: '3.8'
 
@@ -472,6 +522,7 @@ volumes:
 ```
 
 **Add npm scripts to root `package.json`**:
+
 ```json
 {
   "scripts": {
@@ -483,6 +534,7 @@ volumes:
 ```
 
 **Usage**:
+
 ```bash
 # Start Redis in background
 npm run redis:start
@@ -497,6 +549,7 @@ npm run redis:stop
 ```
 
 **First-time setup**:
+
 1. Install Docker Desktop (if not installed)
 2. Run `npm run redis:start`
 3. Redis will be available at `localhost:6379`
@@ -507,26 +560,31 @@ npm run redis:stop
 ## QUESTIONS & CONSIDERATIONS
 
 ### Q: Why not store refresh tokens in database?
+
 A: Redis is faster and has built-in TTL. Database is optional for audit trails but adds complexity.
 
 ### Q: Why 15-minute access tokens?
+
 A: Balance between security (short window) and UX (not too many refreshes). Adjust if needed.
 
 ### Q: What if Redis goes down?
+
 A: New logins fail, existing access tokens work until expiry. Consider fallback to database sessions for critical systems.
 
 ### Q: How to handle multiple sessions (e.g., mobile + web)?
+
 A: Current design: one session per login. Future: Store multiple sessions per user, add session management UI.
 
 ### Q: Should we revoke all sessions on password change?
+
 A: Yes, good practice. Add `revokeAllUserSessions(userId)` to authService.
 
 ---
 
 ## ACCEPTANCE CRITERIA
 
-- [ ] Docker Compose Redis setup working (`npm run redis:start`)
-- [ ] Redis client connects successfully in local dev and production
+- [x] Docker Compose Redis setup working (`npm run redis:start`)
+- [x] Redis client connects successfully in local dev and production
 - [ ] POST /api/v1/auth/login sets HttpOnly refresh cookies
 - [ ] POST /api/v1/auth/refresh returns new access token with valid cookies
 - [ ] POST /api/v1/auth/refresh rotates refresh token (old one invalid)
