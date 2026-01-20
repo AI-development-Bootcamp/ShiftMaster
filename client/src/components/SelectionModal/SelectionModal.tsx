@@ -16,7 +16,13 @@ interface SelectionModalProps {
   onSelect: (value: string) => void;
 }
 
-function SelectionModal({ isOpen, onClose, type, groups, onSelect }: SelectionModalProps) {
+function SelectionModal({
+  isOpen,
+  onClose,
+  type,
+  groups,
+  onSelect,
+}: SelectionModalProps) {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -66,9 +72,16 @@ function SelectionModal({ isOpen, onClose, type, groups, onSelect }: SelectionMo
 
   return (
     <div className="selection-modal-overlay" onClick={handleClose}>
-      <div className="selection-modal-content" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="selection-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="selection-modal-header">
-          <button className="selection-modal-close-btn" onClick={handleClose} aria-label="סגור">
+          <button
+            className="selection-modal-close-btn"
+            onClick={handleClose}
+            aria-label="סגור"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
                 d="M18 6L6 18M6 6L18 18"
@@ -96,7 +109,12 @@ function SelectionModal({ isOpen, onClose, type, groups, onSelect }: SelectionMo
                     <span className="selection-item-text">{item}</span>
                     {selectedValue === item && (
                       <span className="selection-item-check">
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                        >
                           <circle cx="10" cy="10" r="10" fill="#3B82F6" />
                           <path
                             d="M6 10L9 13L14 7"

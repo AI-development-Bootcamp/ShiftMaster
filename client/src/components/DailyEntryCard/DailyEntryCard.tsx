@@ -3,7 +3,12 @@ import StatusBadge, { EntryStatus } from '../StatusBadge/StatusBadge';
 import TimeEntryItem, { TimeEntry } from '../TimeEntryItem/TimeEntryItem';
 import './DailyEntryCard.css';
 
-export type AbsenceType = 'vacation-half' | 'vacation-full' | 'sick' | 'reserves' | null;
+export type AbsenceType =
+  | 'vacation-half'
+  | 'vacation-full'
+  | 'sick'
+  | 'reserves'
+  | null;
 
 export interface DailyEntry {
   id: string;
@@ -54,7 +59,9 @@ function DailyEntryCard({
   const panelId = `${entry.id}-panel`;
 
   return (
-    <div className={`daily-entry-card ${expanded ? 'daily-entry-card--expanded' : ''}`}>
+    <div
+      className={`daily-entry-card ${expanded ? 'daily-entry-card--expanded' : ''}`}
+    >
       <button
         type="button"
         className="entry-header"
@@ -90,8 +97,18 @@ function DailyEntryCard({
               strokeWidth="1.5"
             />
             <path d="M2 7H16" stroke="currentColor" strokeWidth="1.5" />
-            <path d="M6 1V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-            <path d="M12 1V4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <path
+              d="M6 1V4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+            <path
+              d="M12 1V4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </span>
       </button>
@@ -107,7 +124,13 @@ function DailyEntryCard({
               />
             ))}
           </div>
-          <button className="add-report-link" onClick={handleAddReport}>
+          <button
+            className="add-report-link"
+            onClick={handleAddReport}
+            disabled={!onAddReport}
+            aria-disabled={!onAddReport}
+            title={!onAddReport ? 'תכונה זו תהיה זמינה בקרוב' : undefined}
+          >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
                 d="M7 1V13M1 7H13"
@@ -123,7 +146,13 @@ function DailyEntryCard({
 
       {expanded && entry.timeEntries.length === 0 && (
         <div id={panelId} className="entry-content entry-content--empty">
-          <button className="add-report-link" onClick={handleAddReport}>
+          <button
+            className="add-report-link"
+            onClick={handleAddReport}
+            disabled={!onAddReport}
+            aria-disabled={!onAddReport}
+            title={!onAddReport ? 'תכונה זו תהיה זמינה בקרוב' : undefined}
+          >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path
                 d="M7 1V13M1 7H13"

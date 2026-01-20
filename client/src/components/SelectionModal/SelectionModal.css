@@ -70,7 +70,10 @@
   color: #666;
   padding: 0;
   border-radius: 6px;
-  transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+  transition:
+    color 0.2s ease,
+    box-shadow 0.2s ease,
+    outline 0.2s ease;
 }
 
 .selection-modal-close-btn:hover {
@@ -161,7 +164,7 @@
 }
 
 .selection-item--selected .selection-item-text {
-  color: #3B82F6;
+  color: #3b82f6;
   font-weight: 600;
 }
 
@@ -193,7 +196,11 @@
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease,
+    box-shadow 0.2s ease,
+    outline 0.2s ease;
 }
 
 .selection-modal-confirm-btn:hover:not(:disabled) {

@@ -115,9 +115,16 @@
   direction: rtl;
 }
 
-.add-report-link:hover {
+.add-report-link:hover:not(:disabled) {
   background-color: #eff6ff;
   border-color: #3b82f6;
+}
+
+.add-report-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: #9ca3af;
+  border-color: #e5e7eb;
 }
 
 /* Animation for expand/collapse */

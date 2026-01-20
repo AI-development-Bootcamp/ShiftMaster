@@ -7,11 +7,16 @@ interface TimerDisplayProps {
 
 function TimerDisplay({ totalSeconds }: TimerDisplayProps) {
   // Validate and sanitize totalSeconds
-  const sanitized = Number.isFinite(+totalSeconds) ? Math.floor(+totalSeconds) : NaN;
+  const sanitized = Number.isFinite(+totalSeconds)
+    ? Math.floor(+totalSeconds)
+    : NaN;
   let sanitizedSeconds = 0;
 
   if (Number.isNaN(sanitized) || typeof totalSeconds !== 'number') {
-    console.error('[TD_INVALID_INPUT] TimerDisplay received invalid totalSeconds:', totalSeconds);
+    console.error(
+      '[TD_INVALID_INPUT] TimerDisplay received invalid totalSeconds:',
+      totalSeconds
+    );
     sanitizedSeconds = 0;
   } else if (sanitized < 0) {
     sanitizedSeconds = 0;

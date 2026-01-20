@@ -1,11 +1,20 @@
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './ManualReportModal.css';
-import SelectionModal, { SelectionType, SelectionGroup } from '../SelectionModal/SelectionModal';
+import SelectionModal, {
+  SelectionType,
+  SelectionGroup,
+} from '../SelectionModal/SelectionModal';
 
 interface ManualReportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentDayAbsenceType?: 'vacation-half' | 'vacation-full' | 'sick' | 'reserves' | null;
+  currentDayAbsenceType?:
+    | 'vacation-half'
+    | 'vacation-full'
+    | 'sick'
+    | 'reserves'
+    | null;
+  selectedDate?: Date;
 }
 
 interface TimeValue {
@@ -36,37 +45,88 @@ interface DateValue {
   year: number;
 }
 
+interface FileUploadError {
+  code: 'FILE_TOO_LARGE' | 'UNSUPPORTED_TYPE' | null;
+  message?: string;
+}
+
 type TimePickerItem = number | 'AM' | 'PM';
 
-function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: ManualReportModalProps) {
+function ManualReportModal({
+  isOpen,
+  onClose,
+  currentDayAbsenceType = null,
+  selectedDate = new Date(),
+}: ManualReportModalProps) {
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
-  const [editingField, setEditingField] = useState<'entry' | 'exit' | string | null>(null);
-  const [entryTime, setEntryTime] = useState<TimeValue>({ hours: 9, minutes: 41, period: 'AM' });
-  const [exitTime, setExitTime] = useState<TimeValue>({ hours: 9, minutes: 4, period: 'AM' });
+  const [editingField, setEditingField] = useState<
+    'entry' | 'exit' | string | null
+  >(null);
+  const [entryTime, setEntryTime] = useState<TimeValue>({
+    hours: 9,
+    minutes: 41,
+    period: 'AM',
+  });
+  const [exitTime, setExitTime] = useState<TimeValue>({
+    hours: 9,
+    minutes: 4,
+    period: 'AM',
+  });
   const [projectEntries, setProjectEntries] = useState<ProjectEntry[]>([]);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [timeErrors, setTimeErrors] = useState<Record<string, string>>({});
   const [showMissingHoursAlert, setShowMissingHoursAlert] = useState(false);
-  const [selectionModal, setSelectionModal] = useState<{ isOpen: boolean; type: SelectionType | null; projectId: string | null }>({
+  const [selectionModal, setSelectionModal] = useState<{
+    isOpen: boolean;
+    type: SelectionType | null;
+    projectId: string | null;
+  }>({
     isOpen: false,
     type: null,
     projectId: null,
   });
 
   // Absence report state
-  const [selectedAbsenceType, setSelectedAbsenceType] = useState<AbsenceType | null>(null);
+  const [selectedAbsenceType, setSelectedAbsenceType] =
+    useState<AbsenceType | null>(null);
   const [isAbsenceDropdownOpen, setIsAbsenceDropdownOpen] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [fileUploadError, setFileUploadError] = useState<FileUploadError>({
+    code: null,
+  });
   const [isMultiDayView, setIsMultiDayView] = useState(false);
-  const [startDate, setStartDate] = useState<DateValue>({ day: 4, month: 9, year: 2025 });
-  const [endDate, setEndDate] = useState<DateValue>({ day: 8, month: 9, year: 2025 });
-  const [openCalendar, setOpenCalendar] = useState<'start' | 'end' | null>(null);
+  const [startDate, setStartDate] = useState<DateValue>({
+    day: 4,
+    month: 9,
+    year: 2025,
+  });
+  const [endDate, setEndDate] = useState<DateValue>({
+    day: 8,
+    month: 9,
+    year: 2025,
+  });
+  const [openCalendar, setOpenCalendar] = useState<'start' | 'end' | null>(
+    null
+  );
   const [calendarMonth, setCalendarMonth] = useState(9);
   const [calendarYear, setCalendarYear] = useState(2025);
 
-  const hoursRef = useRef<HTMLDivElement>(null);
-  const minutesRef = useRef<HTMLDivElement>(null);
-  const periodRef = useRef<HTMLDivElement>(null);
+  const entryHoursRef = useRef<HTMLDivElement>(null);
+  const entryMinutesRef = useRef<HTMLDivElement>(null);
+  const entryPeriodRef = useRef<HTMLDivElement>(null);
+  const exitHoursRef = useRef<HTMLDivElement>(null);
+  const exitMinutesRef = useRef<HTMLDivElement>(null);
+  const exitPeriodRef = useRef<HTMLDivElement>(null);
+  const projectRefsMap = useRef<
+    Map<
+      string,
+      {
+        hours: React.RefObject<HTMLDivElement>;
+        minutes: React.RefObject<HTMLDivElement>;
+        period: React.RefObject<HTMLDivElement>;
+      }
+    >
+  >(new Map());
   const fileInputRef = useRef<HTMLInputElement>(null);
   const absenceDropdownRef = useRef<HTMLDivElement>(null);
 
@@ -80,36 +140,72 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
   // Hebrew month names (abbreviated)
   const hebrewMonthsShort = [
-    'ינו\'', 'פבר\'', 'מרץ', 'אפר\'', 'מאי', 'יוני',
-    'יולי', 'אוג\'', 'ספט\'', 'אוק\'', 'נוב\'', 'דצמ\''
+    "ינו'",
+    "פבר'",
+    'מרץ',
+    "אפר'",
+    'מאי',
+    'יוני',
+    'יולי',
+    "אוג'",
+    "ספט'",
+    "אוק'",
+    "נוב'",
+    "דצמ'",
   ];
 
   // Hebrew month names (full)
   const hebrewMonthsFull = [
-    'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
-    'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+    'ינואר',
+    'פברואר',
+    'מרץ',
+    'אפריל',
+    'מאי',
+    'יוני',
+    'יולי',
+    'אוגוסט',
+    'ספטמבר',
+    'אוקטובר',
+    'נובמבר',
+    'דצמבר',
   ];
 
   // Hebrew day names (full for calendar)
-  const hebrewDayNamesFull = ['יום א\'', 'יום ב\'', 'יום ג\'', 'יום ד\'', 'יום ה\'', 'יום ו\'', 'שבת'];
+  const hebrewDayNamesFull = [
+    "יום א'",
+    "יום ב'",
+    "יום ג'",
+    "יום ד'",
+    "יום ה'",
+    "יום ו'",
+    'שבת',
+  ];
+
+  // Format date display (e.g., "יום ב' 06/10/25")
+  const formatDateDisplay = (date: Date): string => {
+    const dayOfWeek = date.getDay();
+    const dayName = hebrewDayNamesFull[dayOfWeek];
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear().toString().slice(-2);
+    return `${dayName} ${day}/${month}/${year}`;
+  };
 
   // Mock data for selections
-  const projectGroups: SelectionGroup[] = [
-    
-  ];
+  const projectGroups: SelectionGroup[] = [];
 
   const taskGroups: SelectionGroup[] = [
     {
       title: 'משימות',
-      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review']
-    }
+      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review'],
+    },
   ];
 
   const locationGroups: SelectionGroup[] = [
     {
       title: 'מיקום',
-      items: ['משרד', 'עבודה מהבית', 'אצל לקוח', 'בחוץ']
-    }
+      items: ['משרד', 'עבודה מהבית', 'אצל לקוח', 'בחוץ'],
+    },
   ];
 
   // Generate hours (1-12), minutes (0-59), and periods (AM/PM)
@@ -155,7 +251,10 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
   };
 
   // Generate calendar days array
-  const generateCalendarDays = (month: number, year: number): (number | null)[] => {
+  const generateCalendarDays = (
+    month: number,
+    year: number
+  ): (number | null)[] => {
     const daysInMonth = getDaysInMonth(month, year);
     const firstDay = getFirstDayOfMonth(month, year);
     const days: (number | null)[] = [];
@@ -246,17 +345,39 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
     const file = event.target.files?.[0];
     if (!file) return;
 
+    // Clear any previous errors
+    setFileUploadError({ code: null });
+
     // Check file size (10MB max)
     const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     if (file.size > maxSize) {
-      alert('הקובץ גדול מדי. גודל מקסימלי: 10MB');
+      setFileUploadError({
+        code: 'FILE_TOO_LARGE',
+        message: 'הקובץ גדול מדי. גודל מקסימלי: 10MB',
+      });
+      setUploadedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
 
     // Check file type
-    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    const allowedTypes = [
+      'image/jpeg',
+      'image/jpg',
+      'image/png',
+      'application/pdf',
+    ];
     if (!allowedTypes.includes(file.type)) {
-      alert('סוג קובץ לא נתמך. אנא העלה JPG, PNG או PDF');
+      setFileUploadError({
+        code: 'UNSUPPORTED_TYPE',
+        message: 'סוג קובץ לא נתמך. אנא העלה JPG, PNG או PDF',
+      });
+      setUploadedFile(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
       return;
     }
 
@@ -266,15 +387,19 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
   // Handle file remove
   const handleRemoveFile = () => {
     setUploadedFile(null);
+    setFileUploadError({ code: null });
     // Reset the file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
   };
 
-
   // Validate project times
-  const validateProjectTime = (projectId: string, startTime: TimeValue, endTime: TimeValue) => {
+  const validateProjectTime = (
+    projectId: string,
+    startTime: TimeValue,
+    endTime: TimeValue
+  ) => {
     const startMinutes = timeToMinutes(startTime);
     const endMinutes = timeToMinutes(endTime);
 
@@ -292,11 +417,11 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
   // Calculate total hours from all project entries
   const calculateTotalHours = (): number => {
     let totalMinutes = 0;
-    projectEntries.forEach(project => {
+    projectEntries.forEach((project) => {
       const startMinutes = timeToMinutes(project.startTime);
       const endMinutes = timeToMinutes(project.endTime);
       if (endMinutes > startMinutes) {
-        totalMinutes += (endMinutes - startMinutes);
+        totalMinutes += endMinutes - startMinutes;
       }
     });
     return Math.round((totalMinutes / 60) * 10) / 10; // Round to 1 decimal
@@ -329,7 +454,7 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
       console.log('Saving work data:', {
         entryTime,
         exitTime,
-        projectEntries
+        projectEntries,
       });
     } else {
       // Absence tab
@@ -339,7 +464,7 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
         uploadedFile,
         isMultiDayView,
         startDate,
-        endDate
+        endDate,
       });
     }
 
@@ -360,7 +485,7 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
     console.log('Saving data:', {
       entryTime,
       exitTime,
-      projectEntries
+      projectEntries,
     });
     onClose();
   };
@@ -381,9 +506,11 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
   // Update project description
   const handleDescriptionChange = (projectId: string, description: string) => {
-    setProjectEntries(projectEntries.map(p =>
-      p.id === projectId ? { ...p, description } : p
-    ));
+    setProjectEntries(
+      projectEntries.map((p) =>
+        p.id === projectId ? { ...p, description } : p
+      )
+    );
   };
 
   // Delete project with confirmation
@@ -393,7 +520,11 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
   const confirmDelete = () => {
     if (deleteConfirmId) {
-      setProjectEntries(projectEntries.filter(p => p.id !== deleteConfirmId));
+      setProjectEntries(projectEntries.filter((p) => p.id !== deleteConfirmId));
+      setTimeErrors((prev) => {
+        const { [deleteConfirmId]: _removed, ...rest } = prev;
+        return rest;
+      });
       setDeleteConfirmId(null);
     }
   };
@@ -419,12 +550,14 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
     const fieldType = selectionModal.type;
     const projectId = selectionModal.projectId;
 
-    setProjectEntries(projectEntries.map(p => {
-      if (p.id === projectId) {
-        return { ...p, [fieldType]: value };
-      }
-      return p;
-    }));
+    setProjectEntries(
+      projectEntries.map((p) => {
+        if (p.id === projectId) {
+          return { ...p, [fieldType]: value };
+        }
+        return p;
+      })
+    );
   };
 
   // Get current selection groups based on type
@@ -441,13 +574,52 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
     }
   };
 
+  // Get current refs for the editing field
+  const getCurrentRefs = useCallback((field: string) => {
+    if (field === 'entry') {
+      return {
+        hours: entryHoursRef,
+        minutes: entryMinutesRef,
+        period: entryPeriodRef,
+      };
+    }
+    if (field === 'exit') {
+      return {
+        hours: exitHoursRef,
+        minutes: exitMinutesRef,
+        period: exitPeriodRef,
+      };
+    }
+    if (field.startsWith('project-')) {
+      const [, projectId, timeField] = field.split('-');
+      const key = `${projectId}-${timeField}`;
+
+      if (!projectRefsMap.current.has(key)) {
+        projectRefsMap.current.set(key, {
+          hours: { current: null },
+          minutes: { current: null },
+          period: { current: null },
+        });
+      }
+      return projectRefsMap.current.get(key)!;
+    }
+    return {
+      hours: entryHoursRef,
+      minutes: entryMinutesRef,
+      period: entryPeriodRef,
+    };
+  }, []);
+
   // Get current time value being edited
   const getCurrentTime = useCallback((): TimeValue => {
     if (editingField === 'entry') return entryTime;
     if (editingField === 'exit') return exitTime;
-    if (typeof editingField === 'string' && editingField.startsWith('project-')) {
+    if (
+      typeof editingField === 'string' &&
+      editingField.startsWith('project-')
+    ) {
       const [, projectId, field] = editingField.split('-');
-      const project = projectEntries.find(p => p.id === projectId);
+      const project = projectEntries.find((p) => p.id === projectId);
       if (project) {
         return field === 'start' ? project.startTime : project.endTime;
       }
@@ -461,22 +633,31 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
       setEntryTime(newTime);
     } else if (editingField === 'exit') {
       setExitTime(newTime);
-    } else if (typeof editingField === 'string' && editingField.startsWith('project-')) {
+    } else if (
+      typeof editingField === 'string' &&
+      editingField.startsWith('project-')
+    ) {
       const [, projectId, field] = editingField.split('-');
-      setProjectEntries(projectEntries.map(p => {
-        if (p.id === projectId) {
-          const updatedProject = {
-            ...p,
-            [field === 'start' ? 'startTime' : 'endTime']: newTime
-          };
-          // Validate after update
-          setTimeout(() => {
-            validateProjectTime(projectId, updatedProject.startTime, updatedProject.endTime);
-          }, 0);
-          return updatedProject;
-        }
-        return p;
-      }));
+      setProjectEntries(
+        projectEntries.map((p) => {
+          if (p.id === projectId) {
+            const updatedProject = {
+              ...p,
+              [field === 'start' ? 'startTime' : 'endTime']: newTime,
+            };
+            // Validate after update
+            setTimeout(() => {
+              validateProjectTime(
+                projectId,
+                updatedProject.startTime,
+                updatedProject.endTime
+              );
+            }, 0);
+            return updatedProject;
+          }
+          return p;
+        })
+      );
     }
   };
 
@@ -484,20 +665,21 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
   useEffect(() => {
     if (editingField) {
       const currentTime = getCurrentTime();
+      const refs = getCurrentRefs(editingField);
 
-      if (hoursRef.current) {
+      if (refs.hours.current) {
         const hourIndex = hours.indexOf(currentTime.hours);
-        hoursRef.current.scrollTop = hourIndex * 40;
+        refs.hours.current.scrollTop = hourIndex * 40;
       }
-      if (minutesRef.current) {
-        minutesRef.current.scrollTop = currentTime.minutes * 40;
+      if (refs.minutes.current) {
+        refs.minutes.current.scrollTop = currentTime.minutes * 40;
       }
-      if (periodRef.current) {
+      if (refs.period.current) {
         const periodIndex = periods.indexOf(currentTime.period);
-        periodRef.current.scrollTop = periodIndex * 40;
+        refs.period.current.scrollTop = periodIndex * 40;
       }
     }
-  }, [editingField, getCurrentTime, hours, periods]);
+  }, [editingField, getCurrentTime, getCurrentRefs, hours, periods]);
 
   // Handle scroll to update selected time
   const handleScroll = (
@@ -516,10 +698,22 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
     if (field === 'hours' && currentTime.hours !== items[clampedIndex]) {
       setCurrentTime({ ...currentTime, hours: items[clampedIndex] as number });
-    } else if (field === 'minutes' && currentTime.minutes !== items[clampedIndex]) {
-      setCurrentTime({ ...currentTime, minutes: items[clampedIndex] as number });
-    } else if (field === 'period' && currentTime.period !== items[clampedIndex]) {
-      setCurrentTime({ ...currentTime, period: items[clampedIndex] as 'AM' | 'PM' });
+    } else if (
+      field === 'minutes' &&
+      currentTime.minutes !== items[clampedIndex]
+    ) {
+      setCurrentTime({
+        ...currentTime,
+        minutes: items[clampedIndex] as number,
+      });
+    } else if (
+      field === 'period' &&
+      currentTime.period !== items[clampedIndex]
+    ) {
+      setCurrentTime({
+        ...currentTime,
+        period: items[clampedIndex] as 'AM' | 'PM',
+      });
     }
   };
 
@@ -538,7 +732,10 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
     // Determine direction: positive deltaY = scroll down, negative = scroll up
     const direction = e.deltaY > 0 ? 1 : -1;
-    const newIndex = Math.max(0, Math.min(currentIndex + direction, items.length - 1));
+    const newIndex = Math.max(
+      0,
+      Math.min(currentIndex + direction, items.length - 1)
+    );
 
     ref.current.scrollTop = newIndex * itemHeight;
   };
@@ -555,7 +752,7 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
 
     ref.current.scrollTo({
       top: targetScroll,
-      behavior: 'smooth'
+      behavior: 'smooth',
     });
   };
 
@@ -593,7 +790,11 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <button className="modal-close-btn" onClick={onClose} aria-label="סגור">
+          <button
+            className="modal-close-btn"
+            onClick={onClose}
+            aria-label="סגור"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
               <path
                 d="M18 6L6 18M6 6L18 18"
@@ -627,396 +828,613 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
           {activeTab === 'work' && (
             <>
               <div className="info-row">
-            <div className="date-display">יום ב&apos; 06/10/25</div>
-            <div className="daily-quota">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="#22C55E" strokeWidth="2" fill="none" />
-                <path d="M7 4V7.5M7 10H7.01" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" />
-              </svg>
-              <span>תקן יומי 9 שעות</span>
-            </div>
-          </div>
-
-          <div className="time-entries">
-            <div className="time-entry-row" onClick={() => handleTimeClick('entry')}>
-              <span className="time-label">כניסה</span>
-              <span className="time-value">{formatTime(entryTime.hours, entryTime.minutes)}</span>
-            </div>
-
-            {editingField === 'entry' && (
-              <div className="time-picker">
-                <div className="time-picker-columns" dir="ltr">
-                  <div
-                    className="time-picker-column"
-                    ref={hoursRef}
-                    onScroll={() => handleScroll(hoursRef, hours, 'hours')}
-                    onWheel={(e) => handleWheel(e, hoursRef, hours)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {hours.map((hour, index) => (
-                      <div
-                        key={hour}
-                        className={`time-picker-item ${entryTime.hours === hour ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(hoursRef, index)}
-                      >
-                        {hour}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
-                  <div
-                    className="time-picker-column"
-                    ref={minutesRef}
-                    onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
-                    onWheel={(e) => handleWheel(e, minutesRef, minutes)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {minutes.map((minute, index) => (
-                      <div
-                        key={minute}
-                        className={`time-picker-item ${entryTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(minutesRef, index)}
-                      >
-                        {minute.toString().padStart(2, '0')}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
-                  <div
-                    className="time-picker-column"
-                    ref={periodRef}
-                    onScroll={() => handleScroll(periodRef, periods, 'period')}
-                    onWheel={(e) => handleWheel(e, periodRef, periods)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {periods.map((period, index) => (
-                      <div
-                        key={period}
-                        className={`time-picker-item ${entryTime.period === period ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(periodRef, index)}
-                      >
-                        {period}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
+                <div className="date-display">
+                  {formatDateDisplay(selectedDate)}
                 </div>
-                <div className="time-picker-selection-indicator"></div>
-              </div>
-            )}
-
-            <div className="time-entry-row" onClick={() => handleTimeClick('exit')}>
-              <span className="time-label">יציאה</span>
-              <span className="time-value">{formatTime(exitTime.hours, exitTime.minutes)}</span>
-            </div>
-
-            {editingField === 'exit' && (
-              <div className="time-picker">
-                <div className="time-picker-columns" dir="ltr">
-                  <div
-                    className="time-picker-column"
-                    ref={hoursRef}
-                    onScroll={() => handleScroll(hoursRef, hours, 'hours')}
-                    onWheel={(e) => handleWheel(e, hoursRef, hours)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {hours.map((hour, index) => (
-                      <div
-                        key={hour}
-                        className={`time-picker-item ${exitTime.hours === hour ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(hoursRef, index)}
-                      >
-                        {hour}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
-                  <div
-                    className="time-picker-column"
-                    ref={minutesRef}
-                    onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
-                    onWheel={(e) => handleWheel(e, minutesRef, minutes)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {minutes.map((minute, index) => (
-                      <div
-                        key={minute}
-                        className={`time-picker-item ${exitTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(minutesRef, index)}
-                      >
-                        {minute.toString().padStart(2, '0')}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
-                  <div
-                    className="time-picker-column"
-                    ref={periodRef}
-                    onScroll={() => handleScroll(periodRef, periods, 'period')}
-                    onWheel={(e) => handleWheel(e, periodRef, periods)}
-                  >
-                    <div className="time-picker-padding"></div>
-                    {periods.map((period, index) => (
-                      <div
-                        key={period}
-                        className={`time-picker-item ${exitTime.period === period ? 'time-picker-item-selected' : ''}`}
-                        onClick={() => handleItemClick(periodRef, index)}
-                      >
-                        {period}
-                      </div>
-                    ))}
-                    <div className="time-picker-padding"></div>
-                  </div>
+                <div className="daily-quota">
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                    <circle
+                      cx="7"
+                      cy="7"
+                      r="6"
+                      stroke="#22C55E"
+                      strokeWidth="2"
+                      fill="none"
+                    />
+                    <path
+                      d="M7 4V7.5M7 10H7.01"
+                      stroke="#22C55E"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <span>תקן יומי 9 שעות</span>
                 </div>
-                <div className="time-picker-selection-indicator"></div>
               </div>
-            )}
-          </div>
 
-          {/* Project Entries Section */}
-          {projectEntries.length > 0 && (
-            <div className="project-entries-section">
-              <h3 className="section-title">דיווח פרוייקטים</h3>
-              {projectEntries.map((project) => (
-                <div key={project.id} className="project-entry">
-                  {/* Project selection fields */}
-                  <div className="project-field" onClick={() => handleOpenSelection('project', project.id)}>
-                    <span className={`field-label ${!project.project ? 'placeholder' : ''}`}>
-                      {project.project || 'בחר פרויקט'}
-                    </span>
-                    <span className="field-chevron">›</span>
-                  </div>
+              <div className="time-entries">
+                <div
+                  className="time-entry-row"
+                  onClick={() => handleTimeClick('entry')}
+                >
+                  <span className="time-label">כניסה</span>
+                  <span className="time-value">
+                    {formatTime(entryTime.hours, entryTime.minutes)}
+                  </span>
+                </div>
 
-                  <div className="project-field" onClick={() => handleOpenSelection('task', project.id)}>
-                    <span className={`field-label ${!project.task ? 'placeholder' : ''}`}>
-                      {project.task || 'בחר משימה'}
-                    </span>
-                    <span className="field-chevron">›</span>
-                  </div>
-
-                  <div className="project-field" onClick={() => handleOpenSelection('location', project.id)}>
-                    <span className={`field-label ${!project.location ? 'placeholder' : ''}`}>
-                      {project.location || 'בחר מיקום'}
-                    </span>
-                    <span className="field-icon">◊</span>
-                  </div>
-
-                  {/* Project time entries */}
-                  <div className="project-time-row" onClick={() => handleTimeClick(`project-${project.id}-start`)}>
-                    <span className="time-label">שעת התחלה</span>
-                    <span className="time-value">{formatTime(project.startTime.hours, project.startTime.minutes)}</span>
-                  </div>
-
-                  {editingField === `project-${project.id}-start` && (
-                    <div className="time-picker">
-                      <div className="time-picker-columns" dir="ltr">
-                        <div
-                          className="time-picker-column"
-                          ref={hoursRef}
-                          onScroll={() => handleScroll(hoursRef, hours, 'hours')}
-                          onWheel={(e) => handleWheel(e, hoursRef, hours)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {hours.map((hour, index) => (
-                            <div
-                              key={hour}
-                              className={`time-picker-item ${project.startTime.hours === hour ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(hoursRef, index)}
-                            >
-                              {hour}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
-                        <div
-                          className="time-picker-column"
-                          ref={minutesRef}
-                          onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
-                          onWheel={(e) => handleWheel(e, minutesRef, minutes)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {minutes.map((minute, index) => (
-                            <div
-                              key={minute}
-                              className={`time-picker-item ${project.startTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(minutesRef, index)}
-                            >
-                              {minute.toString().padStart(2, '0')}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
-                        <div
-                          className="time-picker-column"
-                          ref={periodRef}
-                          onScroll={() => handleScroll(periodRef, periods, 'period')}
-                          onWheel={(e) => handleWheel(e, periodRef, periods)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {periods.map((period, index) => (
-                            <div
-                              key={period}
-                              className={`time-picker-item ${project.startTime.period === period ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(periodRef, index)}
-                            >
-                              {period}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
+                {editingField === 'entry' && (
+                  <div className="time-picker">
+                    <div className="time-picker-columns" dir="ltr">
+                      <div
+                        className="time-picker-column"
+                        ref={entryHoursRef}
+                        onScroll={() =>
+                          handleScroll(entryHoursRef, hours, 'hours')
+                        }
+                        onWheel={(e) => handleWheel(e, entryHoursRef, hours)}
+                      >
+                        <div className="time-picker-padding"></div>
+                        {hours.map((hour, index) => (
+                          <div
+                            key={hour}
+                            className={`time-picker-item ${entryTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                            onClick={() =>
+                              handleItemClick(entryHoursRef, index)
+                            }
+                          >
+                            {hour}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
                       </div>
-                      <div className="time-picker-selection-indicator"></div>
-                    </div>
-                  )}
-
-                  <div className="project-time-row" onClick={() => handleTimeClick(`project-${project.id}-end`)}>
-                    <span className="time-label">שעת סיום</span>
-                    <span className="time-value">{formatTime(project.endTime.hours, project.endTime.minutes)}</span>
-                  </div>
-
-                  {editingField === `project-${project.id}-end` && (
-                    <div className="time-picker">
-                      <div className="time-picker-columns" dir="ltr">
-                        <div
-                          className="time-picker-column"
-                          ref={hoursRef}
-                          onScroll={() => handleScroll(hoursRef, hours, 'hours')}
-                          onWheel={(e) => handleWheel(e, hoursRef, hours)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {hours.map((hour, index) => (
-                            <div
-                              key={hour}
-                              className={`time-picker-item ${project.endTime.hours === hour ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(hoursRef, index)}
-                            >
-                              {hour}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
-                        <div
-                          className="time-picker-column"
-                          ref={minutesRef}
-                          onScroll={() => handleScroll(minutesRef, minutes, 'minutes')}
-                          onWheel={(e) => handleWheel(e, minutesRef, minutes)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {minutes.map((minute, index) => (
-                            <div
-                              key={minute}
-                              className={`time-picker-item ${project.endTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(minutesRef, index)}
-                            >
-                              {minute.toString().padStart(2, '0')}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
-                        <div
-                          className="time-picker-column"
-                          ref={periodRef}
-                          onScroll={() => handleScroll(periodRef, periods, 'period')}
-                          onWheel={(e) => handleWheel(e, periodRef, periods)}
-                        >
-                          <div className="time-picker-padding"></div>
-                          {periods.map((period, index) => (
-                            <div
-                              key={period}
-                              className={`time-picker-item ${project.endTime.period === period ? 'time-picker-item-selected' : ''}`}
-                              onClick={() => handleItemClick(periodRef, index)}
-                            >
-                              {period}
-                            </div>
-                          ))}
-                          <div className="time-picker-padding"></div>
-                        </div>
+                      <div
+                        className="time-picker-column"
+                        ref={entryMinutesRef}
+                        onScroll={() =>
+                          handleScroll(entryMinutesRef, minutes, 'minutes')
+                        }
+                        onWheel={(e) =>
+                          handleWheel(e, entryMinutesRef, minutes)
+                        }
+                      >
+                        <div className="time-picker-padding"></div>
+                        {minutes.map((minute, index) => (
+                          <div
+                            key={minute}
+                            className={`time-picker-item ${entryTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                            onClick={() =>
+                              handleItemClick(entryMinutesRef, index)
+                            }
+                          >
+                            {minute.toString().padStart(2, '0')}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
                       </div>
-                      <div className="time-picker-selection-indicator"></div>
+                      <div
+                        className="time-picker-column"
+                        ref={entryPeriodRef}
+                        onScroll={() =>
+                          handleScroll(entryPeriodRef, periods, 'period')
+                        }
+                        onWheel={(e) => handleWheel(e, entryPeriodRef, periods)}
+                      >
+                        <div className="time-picker-padding"></div>
+                        {periods.map((period, index) => (
+                          <div
+                            key={period}
+                            className={`time-picker-item ${entryTime.period === period ? 'time-picker-item-selected' : ''}`}
+                            onClick={() =>
+                              handleItemClick(entryPeriodRef, index)
+                            }
+                          >
+                            {period}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
+                      </div>
                     </div>
-                  )}
+                    <div className="time-picker-selection-indicator"></div>
+                  </div>
+                )}
 
-                  {/* Description field */}
-                  <textarea
-                    className="project-description"
-                    placeholder="הוספת פירוט..."
-                    value={project.description}
-                    onChange={(e) => handleDescriptionChange(project.id, e.target.value)}
-                    rows={3}
-                    dir="rtl"
+                <div
+                  className="time-entry-row"
+                  onClick={() => handleTimeClick('exit')}
+                >
+                  <span className="time-label">יציאה</span>
+                  <span className="time-value">
+                    {formatTime(exitTime.hours, exitTime.minutes)}
+                  </span>
+                </div>
+
+                {editingField === 'exit' && (
+                  <div className="time-picker">
+                    <div className="time-picker-columns" dir="ltr">
+                      <div
+                        className="time-picker-column"
+                        ref={exitHoursRef}
+                        onScroll={() =>
+                          handleScroll(exitHoursRef, hours, 'hours')
+                        }
+                        onWheel={(e) => handleWheel(e, exitHoursRef, hours)}
+                      >
+                        <div className="time-picker-padding"></div>
+                        {hours.map((hour, index) => (
+                          <div
+                            key={hour}
+                            className={`time-picker-item ${exitTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                            onClick={() => handleItemClick(exitHoursRef, index)}
+                          >
+                            {hour}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
+                      </div>
+                      <div
+                        className="time-picker-column"
+                        ref={exitMinutesRef}
+                        onScroll={() =>
+                          handleScroll(exitMinutesRef, minutes, 'minutes')
+                        }
+                        onWheel={(e) => handleWheel(e, exitMinutesRef, minutes)}
+                      >
+                        <div className="time-picker-padding"></div>
+                        {minutes.map((minute, index) => (
+                          <div
+                            key={minute}
+                            className={`time-picker-item ${exitTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                            onClick={() =>
+                              handleItemClick(exitMinutesRef, index)
+                            }
+                          >
+                            {minute.toString().padStart(2, '0')}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
+                      </div>
+                      <div
+                        className="time-picker-column"
+                        ref={exitPeriodRef}
+                        onScroll={() =>
+                          handleScroll(exitPeriodRef, periods, 'period')
+                        }
+                        onWheel={(e) => handleWheel(e, exitPeriodRef, periods)}
+                      >
+                        <div className="time-picker-padding"></div>
+                        {periods.map((period, index) => (
+                          <div
+                            key={period}
+                            className={`time-picker-item ${exitTime.period === period ? 'time-picker-item-selected' : ''}`}
+                            onClick={() =>
+                              handleItemClick(exitPeriodRef, index)
+                            }
+                          >
+                            {period}
+                          </div>
+                        ))}
+                        <div className="time-picker-padding"></div>
+                      </div>
+                    </div>
+                    <div className="time-picker-selection-indicator"></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Project Entries Section */}
+              {projectEntries.length > 0 && (
+                <div className="project-entries-section">
+                  <h3 className="section-title">דיווח פרוייקטים</h3>
+                  {projectEntries.map((project) => (
+                    <div key={project.id} className="project-entry">
+                      {/* Project selection fields */}
+                      <div
+                        className="project-field"
+                        onClick={() =>
+                          handleOpenSelection('project', project.id)
+                        }
+                      >
+                        <span
+                          className={`field-label ${!project.project ? 'placeholder' : ''}`}
+                        >
+                          {project.project || 'בחר פרויקט'}
+                        </span>
+                        <span className="field-chevron">›</span>
+                      </div>
+
+                      <div
+                        className="project-field"
+                        onClick={() => handleOpenSelection('task', project.id)}
+                      >
+                        <span
+                          className={`field-label ${!project.task ? 'placeholder' : ''}`}
+                        >
+                          {project.task || 'בחר משימה'}
+                        </span>
+                        <span className="field-chevron">›</span>
+                      </div>
+
+                      <div
+                        className="project-field"
+                        onClick={() =>
+                          handleOpenSelection('location', project.id)
+                        }
+                      >
+                        <span
+                          className={`field-label ${!project.location ? 'placeholder' : ''}`}
+                        >
+                          {project.location || 'בחר מיקום'}
+                        </span>
+                        <span className="field-icon">◊</span>
+                      </div>
+
+                      {/* Project time entries */}
+                      <div
+                        className="project-time-row"
+                        onClick={() =>
+                          handleTimeClick(`project-${project.id}-start`)
+                        }
+                      >
+                        <span className="time-label">שעת התחלה</span>
+                        <span className="time-value">
+                          {formatTime(
+                            project.startTime.hours,
+                            project.startTime.minutes
+                          )}
+                        </span>
+                      </div>
+
+                      {editingField === `project-${project.id}-start` &&
+                        (() => {
+                          const refs = getCurrentRefs(
+                            `project-${project.id}-start`
+                          );
+                          return (
+                            <div className="time-picker">
+                              <div className="time-picker-columns" dir="ltr">
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.hours}
+                                  onScroll={() =>
+                                    handleScroll(refs.hours, hours, 'hours')
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.hours, hours)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {hours.map((hour, index) => (
+                                    <div
+                                      key={hour}
+                                      className={`time-picker-item ${project.startTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.hours, index)
+                                      }
+                                    >
+                                      {hour}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.minutes}
+                                  onScroll={() =>
+                                    handleScroll(
+                                      refs.minutes,
+                                      minutes,
+                                      'minutes'
+                                    )
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.minutes, minutes)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {minutes.map((minute, index) => (
+                                    <div
+                                      key={minute}
+                                      className={`time-picker-item ${project.startTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.minutes, index)
+                                      }
+                                    >
+                                      {minute.toString().padStart(2, '0')}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.period}
+                                  onScroll={() =>
+                                    handleScroll(refs.period, periods, 'period')
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.period, periods)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {periods.map((period, index) => (
+                                    <div
+                                      key={period}
+                                      className={`time-picker-item ${project.startTime.period === period ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.period, index)
+                                      }
+                                    >
+                                      {period}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                              </div>
+                              <div className="time-picker-selection-indicator"></div>
+                            </div>
+                          );
+                        })()}
+
+                      <div
+                        className="project-time-row"
+                        onClick={() =>
+                          handleTimeClick(`project-${project.id}-end`)
+                        }
+                      >
+                        <span className="time-label">שעת סיום</span>
+                        <span className="time-value">
+                          {formatTime(
+                            project.endTime.hours,
+                            project.endTime.minutes
+                          )}
+                        </span>
+                      </div>
+
+                      {editingField === `project-${project.id}-end` &&
+                        (() => {
+                          const refs = getCurrentRefs(
+                            `project-${project.id}-end`
+                          );
+                          return (
+                            <div className="time-picker">
+                              <div className="time-picker-columns" dir="ltr">
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.hours}
+                                  onScroll={() =>
+                                    handleScroll(refs.hours, hours, 'hours')
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.hours, hours)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {hours.map((hour, index) => (
+                                    <div
+                                      key={hour}
+                                      className={`time-picker-item ${project.endTime.hours === hour ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.hours, index)
+                                      }
+                                    >
+                                      {hour}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.minutes}
+                                  onScroll={() =>
+                                    handleScroll(
+                                      refs.minutes,
+                                      minutes,
+                                      'minutes'
+                                    )
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.minutes, minutes)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {minutes.map((minute, index) => (
+                                    <div
+                                      key={minute}
+                                      className={`time-picker-item ${project.endTime.minutes === minute ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.minutes, index)
+                                      }
+                                    >
+                                      {minute.toString().padStart(2, '0')}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                                <div
+                                  className="time-picker-column"
+                                  ref={refs.period}
+                                  onScroll={() =>
+                                    handleScroll(refs.period, periods, 'period')
+                                  }
+                                  onWheel={(e) =>
+                                    handleWheel(e, refs.period, periods)
+                                  }
+                                >
+                                  <div className="time-picker-padding"></div>
+                                  {periods.map((period, index) => (
+                                    <div
+                                      key={period}
+                                      className={`time-picker-item ${project.endTime.period === period ? 'time-picker-item-selected' : ''}`}
+                                      onClick={() =>
+                                        handleItemClick(refs.period, index)
+                                      }
+                                    >
+                                      {period}
+                                    </div>
+                                  ))}
+                                  <div className="time-picker-padding"></div>
+                                </div>
+                              </div>
+                              <div className="time-picker-selection-indicator"></div>
+                            </div>
+                          );
+                        })()}
+
+                      {/* Description field */}
+                      <textarea
+                        className="project-description"
+                        placeholder="הוספת פירוט..."
+                        value={project.description}
+                        onChange={(e) =>
+                          handleDescriptionChange(project.id, e.target.value)
+                        }
+                        rows={3}
+                        dir="rtl"
+                      />
+
+                      {/* Delete button */}
+                      <button
+                        className="delete-project-btn"
+                        onClick={() => handleDeleteProject(project.id)}
+                      >
+                        מחיקת פרויקט
+                      </button>
+
+                      {/* Error message */}
+                      {timeErrors[project.id] && (
+                        <div className="project-time-error" role="alert">
+                          {timeErrors[project.id]}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Project Button */}
+              <button className="add-project-btn" onClick={handleAddProject}>
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                  <circle
+                    cx="10"
+                    cy="10"
+                    r="9"
+                    stroke="currentColor"
+                    strokeWidth="2"
                   />
+                  <path
+                    d="M10 6V14M6 10H14"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <span>הוספת פרויקט</span>
+              </button>
 
-                  {/* Delete button */}
-                  <button className="delete-project-btn" onClick={() => handleDeleteProject(project.id)}>
-                    מחיקת פרויקט
-                  </button>
-
-                  {/* Error message */}
-                  {timeErrors[project.id] && (
-                    <div className="project-time-error" role="alert">
-                      {timeErrors[project.id]}
+              {/* Delete Confirmation Dialog */}
+              {deleteConfirmId && (
+                <div className="confirmation-overlay" onClick={cancelDelete}>
+                  <div
+                    className="confirmation-dialog"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="confirmation-icon-wrapper">
+                      <svg
+                        width="56"
+                        height="56"
+                        viewBox="0 0 56 56"
+                        fill="none"
+                      >
+                        <rect width="56" height="56" rx="8" fill="#FEF5CC" />
+                        <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
+                        <path
+                          d="M28 26V30M28 32V33"
+                          stroke="#FEF5CC"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
                     </div>
-                  )}
+                    <p className="confirmation-main-message">
+                      למחוק את הדיווח זה מהפרויקטים?
+                    </p>
+                    <p className="confirmation-sub-message">
+                      המחיקה היא קבועה ולא ניתן יהיה לשחזר את הדיווח.
+                    </p>
+                    <button
+                      className="confirmation-link-btn"
+                      onClick={cancelDelete}
+                    >
+                      מעדיף שלא למחוק
+                    </button>
+                    <button
+                      className="confirmation-primary-btn"
+                      onClick={confirmDelete}
+                    >
+                      מחק את הפרויקט
+                    </button>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
+              )}
 
-          {/* Add Project Button */}
-          <button className="add-project-btn" onClick={handleAddProject}>
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="9" stroke="currentColor" strokeWidth="2" />
-              <path d="M10 6V14M6 10H14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
-            <span>הוספת פרויקט</span>
-          </button>
-
-          {/* Delete Confirmation Dialog */}
-          {deleteConfirmId && (
-            <div className="confirmation-overlay" onClick={cancelDelete}>
-              <div className="confirmation-dialog" onClick={(e) => e.stopPropagation()}>
-                <div className="confirmation-icon-wrapper">
-                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                    <rect width="56" height="56" rx="8" fill="#FEF5CC" />
-                    <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
-                    <path d="M28 26V30M28 32V33" stroke="#FEF5CC" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
+              {/* Missing Hours Alert Dialog */}
+              {showMissingHoursAlert && (
+                <div
+                  className="confirmation-overlay"
+                  onClick={() => setShowMissingHoursAlert(false)}
+                >
+                  <div
+                    className="confirmation-dialog"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="confirmation-icon-wrapper">
+                      <svg
+                        width="56"
+                        height="56"
+                        viewBox="0 0 56 56"
+                        fill="none"
+                      >
+                        <rect width="56" height="56" rx="8" fill="#FEF5CC" />
+                        <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
+                        <path
+                          d="M28 26V30M28 32V33"
+                          stroke="#FEF5CC"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <p className="confirmation-main-message">
+                      יום העבודה שלך טרם הושלם.
+                    </p>
+                    <p className="confirmation-sub-message">
+                      חסרות {Math.max(0, 9 - calculateTotalHours())} שעות דיווח
+                      כדי למלוא את היום.
+                    </p>
+                    <button
+                      className="confirmation-link-btn"
+                      onClick={handleDontShowAgain}
+                    >
+                      אל תציג לנו זאת
+                    </button>
+                    <button
+                      className="confirmation-primary-btn"
+                      onClick={handleCompleteHours}
+                    >
+                      תן לי להשלים את השעות
+                    </button>
+                  </div>
                 </div>
-                <p className="confirmation-main-message">למחוק את הדיווח זה מהפרויקטים?</p>
-                <p className="confirmation-sub-message">המחיקה היא קבועה ולא ניתן יהיה לשחזר את הדיווח.</p>
-                <button className="confirmation-link-btn" onClick={cancelDelete}>מעדיף שלא למחוק</button>
-                <button className="confirmation-primary-btn" onClick={confirmDelete}>מחק את הפרויקט</button>
-              </div>
-            </div>
-          )}
+              )}
 
-          {/* Missing Hours Alert Dialog */}
-          {showMissingHoursAlert && (
-            <div className="confirmation-overlay" onClick={() => setShowMissingHoursAlert(false)}>
-              <div className="confirmation-dialog" onClick={(e) => e.stopPropagation()}>
-                <div className="confirmation-icon-wrapper">
-                  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
-                    <rect width="56" height="56" rx="8" fill="#FEF5CC" />
-                    <path d="M28 18L38 36H18L28 18Z" fill="#945312" />
-                    <path d="M28 26V30M28 32V33" stroke="#FEF5CC" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                </div>
-                <p className="confirmation-main-message">יום העבודה שלך טרם הושלם.</p>
-                <p className="confirmation-sub-message">חסרות {Math.max(0, 9 - calculateTotalHours())} שעות דיווח כדי למלוא את היום.</p>
-                <button className="confirmation-link-btn" onClick={handleDontShowAgain}>אל תציג לנו זאת</button>
-                <button className="confirmation-primary-btn" onClick={handleCompleteHours}>תן לי להשלים את השעות</button>
-              </div>
-            </div>
-          )}
-
-          {/* Selection Modal */}
-          <SelectionModal
-            isOpen={selectionModal.isOpen}
-            onClose={handleCloseSelection}
-            type={selectionModal.type || 'project'}
-            groups={getSelectionGroups()}
-            onSelect={handleSelection}
-          />
+              {/* Selection Modal */}
+              <SelectionModal
+                isOpen={selectionModal.isOpen}
+                onClose={handleCloseSelection}
+                type={selectionModal.type || 'project'}
+                groups={getSelectionGroups()}
+                onSelect={handleSelection}
+              />
             </>
           )}
 
@@ -1024,20 +1442,26 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
           {activeTab === 'absence' && (
             <>
               <div className="info-row">
-                <div className="date-display">יום ב&apos; 06/10/25</div>
+                <div className="date-display">
+                  {formatDateDisplay(selectedDate)}
+                </div>
               </div>
 
               {/* Absence Type Selector */}
               <div className="absence-type-section" ref={absenceDropdownRef}>
                 <div
                   className="absence-type-selector"
-                  onClick={() => setIsAbsenceDropdownOpen(!isAbsenceDropdownOpen)}
+                  onClick={() =>
+                    setIsAbsenceDropdownOpen(!isAbsenceDropdownOpen)
+                  }
                 >
                   <span className="absence-type-chevron">◊</span>
                   <span className="absence-type-text">
                     {selectedAbsenceType ? (
                       <>
-                        <span className="absence-emoji">{selectedAbsenceType.emoji}</span>
+                        <span className="absence-emoji">
+                          {selectedAbsenceType.emoji}
+                        </span>
                         {selectedAbsenceType.label}
                       </>
                     ) : (
@@ -1053,7 +1477,9 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                       <div
                         key={type.id}
                         className={`absence-dropdown-item ${
-                          selectedAbsenceType?.id === type.id ? 'absence-dropdown-item-selected' : ''
+                          selectedAbsenceType?.id === type.id
+                            ? 'absence-dropdown-item-selected'
+                            : ''
                         }`}
                         onClick={() => {
                           setSelectedAbsenceType(type);
@@ -1061,7 +1487,13 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                         }}
                       >
                         {selectedAbsenceType?.id === type.id && (
-                          <svg className="check-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                          <svg
+                            className="check-icon"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                          >
                             <circle cx="10" cy="10" r="10" fill="#3B82F6" />
                             <path
                               d="M6 10L9 13L14 7"
@@ -1093,13 +1525,21 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {uploadedFile ? (
-                        <div className="file-uploaded" onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className="file-uploaded"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             className="file-remove-btn"
                             onClick={handleRemoveFile}
                             aria-label="הסר קובץ"
                           >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                            >
                               <path
                                 d="M15 5L5 15M5 5L15 15"
                                 stroke="currentColor"
@@ -1108,8 +1548,19 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                               />
                             </svg>
                           </button>
-                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                            <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
+                          <svg
+                            width="40"
+                            height="40"
+                            viewBox="0 0 40 40"
+                            fill="none"
+                          >
+                            <rect
+                              width="40"
+                              height="40"
+                              rx="8"
+                              fill="#3B82F6"
+                              fillOpacity="0.1"
+                            />
                             <path
                               d="M20 12V20M20 20V28M20 20H28M20 20H12"
                               stroke="#3B82F6"
@@ -1124,8 +1575,21 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                         </div>
                       ) : (
                         <>
-                          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                            <rect x="12" y="16" width="40" height="32" rx="2" stroke="#3B82F6" strokeWidth="2" />
+                          <svg
+                            width="64"
+                            height="64"
+                            viewBox="0 0 64 64"
+                            fill="none"
+                          >
+                            <rect
+                              x="12"
+                              y="16"
+                              width="40"
+                              height="32"
+                              rx="2"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                            />
                             <circle cx="32" cy="28" r="4" fill="#3B82F6" />
                             <path
                               d="M12 40L20 32L28 40L40 28L52 40"
@@ -1135,8 +1599,12 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                               strokeLinejoin="round"
                             />
                           </svg>
-                          <p className="file-upload-link">לחץ כאן להעלאת הקובץ</p>
-                          <p className="file-upload-hint">סוג הקבצים הנתמכים : JPG / PNG / PDF</p>
+                          <p className="file-upload-link">
+                            לחץ כאן להעלאת הקובץ
+                          </p>
+                          <p className="file-upload-hint">
+                            סוג הקבצים הנתמכים : JPG / PNG / PDF
+                          </p>
                         </>
                       )}
                     </div>
@@ -1147,6 +1615,15 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                       onChange={handleFileUpload}
                       style={{ display: 'none' }}
                     />
+                    {fileUploadError.code && (
+                      <div
+                        className="file-upload-error"
+                        role="alert"
+                        data-error-code={fileUploadError.code}
+                      >
+                        {fileUploadError.message}
+                      </div>
+                    )}
                   </div>
 
                   {/* OR Divider */}
@@ -1181,7 +1658,10 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                   <div className="form-section-title">מלא את הטופס</div>
 
                   {/* Start Date */}
-                  <div className="date-row" onClick={() => handleToggleCalendar('start')}>
+                  <div
+                    className="date-row"
+                    onClick={() => handleToggleCalendar('start')}
+                  >
                     <span className="date-value">{formatDate(startDate)}</span>
                     <span className="date-label">תאריך התחלה</span>
                   </div>
@@ -1190,17 +1670,29 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                   {openCalendar === 'start' && (
                     <div className="calendar-dropdown">
                       <div className="calendar-dropdown-header">
-                        <span className="calendar-header-date">{formatDateForCalendar(startDate)}</span>
-                        <span className="calendar-header-title">תאריך התחלה</span>
+                        <span className="calendar-header-date">
+                          {formatDateForCalendar(startDate)}
+                        </span>
+                        <span className="calendar-header-title">
+                          תאריך התחלה
+                        </span>
                       </div>
                       <div className="calendar-nav">
-                        <button className="calendar-nav-arrow" onClick={handleCalendarNextMonth} aria-label="חודש הבא">
+                        <button
+                          className="calendar-nav-arrow"
+                          onClick={handleCalendarNextMonth}
+                          aria-label="חודש הבא"
+                        >
                           ‹
                         </button>
                         <span className="calendar-month-display">
                           {hebrewMonthsFull[calendarMonth]} {calendarYear}
                         </span>
-                        <button className="calendar-nav-arrow" onClick={handleCalendarPrevMonth} aria-label="חודש קודם">
+                        <button
+                          className="calendar-nav-arrow"
+                          onClick={handleCalendarPrevMonth}
+                          aria-label="חודש קודם"
+                        >
                           ›
                         </button>
                       </div>
@@ -1212,25 +1704,34 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                         ))}
                       </div>
                       <div className="calendar-grid">
-                        {generateCalendarDays(calendarMonth, calendarYear).map((day, index) => (
-                          <div
-                            key={index}
-                            className={`calendar-grid-day ${
-                              day === null ? 'calendar-grid-day-empty' : ''
-                            } ${
-                              day !== null && isDateSelected(day) ? 'calendar-grid-day-selected' : ''
-                            }`}
-                            onClick={() => day !== null && handleDateSelect(day)}
-                          >
-                            {day}
-                          </div>
-                        ))}
+                        {generateCalendarDays(calendarMonth, calendarYear).map(
+                          (day, index) => (
+                            <div
+                              key={index}
+                              className={`calendar-grid-day ${
+                                day === null ? 'calendar-grid-day-empty' : ''
+                              } ${
+                                day !== null && isDateSelected(day)
+                                  ? 'calendar-grid-day-selected'
+                                  : ''
+                              }`}
+                              onClick={() =>
+                                day !== null && handleDateSelect(day)
+                              }
+                            >
+                              {day}
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
 
                   {/* End Date */}
-                  <div className="date-row" onClick={() => handleToggleCalendar('end')}>
+                  <div
+                    className="date-row"
+                    onClick={() => handleToggleCalendar('end')}
+                  >
                     <span className="date-value">{formatDate(endDate)}</span>
                     <span className="date-label">תאריך סיום</span>
                   </div>
@@ -1239,17 +1740,29 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                   {openCalendar === 'end' && (
                     <div className="calendar-dropdown">
                       <div className="calendar-dropdown-header">
-                        <span className="calendar-header-date">{formatDateForCalendar(endDate)}</span>
-                        <span className="calendar-header-title">תאריך סיום</span>
+                        <span className="calendar-header-date">
+                          {formatDateForCalendar(endDate)}
+                        </span>
+                        <span className="calendar-header-title">
+                          תאריך סיום
+                        </span>
                       </div>
                       <div className="calendar-nav">
-                        <button className="calendar-nav-arrow" onClick={handleCalendarNextMonth} aria-label="חודש הבא">
+                        <button
+                          className="calendar-nav-arrow"
+                          onClick={handleCalendarNextMonth}
+                          aria-label="חודש הבא"
+                        >
                           ‹
                         </button>
                         <span className="calendar-month-display">
                           {hebrewMonthsFull[calendarMonth]} {calendarYear}
                         </span>
-                        <button className="calendar-nav-arrow" onClick={handleCalendarPrevMonth} aria-label="חודש קודם">
+                        <button
+                          className="calendar-nav-arrow"
+                          onClick={handleCalendarPrevMonth}
+                          aria-label="חודש קודם"
+                        >
                           ›
                         </button>
                       </div>
@@ -1261,26 +1774,35 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                         ))}
                       </div>
                       <div className="calendar-grid">
-                        {generateCalendarDays(calendarMonth, calendarYear).map((day, index) => (
-                          <div
-                            key={index}
-                            className={`calendar-grid-day ${
-                              day === null ? 'calendar-grid-day-empty' : ''
-                            } ${
-                              day !== null && isDateSelected(day) ? 'calendar-grid-day-selected' : ''
-                            }`}
-                            onClick={() => day !== null && handleDateSelect(day)}
-                          >
-                            {day}
-                          </div>
-                        ))}
+                        {generateCalendarDays(calendarMonth, calendarYear).map(
+                          (day, index) => (
+                            <div
+                              key={index}
+                              className={`calendar-grid-day ${
+                                day === null ? 'calendar-grid-day-empty' : ''
+                              } ${
+                                day !== null && isDateSelected(day)
+                                  ? 'calendar-grid-day-selected'
+                                  : ''
+                              }`}
+                              onClick={() =>
+                                day !== null && handleDateSelect(day)
+                              }
+                            >
+                              {day}
+                            </div>
+                          )
+                        )}
                       </div>
                     </div>
                   )}
 
                   {/* Days Calculation */}
                   <div className="days-summary">
-                    סך הכל ימי דיווח: <span className="days-number">{calculateDaysBetween(startDate, endDate)} ימים</span>
+                    סך הכל ימי דיווח:{' '}
+                    <span className="days-number">
+                      {calculateDaysBetween(startDate, endDate)} ימים
+                    </span>
                   </div>
 
                   {/* File Upload Section (same as single-day) */}
@@ -1291,13 +1813,21 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                       onClick={() => fileInputRef.current?.click()}
                     >
                       {uploadedFile ? (
-                        <div className="file-uploaded" onClick={(e) => e.stopPropagation()}>
+                        <div
+                          className="file-uploaded"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           <button
                             className="file-remove-btn"
                             onClick={handleRemoveFile}
                             aria-label="הסר קובץ"
                           >
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                            >
                               <path
                                 d="M15 5L5 15M5 5L15 15"
                                 stroke="currentColor"
@@ -1306,8 +1836,19 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                               />
                             </svg>
                           </button>
-                          <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                            <rect width="40" height="40" rx="8" fill="#3B82F6" fillOpacity="0.1" />
+                          <svg
+                            width="40"
+                            height="40"
+                            viewBox="0 0 40 40"
+                            fill="none"
+                          >
+                            <rect
+                              width="40"
+                              height="40"
+                              rx="8"
+                              fill="#3B82F6"
+                              fillOpacity="0.1"
+                            />
                             <path
                               d="M20 12V20M20 20V28M20 20H28M20 20H12"
                               stroke="#3B82F6"
@@ -1322,8 +1863,21 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                         </div>
                       ) : (
                         <>
-                          <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
-                            <rect x="12" y="16" width="40" height="32" rx="2" stroke="#3B82F6" strokeWidth="2" />
+                          <svg
+                            width="64"
+                            height="64"
+                            viewBox="0 0 64 64"
+                            fill="none"
+                          >
+                            <rect
+                              x="12"
+                              y="16"
+                              width="40"
+                              height="32"
+                              rx="2"
+                              stroke="#3B82F6"
+                              strokeWidth="2"
+                            />
                             <circle cx="32" cy="28" r="4" fill="#3B82F6" />
                             <path
                               d="M12 40L20 32L28 40L40 28L52 40"
@@ -1333,8 +1887,12 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                               strokeLinejoin="round"
                             />
                           </svg>
-                          <p className="file-upload-link">לחץ כאן להעלאת הקובץ</p>
-                          <p className="file-upload-hint">סוג הקבצים הנתמכים : JPG / PNG / PDF</p>
+                          <p className="file-upload-link">
+                            לחץ כאן להעלאת הקובץ
+                          </p>
+                          <p className="file-upload-hint">
+                            סוג הקבצים הנתמכים : JPG / PNG / PDF
+                          </p>
                         </>
                       )}
                     </div>
@@ -1345,12 +1903,20 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
                       onChange={handleFileUpload}
                       style={{ display: 'none' }}
                     />
+                    {fileUploadError.code && (
+                      <div
+                        className="file-upload-error"
+                        role="alert"
+                        data-error-code={fileUploadError.code}
+                      >
+                        {fileUploadError.message}
+                      </div>
+                    )}
                   </div>
                 </>
               )}
             </>
           )}
-
         </div>
 
         {/* Modal Footer */}
@@ -1369,7 +1935,9 @@ function ManualReportModal({ isOpen, onClose, currentDayAbsenceType = null }: Ma
               <div className="progress-bar-container">
                 <div
                   className="progress-bar-fill"
-                  style={{ width: `${Math.min((calculateTotalHours() / 9) * 100, 100)}%` }}
+                  style={{
+                    width: `${Math.min((calculateTotalHours() / 9) * 100, 100)}%`,
+                  }}
                 />
               </div>
               <button className="footer-save-btn" onClick={handleSave}>

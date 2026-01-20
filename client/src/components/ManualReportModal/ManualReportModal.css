@@ -142,7 +142,7 @@
   font-family: 'Assistant', sans-serif;
   font-size: 12px;
   font-weight: 500;
-  color: #22C55E;
+  color: #22c55e;
 }
 
 .daily-quota svg {
@@ -380,7 +380,9 @@
   min-height: 60px;
   box-sizing: border-box;
   outline: none;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .project-description::placeholder {
@@ -398,7 +400,7 @@
   padding: 10px;
   border: none;
   background: transparent;
-  color: #EE2662;
+  color: #ee2662;
   font-family: 'Assistant', sans-serif;
   font-size: 14px;
   font-weight: 500;
@@ -415,7 +417,7 @@
 .project-time-error {
   font-family: 'Assistant', sans-serif;
   font-size: 12px;
-  color: #EE2662;
+  color: #ee2662;
   text-align: center;
   padding: 8px;
   background: #fee2e2;
@@ -586,7 +588,7 @@
 
 .progress-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, #FFD700 0%, #FF6B00 100%);
+  background: linear-gradient(90deg, #ffd700 0%, #ff6b00 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -704,11 +706,11 @@
 }
 
 .absence-dropdown-item-selected {
-  background: #EFF6FF;
+  background: #eff6ff;
 }
 
 .absence-dropdown-item-selected:hover {
-  background: #DBEAFE;
+  background: #dbeafe;
 }
 
 .absence-dropdown-text {
@@ -748,13 +750,13 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  background: #F8FAFC;
+  background: #f8fafc;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .file-upload-area:hover {
-  background: #EFF6FF;
+  background: #eff6ff;
   border-color: #2563eb;
 }
 
@@ -795,7 +797,7 @@
   width: 28px;
   height: 28px;
   border: none;
-  background: #EE2662;
+  background: #ee2662;
   border-radius: 50%;
   cursor: pointer;
   color: #ffffff;
@@ -831,6 +833,20 @@
   color: #666;
   text-align: center;
   margin: 0;
+}
+
+.file-upload-error {
+  font-family: 'Assistant', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: #dc2626;
+  background-color: #fee2e2;
+  border: 1px solid #fca5a5;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin-top: 12px;
+  text-align: right;
+  direction: rtl;
 }
 
 /* Divider Section */
@@ -1058,7 +1074,7 @@
   font-family: 'Assistant', sans-serif;
   font-size: 12px;
   font-weight: 400;
-  color: #EA6B6D;
+  color: #ea6b6d;
 }
 
 /* Calendar Navigation */

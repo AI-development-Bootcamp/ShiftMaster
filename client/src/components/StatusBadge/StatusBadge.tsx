@@ -1,6 +1,12 @@
 import './StatusBadge.css';
 
-export type EntryStatus = 'missing' | 'complete' | 'partial' | 'sick' | 'weekend' | 'half-vacation';
+export type EntryStatus =
+  | 'missing'
+  | 'complete'
+  | 'partial'
+  | 'sick'
+  | 'weekend'
+  | 'half-vacation';
 
 interface StatusBadgeProps {
   status: EntryStatus;
@@ -18,7 +24,8 @@ const statusConfig: Record<EntryStatus, { label: string; icon: string }> = {
 
 function StatusBadge({ status, hours }: StatusBadgeProps) {
   const config = statusConfig[status];
-  let displayLabel = hours !== undefined ? `${hours} ${config.label}` : config.label;
+  let displayLabel =
+    hours !== undefined ? `${hours} ${config.label}` : config.label;
 
   // Special display for half-vacation: "חצי חופש\4.5 ש'"
   if (status === 'half-vacation' && hours !== undefined) {
@@ -29,7 +36,13 @@ function StatusBadge({ status, hours }: StatusBadgeProps) {
     switch (config.icon) {
       case 'check':
         return (
-          <svg className="status-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <svg
+            className="status-icon"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+          >
             <path
               d="M10 3L4.5 8.5L2 6"
               stroke="currentColor"
@@ -41,7 +54,13 @@ function StatusBadge({ status, hours }: StatusBadgeProps) {
         );
       case 'warning':
         return (
-          <svg className="status-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <svg
+            className="status-icon"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+          >
             <path
               d="M6 4V6.5M6 8.5H6.005M10.5 6C10.5 8.48528 8.48528 10.5 6 10.5C3.51472 10.5 1.5 8.48528 1.5 6C1.5 3.51472 3.51472 1.5 6 1.5C8.48528 1.5 10.5 3.51472 10.5 6Z"
               stroke="currentColor"
@@ -53,7 +72,13 @@ function StatusBadge({ status, hours }: StatusBadgeProps) {
         );
       case 'circle-slash':
         return (
-          <svg className="status-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+          <svg
+            className="status-icon"
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+          >
             <circle cx="6" cy="6" r="5" fill="currentColor" />
             <line
               x1="9"
