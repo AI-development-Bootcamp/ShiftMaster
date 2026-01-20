@@ -164,42 +164,58 @@ http://localhost:3000/api-docs
 Create a `.env` file in the `server` directory. See `server/ENV_SETUP.md` for details:
 
 ```env
-# Server
+# Backend API URL (for frontend apps)
+VITE_API_URL=http://localhost:3000/api/v1
+
+# JWT Authentication
+JWT_SECRET=your-secret-key-change-in-production
+
+# Supabase Configuration
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_DB_URL=postgresql://postgres:password@db.your-project.supabase.co:5432/postgres
+SUPABASE_ANON_KEY=your-anon-key-here
+SUPABASE_SECRET_KEY=your-service-role-key-here
+
+# Server Port
 PORT=3000
+
+# Node Environment
 NODE_ENV=development
 
-# Supabase
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-
-# JWT
-JWT_SECRET=your-secret-key-here-change-this-in-production
-JWT_EXPIRY=24h
+# CORS Configuration
+CORS_ORIGINS=http://localhost:5173,http://localhost:5174
 ```
 
-### Client
+### Required Environment Variables
 
-Create a `.env` file in the `client` directory. See `client/ENV_SETUP.md` for details:
+| Variable | Description | Required | Usage |
+|----------|-------------|----------|-------|
+| `SUPABASE_URL` | Supabase API URL (https://...) | ✅ Yes | Supabase client initialization |
+| `SUPABASE_DB_URL` | PostgreSQL connection string | ✅ Yes | Database tooling (Knex, TypeORM, etc.) |
+| `SUPABASE_ANON_KEY` | Public API key for client-side operations | ✅ Yes | Frontend & regular backend operations |
+| `SUPABASE_SECRET_KEY` | Service role key for admin operations | ✅ Yes | Migrations, seed data, admin operations (server-only) |
+| `JWT_SECRET` | Secret key for JWT token signing/verification | ✅ Yes | Authentication |
+| `PORT` | Server port number | No (default: 3000) | Server configuration |
+| `NODE_ENV` | Environment mode | No (default: development) | Server behavior |
+| `VITE_API_URL` | Backend API URL for frontends | ✅ Yes (frontends) | Frontend API calls |
+| `CORS_ORIGINS` | Comma-separated allowed CORS origins | No (default: localhost:5173,5174) | CORS configuration |
 
-```env
-# API URL for backend server
-VITE_API_URL=http://localhost:3000
-```
+### Getting Supabase Credentials
 
-### Admin
+1. Go to your Supabase project dashboard
+2. Navigate to **Settings → API**
+3. Copy the following values:
+   - **Project URL** → `SUPABASE_URL` (format: `https://[PROJECT-REF].supabase.co`)
+   - **Connection String (URI)** → `SUPABASE_DB_URL` (format: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`)
+   - **anon public** key → `SUPABASE_ANON_KEY`
+   - **service_role** key → `SUPABASE_SECRET_KEY` (⚠️ Keep this secret! Server-only)
 
-Create a `.env` file in the `admin` directory. See `admin/ENV_SETUP.md` for details:
+### Security Notes
 
-```env
-# API URL for backend server
-VITE_API_URL=http://localhost:3000
-```
-
-**Important Notes:**
-- All frontend environment variables must have the `VITE_` prefix
-- Environment variable keys should be in alphabetical order (for dotenv-linter compliance)
-- All .env files must end with a trailing newline
-- Never commit .env files to version control
+- ⚠️ **NEVER** commit `.env` files to version control
+- ⚠️ **NEVER** expose `SUPABASE_SECRET_KEY` in frontend code
+- ✅ `SUPABASE_ANON_KEY` is safe to use in frontend (protected by RLS policies)
+- ✅ Use different credentials for development and production databases
 
 ## 📦 Workspaces
 

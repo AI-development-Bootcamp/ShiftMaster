@@ -46,7 +46,7 @@ describe('Authentication Middleware', () => {
   describe('isAuthenticated', () => {
     it('should authenticate user with valid token', () => {
       const payload: JwtPayload = {
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'test@example.com',
         role: 'regular',
       };
@@ -93,7 +93,7 @@ describe('Authentication Middleware', () => {
 
     it('should return 401 when token is malformed (no Bearer prefix)', () => {
       const token = generateToken({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'test@example.com',
         role: 'regular',
       });
@@ -146,7 +146,7 @@ describe('Authentication Middleware', () => {
       // Generate token that expires immediately
       const token = generateToken(
         {
-          userId: 1,
+          userId: '550e8400-e29b-41d4-a716-446655440000',
           email: 'test@example.com',
           role: 'regular',
         },
@@ -202,7 +202,7 @@ describe('Authentication Middleware', () => {
 
     it('should handle admin user tokens', () => {
       const payload: JwtPayload = {
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       };
@@ -227,7 +227,7 @@ describe('Authentication Middleware', () => {
   describe('isAdmin', () => {
     it('should allow access for admin user', () => {
       mockRequest.user = {
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
         iat: Math.floor(Date.now() / 1000),
@@ -242,7 +242,7 @@ describe('Authentication Middleware', () => {
 
     it('should return 403 for regular user', () => {
       mockRequest.user = {
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         role: 'regular',
         iat: Math.floor(Date.now() / 1000),
@@ -291,7 +291,7 @@ describe('Authentication Middleware', () => {
   describe('middleware chaining', () => {
     it('should work correctly when isAuthenticated is followed by isAdmin for admin user', () => {
       const payload: JwtPayload = {
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       };
@@ -323,7 +323,7 @@ describe('Authentication Middleware', () => {
 
     it('should block regular user when isAdmin is called after isAuthenticated', () => {
       const payload: JwtPayload = {
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         role: 'regular',
       };

@@ -45,7 +45,7 @@ describe('AuthController', () => {
   describe('login', () => {
     it('should successfully login with valid credentials', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -72,7 +72,7 @@ describe('AuthController', () => {
 
       // Verify generateToken was called with correct payload
       expect(jwtUtil.generateToken).toHaveBeenCalledWith({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'john@example.com',
         role: 'regular',
       });
@@ -84,7 +84,7 @@ describe('AuthController', () => {
         data: {
           token: mockToken,
           user: {
-            user_id: 1,
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
             full_name: 'John Doe',
             email: 'john@example.com',
             role: 'regular',
@@ -95,7 +95,7 @@ describe('AuthController', () => {
 
     it('should successfully login admin user', async () => {
       const mockAdmin = {
-        user_id: 2,
+        user_id: '550e8400-e29b-41d4-a716-446655440001',
         full_name: 'Admin User',
         email: 'admin@example.com',
         role: 'admin' as const,
@@ -120,7 +120,7 @@ describe('AuthController', () => {
         data: {
           token: mockToken,
           user: {
-            user_id: 2,
+            user_id: '550e8400-e29b-41d4-a716-446655440001',
             full_name: 'Admin User',
             email: 'admin@example.com',
             role: 'admin',
@@ -293,7 +293,7 @@ describe('AuthController', () => {
 
     it('should not include password in response', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -317,7 +317,7 @@ describe('AuthController', () => {
 
     it('should not include active flag in response', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
