@@ -1,0 +1,105 @@
+.create-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.create-menu__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Center content horizontally */
+    gap: 10px;
+    /* Icon-text gap */
+
+    height: 48px;
+    width: 106px;
+    /* Explicit width as requested */
+    min-width: 0;
+    /* Reset min-width */
+    padding: 0 8px;
+    /* Reduced padding to fit content in smaller width */
+
+    background-color: #1F6FEB;
+    /* Pixel-perfect Blue */
+    color: #FFFFFF;
+
+    border: none;
+    border-radius: 10px;
+    /* Rounded 10px */
+    box-shadow: none;
+    /* Flat */
+
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0px;
+    line-height: 20px;
+
+    cursor: pointer;
+    transition: background-color 120ms ease-out;
+
+    /* Ensure LTR layout for Icon-Left */
+    flex-direction: row;
+    direction: ltr;
+}
+
+.create-menu__trigger:hover {
+    background-color: #1A5FD1;
+}
+
+.create-menu__trigger:active {
+    background-color: #174FB0;
+}
+
+.create-menu__trigger:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.create-menu__icon {
+    width: 18px;
+    height: 18px;
+    color: #FFFFFF;
+    flex-shrink: 0;
+}
+
+.create-menu__trigger:focus {
+    outline: none;
+}
+
+/* Dropdown styling */
+.create-menu__dropdown {
+    position: fixed;
+    /* Fixed relative to viewport (Portal) */
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    width: max-content;
+    z-index: 9999;
+    overflow: hidden;
+    padding: 4px 0;
+}
+
+.create-menu__item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    text-align: right;
+    /* RTL text for content inside menu */
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.1s ease;
+}
+
+.create-menu__item:hover {
+    background-color: #f5f5f5;
+}
+
+.create-menu__item:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: transparent;
+}

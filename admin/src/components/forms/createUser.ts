@@ -1,4 +1,5 @@
 import { FormFieldSchema } from '../FormShell';
+import { FIELD_TYPES } from '../../constants/forms';
 
 export const userFieldsCreate: FormFieldSchema[] = [
     {
