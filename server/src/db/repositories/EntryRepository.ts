@@ -5,12 +5,12 @@ import { Entry, NewEntry, UpdateEntry } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry> implements IEntryRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('entries', 'entry_id', client);
     }
 
     async findByUserIdAndDate(userId: string, date: string): Promise<Entry[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('user_id', userId)
@@ -25,7 +25,7 @@ export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry
     }
 
     async findByUserIdAndDateRange(userId: string, startDate: string, endDate: string): Promise<Entry[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('user_id', userId)

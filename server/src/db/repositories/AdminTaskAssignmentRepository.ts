@@ -5,12 +5,12 @@ import { AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment 
 import { logDbError } from '../utils/logger.js';
 
 export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment> implements IAdminTaskAssignmentRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('admin_task_assignments', 'admin_task_assignment_id', client);
     }
 
     async findByUserId(userId: string): Promise<AdminTaskAssignment[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('user_id', userId)
@@ -25,7 +25,7 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
     }
 
     async findByTaskId(taskId: string): Promise<AdminTaskAssignment[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('task_id', taskId)
@@ -40,7 +40,7 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
     }
 
     async revoke(id: string): Promise<void> {
-        const { error } = await this.client
+        const { error } = await this.dbConnection
             .from(this.table)
             .update({ active: false, revoked_at: new Date().toISOString() })
             .eq(this.primaryKey, id);

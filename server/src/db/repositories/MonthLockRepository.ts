@@ -5,12 +5,12 @@ import { MonthLock, NewMonthLock, UpdateMonthLock } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock, UpdateMonthLock> implements IMonthLockRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('month_locks', 'lock_id', client);
     }
 
     async findByYearAndMonth(year: number, month: number): Promise<MonthLock | null> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('year', year)

@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 import { env } from '../config/index.js';
 
 export interface JwtPayload {
-  userId: number;
+  userId: string; // UUID
   email: string;
   role: 'admin' | 'regular';
 }

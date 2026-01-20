@@ -5,12 +5,12 @@ import { EntryAssignment, NewEntryAssignment, UpdateEntryAssignment } from '../t
 import { logDbError } from '../utils/logger.js';
 
 export class EntryAssignmentRepository extends BaseRepository<EntryAssignment, NewEntryAssignment, UpdateEntryAssignment> implements IEntryAssignmentRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('entry_assignments', 'entry_assignment_id', client);
     }
 
     async findByEntryId(entryId: string): Promise<EntryAssignment[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('entry_id', entryId);

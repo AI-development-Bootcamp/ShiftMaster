@@ -31,7 +31,7 @@ describe('POST /auth/login', () => {
 
   it('should return 200 with token and user data on successful login', async () => {
     const mockUser = {
-      user_id: 1,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
       full_name: 'John Doe',
       email: 'john@example.com',
       role: 'regular' as const,
@@ -54,7 +54,7 @@ describe('POST /auth/login', () => {
       data: {
         token: mockToken,
         user: {
-          user_id: 1,
+          user_id: '550e8400-e29b-41d4-a716-446655440000',
           full_name: 'John Doe',
           email: 'john@example.com',
           role: 'regular',
@@ -145,7 +145,7 @@ describe('POST /auth/login', () => {
 
   it('should have correct Content-Type header', async () => {
     const mockUser = {
-      user_id: 1,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
       full_name: 'John Doe',
       email: 'john@example.com',
       role: 'regular' as const,
@@ -165,7 +165,7 @@ describe('POST /auth/login', () => {
 
   it('should accept JSON body', async () => {
     const mockUser = {
-      user_id: 1,
+      user_id: '550e8400-e29b-41d4-a716-446655440000',
       full_name: 'John Doe',
       email: 'john@example.com',
       role: 'regular' as const,

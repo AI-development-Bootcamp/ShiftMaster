@@ -6,12 +6,12 @@ import { logDbError } from '../utils/logger.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> implements ITaskRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('tasks', 'task_id', client);
     }
 
     async findByProjectId(projectId: string): Promise<Task[]> {
-        const { data, error } = await this.client
+        const { data, error } = await this.dbConnection
             .from(this.table)
             .select('*')
             .eq('project_id', projectId)
