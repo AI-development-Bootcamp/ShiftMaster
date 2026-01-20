@@ -24,4 +24,24 @@ export class UserRepository extends BaseRepository<User, NewUser, UpdateUser> im
 
         return data as User;
     }
+
+    async findPaginated(page: number, limit: number): Promise<{ data: User[]; count: number }> {
+        const from = (page - 1) * limit;
+        const to = from + limit - 1;
+
+        const { data, error, count } = await this.dbConnection
+            .from(this.table)
+            .select('*', { count: 'exact' })
+            .range(from, to);
+
+        if (error) {
+            logDbError('UserRepository.findPaginated', error);
+            throw error;
+        }
+
+        return {
+            data: (data as User[]) || [],
+            count: count || 0
+        };
+    }
 }

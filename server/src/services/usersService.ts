@@ -128,10 +128,13 @@ export class UsersService {
       password: string;
       role: 'admin' | 'regular';
       job_title?: string;
-    }): Promise<UserResponse> {
+    }
+  ): Promise<UserResponse> {
     // Enforce admin access
     if (actor.role !== 'admin') {
-      throw new AuthorizationError('Access denied: Only admins can create users');
+      throw new AuthorizationError(
+        'Access denied: Only admins can create users'
+      );
     }
     // Check email uniqueness
     const existingUser = await this.userRepo.findByEmail(userData.email);
@@ -170,30 +173,29 @@ export class UsersService {
    * Get paginated list of users (Admin only)
    * @throws AuthorizationError if actor is not admin
    */
-  async listUsers(actor: Actor, page: number = 1, limit: number = 20): Promise<PaginatedUsersResponse> {
+  async listUsers(
+    actor: Actor,
+    page: number = 1,
+    limit: number = 20
+  ): Promise<PaginatedUsersResponse> {
     // Enforce admin access
     if (actor.role !== 'admin') {
       throw new AuthorizationError('Access denied: Only admins can list users');
     }
-    // Get all users
-    const allUsers = await this.userRepo.findAll();
 
-    // Calculate pagination
-    const total = allUsers.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
+    // Get paginated users from database
+    const { data, count } = await this.userRepo.findPaginated(page, limit);
 
-    // Slice for current page
-    const paginatedUsers = allUsers.slice(startIndex, endIndex);
+    // Calculate total pages
+    const totalPages = Math.ceil(count / limit);
 
     // Sanitize users (remove password_hash)
-    const users = paginatedUsers.map(sanitizeUser);
+    const users = data.map(sanitizeUser);
 
     return {
       users,
       pagination: {
-        total,
+        total: count,
         page,
         limit,
         totalPages,
@@ -235,7 +237,9 @@ export class UsersService {
   ): Promise<UserResponse> {
     // Enforce admin access
     if (actor.role !== 'admin') {
-      throw new AuthorizationError('Access denied: Only admins can update users');
+      throw new AuthorizationError(
+        'Access denied: Only admins can update users'
+      );
     }
 
     // Verify user exists
@@ -256,10 +260,12 @@ export class UsersService {
     const updateData: UpdateUser = {};
 
     // Copy fields from updates, handling password specially
-    if (updates.full_name !== undefined) updateData.full_name = updates.full_name;
+    if (updates.full_name !== undefined)
+      updateData.full_name = updates.full_name;
     if (updates.email !== undefined) updateData.email = updates.email;
     if (updates.role !== undefined) updateData.role = updates.role;
-    if (updates.job_title !== undefined) updateData.job_title = updates.job_title;
+    if (updates.job_title !== undefined)
+      updateData.job_title = updates.job_title;
     if (updates.active !== undefined) updateData.active = updates.active;
 
     // If updating password, hash it first
@@ -281,17 +287,20 @@ export class UsersService {
     }
   }
 
-
-
   /**
    * Soft delete a user (set active=false) (Admin only)
    * @throws UserNotFoundError if user doesn't exist
    * @throws AuthorizationError if actor is not admin
    */
-  async deleteUser(actor: Actor, userId: string): Promise<{ success: boolean; message: string }> {
+  async deleteUser(
+    actor: Actor,
+    userId: string
+  ): Promise<{ success: boolean; message: string }> {
     // Enforce admin access
     if (actor.role !== 'admin') {
-      throw new AuthorizationError('Access denied: Only admins can delete users');
+      throw new AuthorizationError(
+        'Access denied: Only admins can delete users'
+      );
     }
     // Verify user exists
     const existingUser = await this.userRepo.findById(userId);

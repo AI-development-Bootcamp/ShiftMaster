@@ -69,7 +69,10 @@ import {
   updateUser,
   deleteUser,
 } from '../../controllers/usersController.js';
-import { DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
+import {
+  DuplicateEmailError,
+  UserNotFoundError,
+} from '../../services/usersService.js';
 import type { DecodedToken } from '../../utils/jwt.js';
 
 interface AuthenticatedRequest extends Request {
@@ -77,14 +80,20 @@ interface AuthenticatedRequest extends Request {
 }
 
 // Get mocks from the mocked module
-const usersServiceModule = await vi.importMock<typeof import('../../services/usersService.js')>('../../services/usersService.js');
+const usersServiceModule = await vi.importMock<
+  typeof import('../../services/usersService.js')
+>('../../services/usersService.js');
 const {
   mockCreateUser,
   mockListUsers,
   mockGetUserById,
   mockUpdateUser,
   mockDeleteUser,
-} = (usersServiceModule as unknown as { __mocks: Record<string, ReturnType<typeof vi.fn>> }).__mocks;
+} = (
+  usersServiceModule as unknown as {
+    __mocks: Record<string, ReturnType<typeof vi.fn>>;
+  }
+).__mocks;
 
 describe('UsersController', () => {
   let mockRequest: Partial<Request>;
@@ -114,8 +123,9 @@ describe('UsersController', () => {
     (mockRequest as AuthenticatedRequest).user = {
       userId: 'admin-id',
       role: 'admin',
-      email: 'admin@example.com'
+      email: 'admin@example.com',
     };
+  });
 
   describe('createUser', () => {
     it('should create user successfully', async () => {
@@ -251,7 +261,11 @@ describe('UsersController', () => {
 
       await listUsers(mockRequest as Request, mockResponse as Response);
 
-      expect(mockListUsers).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 1, 20);
+      expect(mockListUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'admin' }),
+        1,
+        20
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -275,7 +289,11 @@ describe('UsersController', () => {
 
       await listUsers(mockRequest as Request, mockResponse as Response);
 
-      expect(mockListUsers).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 2, 10);
+      expect(mockListUsers).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'admin' }),
+        2,
+        10
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
     });
 
@@ -307,8 +325,6 @@ describe('UsersController', () => {
         active: true,
         created_at: '2024-01-01T00:00:00Z',
       };
-
-
 
       (mockRequest as AuthenticatedRequest).user = {
         userId: mockUser.user_id,
@@ -385,7 +401,9 @@ describe('UsersController', () => {
 
       await getUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockGetUserById).toHaveBeenCalledWith('550e8400-e29b-41d4-a716-446655440001');
+      expect(mockGetUserById).toHaveBeenCalledWith(
+        '550e8400-e29b-41d4-a716-446655440001'
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -542,7 +560,10 @@ describe('UsersController', () => {
 
       await deleteUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockDeleteUser).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), userId);
+      expect(mockDeleteUser).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'admin' }),
+        userId
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,

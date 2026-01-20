@@ -22,6 +22,7 @@ vi.mock('../../db/repositories/UserRepository.js', () => {
       update: vi.fn(),
       delete: vi.fn(),
       findByEmail: vi.fn(),
+      findPaginated: vi.fn(),
     })),
   };
 });
@@ -40,6 +41,7 @@ describe('UsersService', () => {
     update: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
     findByEmail: ReturnType<typeof vi.fn>;
+    findPaginated: ReturnType<typeof vi.fn>;
   };
 
   const mockUser: User = {
@@ -171,11 +173,15 @@ describe('UsersService', () => {
     ];
 
     it('should return paginated users with default pagination', async () => {
-      mockUserRepo.findAll.mockResolvedValue(mockUsers);
+      mockUserRepo.findPaginated.mockResolvedValue({
+        data: mockUsers,
+        count: 5,
+      });
 
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor);
 
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(1, 20);
       expect(result.users).toHaveLength(5);
       expect(result.pagination).toEqual({
         total: 5,
@@ -187,11 +193,28 @@ describe('UsersService', () => {
     });
 
     it('should return correct page with custom pagination', async () => {
-      mockUserRepo.findAll.mockResolvedValue(mockUsers);
+      const page2Users = [
+        {
+          ...mockUser,
+          user_id: '123e4567-e89b-12d3-a456-426614174003',
+          email: 'user3@example.com',
+        },
+        {
+          ...mockUser,
+          user_id: '123e4567-e89b-12d3-a456-426614174004',
+          email: 'user4@example.com',
+        },
+      ];
+
+      mockUserRepo.findPaginated.mockResolvedValue({
+        data: page2Users,
+        count: 5,
+      });
 
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor, 2, 2);
 
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(2, 2);
       expect(result.users).toHaveLength(2);
       expect(result.users[0].user_id).toBe(
         '123e4567-e89b-12d3-a456-426614174003'
@@ -208,18 +231,25 @@ describe('UsersService', () => {
     });
 
     it('should return empty array for page beyond total', async () => {
-      mockUserRepo.findAll.mockResolvedValue(mockUsers);
+      mockUserRepo.findPaginated.mockResolvedValue({
+        data: [],
+        count: 5,
+      });
 
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor, 10, 20);
 
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(10, 20);
       expect(result.users).toHaveLength(0);
       expect(result.pagination.total).toBe(5);
       expect(result.pagination.page).toBe(10);
     });
 
     it('should exclude password_hash from all users', async () => {
-      mockUserRepo.findAll.mockResolvedValue(mockUsers);
+      mockUserRepo.findPaginated.mockResolvedValue({
+        data: mockUsers,
+        count: 5,
+      });
 
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor);

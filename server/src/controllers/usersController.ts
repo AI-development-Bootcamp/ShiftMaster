@@ -30,7 +30,6 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     if (!validationResult.success) {
       res.status(400).json({
         success: false,
-        data: null,
         error: {
           message: 'Validation error',
           code: 'VALIDATION_ERROR',
@@ -64,7 +63,6 @@ export async function createUser(req: Request, res: Response): Promise<void> {
       data: {
         user,
       },
-      error: null,
     });
   } catch (error) {
     // Handle duplicate email error
