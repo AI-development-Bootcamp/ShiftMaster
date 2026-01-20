@@ -1,4 +1,5 @@
 import { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import '../../styles/TableSearch.css';
 
 interface TableSearchProps {
@@ -11,9 +12,12 @@ interface TableSearchProps {
 export function TableSearch({
     value,
     onChange,
-    placeholder = 'חיפוש...',
+    placeholder,
     className = ''
 }: TableSearchProps) {
+    const { t } = useTranslation();
+    const resolvedPlaceholder = placeholder || t('common.searchPlaceholder');
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         onChange(e.target.value);
     };
@@ -24,10 +28,10 @@ export function TableSearch({
             <input
                 type="text"
                 className="table-search__input"
-                placeholder={placeholder}
+                placeholder={resolvedPlaceholder}
                 value={value}
                 onChange={handleChange}
-                aria-label="חיפוש"
+                aria-label={t('common.search')}
             />
         </div>
     );

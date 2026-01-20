@@ -61,7 +61,7 @@ export function MonthGrid({ year, locks, onToggleLock, isLoading }: MonthGridPro
   }
 
   return (
-    <div className="month-grid" role="grid" aria-label="רשת חודשים">
+    <div className="month-grid" role="grid" aria-label={t('monthLocks.gridLabel')}>
       {MONTH_KEYS.map((monthKey, index) => {
         const monthNumber = index + 1;
         const monthName = t(`monthNames.${monthKey}`);

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { TaskEmployeeAssignmentFormProps, EmployeeRow } from './TaskEmployeeAssignmentForm.types';
 import { TableShell, SortState } from '../../TableShell';
 import { TableSearch } from '../../TableShell/TableSearch';
@@ -21,6 +22,7 @@ export function TaskEmployeeAssignmentForm({
     onClose,
     initialSelectedIds = []
 }: TaskEmployeeAssignmentFormProps) {
+    const { t } = useTranslation();
     // --- State ---
     const [localPage, setLocalPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>(null);
@@ -100,7 +102,7 @@ export function TaskEmployeeAssignmentForm({
 
     const handleSubmit = () => {
         if (selectedKeys.size === 0) {
-            setError('יש לבחור לפחות עובד אחד');
+            setError(t('taskEmployeeAssignmentForm.errors.selectAtLeastOne'));
             return;
         }
         const selectedRows = rows.filter(r => selectedKeys.has(r.id));
@@ -131,20 +133,20 @@ export function TaskEmployeeAssignmentForm({
                         type="button"
                         className="task-employee-form__close-btn"
                         onClick={onClose}
-                        aria-label="סגור"
+                        aria-label={t('taskEmployeeAssignmentForm.close')}
                     >
                         ×
                     </button>
 
                     <div className="task-employee-form__header-top">
                         <h2 className="task-employee-form__title">
-                            שייך עובד חדש למשימה
+                            {t('taskEmployeeAssignmentForm.title')}
                         </h2>
                     </div>
 
                     <div className="task-employee-form__header-bottom">
                         <p className="task-employee-form__subtitle">
-                            כאן תוכל לשייך עובד חדש מהמאגר לטובת
+                            {t('taskEmployeeAssignmentForm.subtitle')}
                         </p>
                         <div className="task-employee-form__context-pills">
                             <span className="task-employee-form__pill">{contextPath.client.name}</span>
@@ -159,7 +161,7 @@ export function TaskEmployeeAssignmentForm({
                         <TableSearch
                             value={searchQuery}
                             onChange={setSearchQuery}
-                            placeholder="חיפוש לפי שם עובד"
+                            placeholder={t('taskEmployeeAssignmentForm.searchPlaceholder')}
                             className="task-employee-form__search-overrides"
                         />
                     </div>
@@ -179,9 +181,9 @@ export function TaskEmployeeAssignmentForm({
                             data={data}
                             columns={[
                                 { key: 'selection', header: '', type: 'selection', width: 48 },
-                                { key: 'fullName', header: 'שם העובד', type: 'text', sortable: true, width: '40%' },
-                                { key: 'type', header: 'סוג עובד', type: 'text', sortable: true, width: '30%' },
-                                { key: 'role', header: 'תפקיד', type: 'text', sortable: true, width: '30%' },
+                                { key: 'fullName', header: t('taskEmployeeAssignmentForm.columns.employeeName'), type: 'text', sortable: true, width: '40%' },
+                                { key: 'type', header: t('taskEmployeeAssignmentForm.columns.employeeType'), type: 'text', sortable: true, width: '30%' },
+                                { key: 'role', header: t('taskEmployeeAssignmentForm.columns.role'), type: 'text', sortable: true, width: '30%' },
                             ]}
                             getRowId={(row) => row.id}
                             pagination={{
@@ -196,7 +198,7 @@ export function TaskEmployeeAssignmentForm({
                             selectedRowKeys={selectedKeys}
                             onSelectionChange={handleToggleSelection}
                             isLoading={false}
-                            emptyStateAlt="לא נמצאו עובדים"
+                            emptyStateAlt={t('taskEmployeeAssignmentForm.emptyState')}
                         />
                     </div>
                 </div>
@@ -209,7 +211,7 @@ export function TaskEmployeeAssignmentForm({
                         onClick={handleSubmit}
                         disabled={selectedKeys.size === 0}
                     >
-                        שייך עובד למשימה
+                        {t('taskEmployeeAssignmentForm.submitButton')}
                     </button>
                 </footer>
             </div>

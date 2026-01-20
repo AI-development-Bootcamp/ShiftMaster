@@ -1,4 +1,5 @@
 
+import { useTranslation } from 'react-i18next';
 import '../../styles/MonthLocks.css';
 
 /**
@@ -23,12 +24,15 @@ interface MonthTileProps {
  * @param props - Component props
  */
 export function MonthTile({ monthName, isLocked, onClick }: MonthTileProps) {
+  const { t } = useTranslation();
+  const statusText = isLocked ? t('monthLocks.status.locked') : t('monthLocks.status.unlocked');
+
   return (
     <button
       type="button"
       className={`month-tile ${isLocked ? 'month-tile--locked' : 'month-tile--unlocked'}`}
       onClick={onClick}
-      aria-label={`${monthName} - ${isLocked ? 'נעול' : 'פתוח'}`}
+      aria-label={`${monthName} - ${statusText}`}
       aria-pressed={isLocked}
     >
       <span className="month-tile-name">{monthName}</span>

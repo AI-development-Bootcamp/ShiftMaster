@@ -5,7 +5,10 @@
         "actions": "פעולות",
         "appName": "Shift Master",
         "show": "הצג",
-        "hide": "הסתר"
+        "hide": "הסתר",
+        "search": "חיפוש",
+        "searchPlaceholder": "חיפוש...",
+        "selectRow": "בחר שורה"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
@@ -132,6 +135,24 @@
         "closeModal": "סגור",
         "loading": "טוען נתוני נעילה...",
         "locked": "נעול",
-        "unlocked": "פתוח"
+        "unlocked": "פתוח",
+        "gridLabel": "רשת חודשים"
+    },
+    "taskEmployeeAssignmentForm": {
+        "title": "שייך עובד חדש למשימה",
+        "subtitle": "כאן תוכל לשייך עובד חדש מהמאגר לטובת",
+        "searchPlaceholder": "חיפוש לפי שם עובד",
+        "columns": {
+            "selection": "",
+            "employeeName": "שם העובד",
+            "employeeType": "סוג עובד",
+            "role": "תפקיד"
+        },
+        "errors": {
+            "selectAtLeastOne": "יש לבחור לפחות עובד אחד"
+        },
+        "emptyState": "לא נמצאו עובדים",
+        "submitButton": "שייך עובד למשימה",
+        "close": "סגור"
     }
 }

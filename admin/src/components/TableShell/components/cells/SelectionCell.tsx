@@ -1,4 +1,5 @@
 import { ChangeEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface SelectionCellProps {
     rowId: string;
@@ -16,8 +17,11 @@ export function SelectionCell({
     rowId,
     isSelected,
     onChange,
-    ariaLabel = 'בחר שורה'
+    ariaLabel
 }: SelectionCellProps) {
+    const { t } = useTranslation();
+    const resolvedAriaLabel = ariaLabel || t('common.selectRow');
+
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         onChange(rowId, e.target.checked);
     };
@@ -28,7 +32,7 @@ export function SelectionCell({
                 type="checkbox"
                 checked={isSelected}
                 onChange={handleChange}
-                aria-label={ariaLabel}
+                aria-label={resolvedAriaLabel}
                 className="table-shell__selection-checkbox"
             />
         </div>

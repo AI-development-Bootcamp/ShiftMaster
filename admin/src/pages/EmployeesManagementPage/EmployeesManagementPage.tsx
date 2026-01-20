@@ -114,7 +114,7 @@ export function EmployeesManagementPage() {
                     <TableSearch
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        placeholder={t('common.search', 'חיפוש...')}
+                        placeholder={t('common.searchPlaceholder')}
                     />
 
                     <button

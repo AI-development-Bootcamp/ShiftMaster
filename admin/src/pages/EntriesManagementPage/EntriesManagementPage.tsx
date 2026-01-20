@@ -144,7 +144,7 @@ export function EntriesManagementPage() {
                     <TableSearch
                         value={searchQuery}
                         onChange={setSearchQuery}
-                        placeholder={t('common.search', 'חיפוש...')}
+                        placeholder={t('entriesPage.searchBarHint')}
                     />
 
                     <MonthLockButton
