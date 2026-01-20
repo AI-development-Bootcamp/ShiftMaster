@@ -2,11 +2,11 @@
  * Logger utility for standardized error logging
  */
 
-export const logDbError = (context: string, error: any) => {
+export const logDbError = (context: string, error: unknown) => {
     console.error(`[DB Error][${context}]`, JSON.stringify(error, null, 2));
 };
 
-export const logError = (context: string, error: any) => {
+export const logError = (context: string, error: unknown) => {
     console.error(`[Error][${context}]`, error);
 };
 
