@@ -71,7 +71,7 @@ function ProjectEntriesSection({
         </div>
       )}
 
-      <button className="add-project-btn" onClick={onAddProject}>
+      <button type="button" className="add-project-btn" onClick={onAddProject}>
         <PlusCircleIcon />
         <span>הוספת פרויקט</span>
       </button>

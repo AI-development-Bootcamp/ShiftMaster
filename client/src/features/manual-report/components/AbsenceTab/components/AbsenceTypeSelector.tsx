@@ -1,3 +1,4 @@
+import { useRef, useEffect, KeyboardEvent } from 'react';
 import { AbsenceType } from '../../../types/manualReport';
 import { ABSENCE_TYPES } from '../../../constants/absence';
 import { CheckIcon } from '../../icons';
@@ -17,9 +18,42 @@ function AbsenceTypeSelector({
   onSelect,
   dropdownRef,
 }: AbsenceTypeSelectorProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const listboxRef = useRef<HTMLDivElement>(null);
+  const focusedIndexRef = useRef<number>(0);
+
+  useEffect(() => {
+    if (isOpen && listboxRef.current) {
+      // Move focus into the listbox when opened
+      const firstOption = listboxRef.current.querySelector(
+        '[role="option"]'
+      ) as HTMLElement;
+      firstOption?.focus();
+      focusedIndexRef.current = 0;
+    } else if (!isOpen && buttonRef.current) {
+      // Return focus to button when closed
+      buttonRef.current.focus();
+    }
+  }, [isOpen]);
+
+  const handleButtonKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onToggle();
+    }
+  };
+
   return (
     <div className="absence-type-section" ref={dropdownRef}>
-      <div className="absence-type-selector" onClick={onToggle}>
+      <button
+        ref={buttonRef}
+        type="button"
+        className="absence-type-selector"
+        onClick={onToggle}
+        onKeyDown={handleButtonKeyDown}
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+      >
         <span className="absence-type-chevron">◊</span>
         <span className="absence-type-text">
           {selectedType ? (
@@ -31,12 +65,13 @@ function AbsenceTypeSelector({
             'בחר סוג היעדרות'
           )}
         </span>
-      </div>
+      </button>
 
       {isOpen && (
-        <div className="absence-dropdown">
+        <div ref={listboxRef} className="absence-dropdown" role="listbox">
           {ABSENCE_TYPES.map((type) => (
-            <div
+            <button
+              type="button"
               key={type.id}
               className={`absence-dropdown-item ${
                 selectedType?.id === type.id
@@ -46,13 +81,15 @@ function AbsenceTypeSelector({
               onClick={() => {
                 onSelect(type);
               }}
+              role="option"
+              aria-selected={selectedType?.id === type.id}
             >
               {selectedType?.id === type.id && <CheckIcon />}
               <span className="absence-dropdown-text">
                 <span className="absence-emoji">{type.emoji}</span>
                 {type.label}
               </span>
-            </div>
+            </button>
           ))}
         </div>
       )}

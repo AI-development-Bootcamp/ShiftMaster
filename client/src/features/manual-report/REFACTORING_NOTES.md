@@ -1,11 +1,12 @@
 # ManualReportModal Refactoring Notes
 
 ## Overview
+
 The ManualReportModal component has been refactored from a 1989-line monolithic component into a modular, feature-based structure. This refactoring improves maintainability, testability, and follows best practices for React application architecture.
 
 ## Folder Structure
 
-```
+````
 client/src/features/manual-report/
 ├── components/
 │   ├── icons/
@@ -63,7 +64,7 @@ client/src/features/manual-report/
 │   └── manualReportModal.css
 ├── index.ts
 └── REFACTORING_NOTES.md (this file)
-```
+```text
 
 ## Migration Guide
 
@@ -211,26 +212,28 @@ The refactoring maintains full backward compatibility:
 ### New Import (Recommended)
 ```typescript
 import { ManualReportModal } from '@/features/manual-report';
-```
+````
 
 ### Old Import (Still Works)
+
 ```typescript
 import ManualReportModal from '@/components/ManualReportModal/ManualReportModal';
 ```
 
 ## File Size Comparison
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Main Component | 1989 lines | ~70 lines |
-| Largest Sub-component | N/A | ~200 lines |
+| Metric                  | Before      | After       |
+| ----------------------- | ----------- | ----------- |
+| Main Component          | 1989 lines  | ~70 lines   |
+| Largest Sub-component   | N/A         | ~200 lines  |
 | Total Lines (all files) | ~2176 lines | ~2400 lines |
-| Number of Files | 2 | 40+ |
-| Reusable Components | 0 | 15+ |
+| Number of Files         | 2           | 40+         |
+| Reusable Components     | 0           | 15+         |
 
 ## TODO Items Preserved
 
 All TODO comments from the original implementation have been preserved in their respective locations:
+
 - Save work data to backend (ManualReportModal.tsx)
 - Save absence data to backend (ManualReportModal.tsx)
 
@@ -245,6 +248,7 @@ All TODO comments from the original implementation have been preserved in their 
 ## Future Enhancements
 
 Potential areas for further improvement:
+
 1. Add unit tests for all components
 2. Add integration tests
 3. Consider extracting SelectionModal to the feature

@@ -32,10 +32,18 @@ function ConfirmationDialog({
         </div>
         <p className="confirmation-main-message">{title}</p>
         <p className="confirmation-sub-message">{message}</p>
-        <button className="confirmation-link-btn" onClick={onCancel}>
+        <button
+          type="button"
+          className="confirmation-link-btn"
+          onClick={onCancel}
+        >
           {cancelText}
         </button>
-        <button className="confirmation-primary-btn" onClick={onConfirm}>
+        <button
+          type="button"
+          className="confirmation-primary-btn"
+          onClick={onConfirm}
+        >
           {confirmText}
         </button>
       </div>

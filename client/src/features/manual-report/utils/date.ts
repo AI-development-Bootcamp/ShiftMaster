@@ -13,13 +13,30 @@ export const formatDateDisplay = (date: Date): string => {
   return `${dayName} ${day}/${month}/${year}`;
 };
 
-export const formatDate = (date: DateValue): string => {
-  return `${date.day.toString().padStart(2, '0')} ${HEBREW_MONTHS_SHORT[date.month]} ${date.year}`;
-};
+ const assertValidDateValue = (date: DateValue): void => {
+   const isValidMonth =
+     Number.isInteger(date.month) &&
+     date.month >= 0 &&
+     date.month < HEBREW_MONTHS_SHORT.length;
+   const isValidDay =
+     Number.isInteger(date.day) &&
+     date.day >= 1 &&
+     date.day <= getDaysInMonth(date.month, date.year);
+   const isValidYear = Number.isInteger(date.year);
+   if (!isValidMonth || !isValidDay || !isValidYear) {
+     const error = new Error('Invalid date value');
+     (error as { code?: string }).code = 'INVALID_DATE_VALUE';
+     throw error;
+   }
+ };
 
-export const formatDateForCalendar = (date: DateValue): string => {
-  return `${date.day.toString().padStart(2, '0')} ${HEBREW_MONTHS_SHORT[date.month]} ${date.year}`;
-};
+ const formatDateBase = (date: DateValue): string => {
+   assertValidDateValue(date);
+   return `${date.day.toString().padStart(2, '0')} ${HEBREW_MONTHS_SHORT[date.month]} $date.year}`;
+ };
+
+ export const formatDate = formatDateBase;
+ export const formatDateForCalendar = formatDateBase;
 
 export const getDaysInMonth = (month: number, year: number): number => {
   return new Date(year, month + 1, 0).getDate();
@@ -58,9 +75,8 @@ export const calculateDaysBetween = (
   start: DateValue,
   end: DateValue
 ): number => {
-  const startDateObj = new Date(start.year, start.month, start.day);
-  const endDateObj = new Date(end.year, end.month, end.day);
-  const diffTime = Math.abs(endDateObj.getTime() - startDateObj.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays + 1;
+  const startUtc = Date.UTC(start.year, start.month, start.day);
+  const endUtc = Date.UTC(end.year, end.month, end.day);
+  const diffDays = Math.abs(endUtc - startUtc) / (1000 * 60 * 60 * 24);
+  return Math.round(diffDays) + 1;
 };

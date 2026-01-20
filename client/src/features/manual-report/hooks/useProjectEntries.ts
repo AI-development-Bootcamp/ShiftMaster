@@ -37,38 +37,42 @@ export function useProjectEntries() {
     []
   );
 
-  const updateProjectTime = useCallback(
-    (projectId: string, field: 'startTime' | 'endTime', newTime: TimeValue) => {
-      setProjectEntries((prev) =>
-        prev.map((p) => {
-          if (p.id === projectId) {
-            const updatedProject = { ...p, [field]: newTime };
+// ...existing code...
 
-            setTimeout(() => {
-              const error = validateProjectTime(
-                updatedProject.startTime,
-                updatedProject.endTime
-              );
+const updateProjectTime = useCallback(
+  (projectId: string, field: 'startTime' | 'endTime', newTime: TimeValue) => {
+    setProjectEntries((prev) =>
+      prev.map((p) => {
+        if (p.id === projectId) {
+          const updatedProject = { ...p, [field]: newTime };
 
-              setTimeErrors((prevErrors) => {
-                const newErrors = { ...prevErrors };
-                if (error) {
-                  newErrors[projectId] = error;
-                } else {
-                  delete newErrors[projectId];
-                }
-                return newErrors;
-              });
-            }, 0);
+          setTimeout(() => {
+            const error = validateProjectTime(
+              updatedProject.startTime,
+              updatedProject.endTime
+            );
 
-            return updatedProject;
-          }
-          return p;
-        })
-      );
-    },
-    []
-  );
+            setTimeErrors((prevErrors) => {
+              const newErrors = { ...prevErrors };
+              if (error) {
+                newErrors[projectId] = error.message || error.toString(); // Convert to string
+              } else {
+                delete newErrors[projectId];
+              }
+              return newErrors;
+            });
+          }, 0);
+
+          return updatedProject;
+        }
+        return p;
+      })
+    );
+  },
+  []
+);
+
+// ...existing code...
 
   const deleteProject = useCallback((projectId: string) => {
     setProjectEntries((prev) => prev.filter((p) => p.id !== projectId));

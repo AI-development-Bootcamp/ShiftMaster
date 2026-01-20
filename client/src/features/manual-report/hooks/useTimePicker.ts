@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react';
 import { TimeValue, TimePickerItem, TimePickerRefs } from '../types/manualReport';
-import { HOURS, PERIODS, TIME_PICKER_ITEM_HEIGHT } from '../constants/time';
+import { HOURS, MINUTES, PERIODS, TIME_PICKER_ITEM_HEIGHT } from '../constants/time';
 
 interface UseTimePickerProps {
   currentTime: TimeValue;
@@ -31,15 +31,16 @@ export function useTimePicker({
 
     const refs = getRefs(editingField);
 
-    if (refs.hours.current) {
-      const hourIndex = HOURS.indexOf(currentTime.hours);
+    const hourIndex = HOURS.indexOf(currentTime.hours);
+    if (refs.hours.current && hourIndex >= 0) {
       refs.hours.current.scrollTop = hourIndex * TIME_PICKER_ITEM_HEIGHT;
     }
-    if (refs.minutes.current) {
-      refs.minutes.current.scrollTop = currentTime.minutes * TIME_PICKER_ITEM_HEIGHT;
+    const minuteIndex = MINUTES.indexOf(currentTime.minutes);
+    if (refs.minutes.current && minuteIndex >= 0) {
+      refs.minutes.current.scrollTop = minuteIndex * TIME_PICKER_ITEM_HEIGHT;
     }
-    if (refs.period.current) {
-      const periodIndex = PERIODS.indexOf(currentTime.period);
+    const periodIndex = PERIODS.indexOf(currentTime.period);
+    if (refs.period.current && periodIndex >= 0) {
       refs.period.current.scrollTop = periodIndex * TIME_PICKER_ITEM_HEIGHT;
     }
   }, [editingField, currentTime, getRefs]);

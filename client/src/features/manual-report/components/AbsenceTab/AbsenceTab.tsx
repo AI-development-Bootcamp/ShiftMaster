@@ -64,6 +64,7 @@ function AbsenceTab({ selectedDate }: AbsenceTabProps) {
           </div>
 
           <button
+            type="button"
             className="multi-day-btn"
             onClick={() => setIsMultiDayView(true)}
           >

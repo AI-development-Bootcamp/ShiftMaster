@@ -1,11 +1,5 @@
 import { WarningTriangleIcon } from '../icons';
-
-interface MissingHoursDialogProps {
-  isOpen: boolean;
-  missingHours: number;
-  onComplete: () => void;
-  onDontShowAgain: () => void;
-}
+import { MissingHoursDialogProps } from '../../types/manualReport';
 
 function MissingHoursDialog({
   isOpen,
@@ -28,10 +22,18 @@ function MissingHoursDialog({
         <p className="confirmation-sub-message">
           חסרות {Math.max(0, missingHours)} שעות דיווח כדי למלוא את היום.
         </p>
-        <button className="confirmation-link-btn" onClick={onDontShowAgain}>
+        <button
+          type="button"
+          className="confirmation-link-btn"
+          onClick={onDontShowAgain}
+        >
           אל תציג לנו זאת
         </button>
-        <button className="confirmation-primary-btn" onClick={onComplete}>
+        <button
+          type="button"
+          className="confirmation-primary-btn"
+          onClick={onComplete}
+        >
           תן לי להשלים את השעות
         </button>
       </div>

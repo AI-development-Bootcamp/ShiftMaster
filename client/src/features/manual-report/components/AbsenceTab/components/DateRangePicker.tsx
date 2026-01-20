@@ -6,7 +6,10 @@ import {
   generateCalendarDays,
   compareDates,
 } from '../../../utils/date';
-import { HEBREW_MONTHS_FULL, HEBREW_DAY_NAMES_FULL } from '../../../constants/hebrewCalendar';
+import {
+  HEBREW_MONTHS_FULL,
+  HEBREW_DAY_NAMES_FULL,
+} from '../../../constants/hebrewCalendar';
 
 interface DateRangePickerProps {
   startDate: DateValue;
@@ -24,8 +27,12 @@ function DateRangePicker({
   const [openCalendar, setOpenCalendar] = useState<'start' | 'end' | null>(
     null
   );
-  const [calendarMonth, setCalendarMonth] = useState(9);
-  const [calendarYear, setCalendarYear] = useState(2025);
+  const [calendarMonth, setCalendarMonth] = useState(() =>
+    new Date().getMonth()
+  );
+  const [calendarYear, setCalendarYear] = useState(() =>
+    new Date().getFullYear()
+  );
 
   const handleToggleCalendar = (type: 'start' | 'end') => {
     if (openCalendar === type) {
@@ -82,10 +89,16 @@ function DateRangePicker({
 
   return (
     <>
-      <div className="date-row" onClick={() => handleToggleCalendar('start')}>
+      <button
+        type="button"
+        className="date-row"
+        onClick={() => handleToggleCalendar('start')}
+        aria-expanded={openCalendar === 'start'}
+        aria-controls="start-calendar"
+      >
         <span className="date-value">{formatDate(startDate)}</span>
         <span className="date-label">תאריך התחלה</span>
-      </div>
+      </button>
 
       {openCalendar === 'start' && (
         <div className="calendar-dropdown">
@@ -121,10 +134,11 @@ function DateRangePicker({
               </div>
             ))}
           </div>
-          <div className="calendar-grid">
+          <div className="calendar-grid" role="grid">
             {generateCalendarDays(calendarMonth, calendarYear).map(
               (day, index) => (
-                <div
+                <button
+                  type="button"
                   key={index}
                   className={`calendar-grid-day ${
                     day === null ? 'calendar-grid-day-empty' : ''
@@ -133,20 +147,28 @@ function DateRangePicker({
                       ? 'calendar-grid-day-selected'
                       : ''
                   }`}
+                  disabled={day === null}
+                  aria-selected={day !== null && isDateSelected(day)}
                   onClick={() => day !== null && handleDateSelect(day)}
                 >
                   {day}
-                </div>
+                </button>
               )
             )}
           </div>
         </div>
       )}
 
-      <div className="date-row" onClick={() => handleToggleCalendar('end')}>
+      <button
+        type="button"
+        className="date-row"
+        onClick={() => handleToggleCalendar('start')}
+        aria-expanded={openCalendar === 'start'}
+        aria-controls="start-calendar"
+      >
         <span className="date-value">{formatDate(endDate)}</span>
         <span className="date-label">תאריך סיום</span>
-      </div>
+      </button>
 
       {openCalendar === 'end' && (
         <div className="calendar-dropdown">

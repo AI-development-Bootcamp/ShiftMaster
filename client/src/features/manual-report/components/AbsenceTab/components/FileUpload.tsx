@@ -21,6 +21,14 @@ function FileUpload({
       <h3 className="file-upload-title">צירוף קבצים ומסמכים</h3>
       <div
         className="file-upload-area"
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            fileInputRef.current?.click();
+          }
+        }}
         onClick={() => fileInputRef.current?.click()}
       >
         {uploadedFile ? (
