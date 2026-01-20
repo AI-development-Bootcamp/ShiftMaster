@@ -30,13 +30,18 @@ This proposal introduces a set of admin-only user management endpoints that allo
 
 ## What Changes
 
-### API Endpoints (Admin-only)
-
-- **POST /api/v1/users** - Create new user
-- **GET /api/v1/users** - List all users (with pagination)
-- **GET /api/v1/users/:id** - Get single user by ID
-- **PATCH /api/v1/users/:id** - Update user information
-- **DELETE /api/v1/users/:id** - Soft delete user (set active=false)
+ - **BREAKING**: None.
+ - **BREAKING**: Add admin-only user management endpoints:
+ - POST /api/v1/users
+ - GET /api/v1/users
+ - GET /api/v1/users/:id
+ - PATCH /api/v1/users/:id
+ - DELETE /api/v1/users/:id
+ - **BREAKING**: Add modules:
+ - server/src/controllers/usersController.ts
+ - server/src/services/usersService.ts
+ - server/src/routes/users.ts
+ - server/src/validations/userValidation.ts
 
 ### New Files
 
