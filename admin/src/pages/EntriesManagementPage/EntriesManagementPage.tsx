@@ -8,6 +8,11 @@ import { mockProjects } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
 import { mockCurrentUser } from '../../mocks/users';
 import { MonthLockButton, MonthLockModal } from '../../components/MonthLocks';
+import { FormShell, FormValues } from '../../components/FormShell';
+import { createClientForm } from '../../components/forms/createClient';
+import { createProjectForm } from '../../components/forms/createProject';
+import { createTaskForm } from '../../components/forms/createTask';
+import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDropdownMenu';
 import { useTranslation } from 'react-i18next';
 import '../../styles/EntriesManagementPage.css';
 
@@ -20,6 +25,20 @@ export function EntriesManagementPage() {
     ]);
     const [isMonthLockModalOpen, setIsMonthLockModalOpen] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
+
+    // --- Create Form State ---
+    const [activeForm, setActiveForm] = useState<'createClient' | 'createProject' | 'createTask' | null>(null);
+
+    const handleFormSubmit = async (values: FormValues) => {
+        console.log(`Submitted ${activeForm} form:`, values);
+        setActiveForm(null);
+    };
+
+    const createDropdownOptions = useMemo(() => [
+        { id: 'client', label: t('createMenu.options.addClient'), onSelect: () => setActiveForm('createClient') },
+        { id: 'project', label: t('createMenu.options.addProject'), onSelect: () => setActiveForm('createProject') },
+        { id: 'task', label: t('createMenu.options.addTask'), onSelect: () => setActiveForm('createTask') },
+    ], [t]);
 
     // Local state for projects data (will be replaced with API data in the future)
     const [projects, setProjects] = useState<Project[]>(mockProjects);
@@ -139,12 +158,16 @@ export function EntriesManagementPage() {
                 </div>
 
                 {/* Actions Section (Left/End) */}
-                <div className="month-lock-button-container">
-                    {/* Visual Order RTL: [Search] [Button] (Button is Leftmost) */}
+                <div className="month-lock-button-container" style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    {/* Visual Order RTL: [CreateDropdown] [Search] [MonthButton] */}
                     <TableSearch
                         value={searchQuery}
                         onChange={setSearchQuery}
                         placeholder={t('entriesPage.searchBarHint')}
+                    />
+                    <CreateDropdownMenu
+                        label={t('createMenu.title')}
+                        options={createDropdownOptions}
                     />
 
                     <MonthLockButton
@@ -177,6 +200,34 @@ export function EntriesManagementPage() {
                 onRadioChange={handleRadioChange}
                 isLoading={false}
             />
+
+            {/* Create Forms */}
+            {activeForm === 'createClient' && (
+                <FormShell
+                    {...createClientForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeForm === 'createProject' && (
+                <FormShell
+                    {...createProjectForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeForm === 'createTask' && (
+                <FormShell
+                    {...createTaskForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
         </div>
     );
 }

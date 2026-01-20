@@ -7,6 +7,8 @@ import { useTableSearch } from '../../hooks/useTableSearch';
 import { mockUsers } from '../../mocks/users';
 import { User, UserRole } from '@abra-shift-master/shared';
 import { useTranslation } from 'react-i18next';
+import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
+import { CONFIRM_VARIANTS } from '../../constants/ui';
 import '../../styles/EmployeesManagementPage.css';
 
 export function EmployeesManagementPage() {
@@ -16,6 +18,9 @@ export function EmployeesManagementPage() {
     const [users, setUsers] = useState<User[]>(mockUsers);
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>(null);
+
+    // --- Delete Confirmation State ---
+    const [deletingUser, setDeletingUser] = useState<User | null>(null);
 
     // --- Search Logic (Reusable) ---
     const { searchQuery, setSearchQuery, filteredData } = useTableSearch(users, ['full_name', 'email', 'job_title']);
@@ -92,11 +97,15 @@ export function EmployeesManagementPage() {
         setActiveForm('edit');
     };
 
-    const handleDelete = (user: User) => {
-        console.log('Delete user:', user);
-        if (window.confirm(`${t('employeesPage.confirmDelete')} ${user.full_name}?`)) {
-            setUsers(prev => prev.filter(u => u.user_id !== user.user_id));
-        }
+    const handleDeleteClick = (user: User) => {
+        setDeletingUser(user);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deletingUser) return;
+        console.log('Delete Employee ID:', deletingUser.user_id);
+        setUsers(prev => prev.filter(u => u.user_id !== deletingUser.user_id));
+        setDeletingUser(null);
     };
 
     return (
@@ -149,7 +158,7 @@ export function EmployeesManagementPage() {
                         {
                             label: t('employeesPage.actions.deleteEmployee', 'מחק עובד'),
                             variant: 'danger',
-                            onClick: (row) => handleDelete(row)
+                            onClick: (row) => handleDeleteClick(row)
                         }
                     ]
                 }}
@@ -171,6 +180,17 @@ export function EmployeesManagementPage() {
                     onClose={() => setActiveForm(null)}
                 />
             )}
+
+            <ConfirmActionModal
+                isOpen={!!deletingUser}
+                title={t('confirmDelete.employee.title')}
+                description={`${t('confirmDelete.employee.description')} (${deletingUser?.full_name})`}
+                variant={CONFIRM_VARIANTS.DANGER}
+                confirmLabel={t('confirmDelete.confirmLabel')}
+                cancelLabel={t('confirmDelete.cancelLabel')}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeletingUser(null)}
+            />
         </div>
     );
 }

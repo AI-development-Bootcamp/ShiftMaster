@@ -5,9 +5,12 @@ import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState, PersonChip } from '../../components/TableShell/types';
 import { TaskEmployeeAssignmentForm, EmployeeRow } from '../../components/task/TaskEmployeeAssignmentForm';
 import { FormShell, FormValues } from '../../components/FormShell';
-import { editClientForm } from '../../components/forms/createClient';
-import { editProjectForm } from '../../components/forms/createProject';
-import { editTaskForm } from '../../components/forms/createTask';
+import { editClientForm, createClientForm } from '../../components/forms/createClient';
+import { editProjectForm, createProjectForm } from '../../components/forms/createProject';
+import { editTaskForm, createTaskForm } from '../../components/forms/createTask';
+import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDropdownMenu';
+import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
+import { CONFIRM_VARIANTS } from '../../constants/ui';
 import { useTranslation } from 'react-i18next';
 import { UserRole } from '@abra-shift-master/shared';
 
@@ -37,13 +40,16 @@ export function AssignmentPage() {
     ]);
     const [editingAssignment, setEditingAssignment] = useState<AssignmentTableRow | null>(null);
 
-    // --- Edit Form State ---
-    const [activeEditForm, setActiveEditForm] = useState<'client' | 'project' | 'task' | null>(null);
+    // --- Edit/Create Form State ---
+    const [activeForm, setActiveForm] = useState<'client' | 'project' | 'task' | 'createClient' | 'createProject' | 'createTask' | null>(null);
     const [formInitialValues, setFormInitialValues] = useState<FormValues>({});
 
+    // --- Delete Confirmation State ---
+    const [deletingItem, setDeletingItem] = useState<{ type: 'client' | 'project' | 'task', id: string, name: string } | null>(null);
+
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeEditForm} form:`, values);
-        setActiveEditForm(null);
+        console.log(`Submitted ${activeForm} form:`, values);
+        setActiveForm(null);
     };
 
     const handleEditClient = (row: AssignmentTableRow) => {
@@ -53,7 +59,7 @@ export function AssignmentPage() {
                 clientName: client.name,
                 contactDetails: client.contact_info || '',
             });
-            setActiveEditForm('client');
+            setActiveForm('client');
         }
     };
 
@@ -66,7 +72,7 @@ export function AssignmentPage() {
                 projectDuration: { start: project.start_date || '', end: '' }, // End date missing in mock
                 description: project.description || '',
             });
-            setActiveEditForm('project');
+            setActiveForm('project');
         }
     };
 
@@ -76,12 +82,22 @@ export function AssignmentPage() {
             setFormInitialValues({
                 taskTitle: task.name,
                 projectId: String(task.project_id),
-                assignedTo: '', // Mock data doesn't link task directly to single assignee in this context easily
-                dueDate: '', // Mock Task doesn't have due_date
+                assignedTo: '',
+                dueDate: '',
                 description: task.description || '',
             });
-            setActiveEditForm('task');
+            setActiveForm('task');
         }
+    };
+
+    const handleDeleteClick = (type: 'client' | 'project' | 'task', id: string, name: string) => {
+        setDeletingItem({ type, id, name });
+    };
+
+    const handleConfirmDelete = () => {
+        if (!deletingItem) return;
+        console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
+        setDeletingItem(null);
     };
 
     // --- Data Aggregation (Raw Rows) ---
@@ -118,7 +134,6 @@ export function AssignmentPage() {
     }, [t]);
 
     // --- Search Logic (Reusable) ---
-    // Search by client, project, or task name
     const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
 
     // Reset pagination when search/data changes
@@ -168,7 +183,6 @@ export function AssignmentPage() {
 
     const handleAssignmentSubmit = async (selectedRows: EmployeeRow[]) => {
         console.log('Updated assignments for task', editingAssignment?.task_name, ':', selectedRows);
-        // Here we would call API to update assignments
         setEditingAssignment(null);
     };
 
@@ -212,6 +226,12 @@ export function AssignmentPage() {
         }
     ];
 
+    const createDropdownOptions = useMemo(() => [
+        { id: 'client', label: t('createMenu.options.addClient'), onSelect: () => { setFormInitialValues({}); setActiveForm('createClient'); } },
+        { id: 'project', label: t('createMenu.options.addProject'), onSelect: () => { setFormInitialValues({}); setActiveForm('createProject'); } },
+        { id: 'task', label: t('createMenu.options.addTask'), onSelect: () => { setFormInitialValues({}); setActiveForm('createTask'); } },
+    ], [t]);
+
     return (
         <div className="assignment-page">
             <div className="assignment-page-header">
@@ -222,11 +242,17 @@ export function AssignmentPage() {
                 </div>
 
                 {/* Actions/Search Section (Left/End) */}
-                <TableSearch
-                    value={searchQuery}
-                    onChange={setSearchQuery}
-                    placeholder={t('assignmentPage.searchBarHint')}
-                />
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                    <TableSearch
+                        value={searchQuery}
+                        onChange={setSearchQuery}
+                        placeholder={t('assignmentPage.searchBarHint')}
+                    />
+                    <CreateDropdownMenu
+                        label={t('createMenu.title')}
+                        options={createDropdownOptions}
+                    />
+                </div>
             </div>
 
             <TableShell
@@ -257,9 +283,9 @@ export function AssignmentPage() {
                         },
                     ],
                     deleteOptions: [
-                        { label: t('assignmentPage.actions.deleteClient'), onClick: () => console.log('Delete Client') },
-                        { label: t('assignmentPage.actions.deleteProject'), onClick: () => console.log('Delete Project') },
-                        { label: t('assignmentPage.actions.deleteTask'), onClick: () => console.log('Delete Task') },
+                        { label: t('assignmentPage.actions.deleteClient'), onClick: (row) => handleDeleteClick('client', String(row.client_id), row.client_name) },
+                        { label: t('assignmentPage.actions.deleteProject'), onClick: (row) => handleDeleteClick('project', String(row.project_id), row.project_name) },
+                        { label: t('assignmentPage.actions.deleteTask'), onClick: (row) => handleDeleteClick('task', String(row.task_id), row.task_name) },
                     ]
                 }}
             />
@@ -278,32 +304,72 @@ export function AssignmentPage() {
                 />
             )}
 
-            {activeEditForm === 'client' && (
+            {/* Edit Forms */}
+            {activeForm === 'client' && (
                 <FormShell
                     {...editClientForm}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveEditForm(null)}
+                    onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
                 />
             )}
 
-            {activeEditForm === 'project' && (
+            {activeForm === 'project' && (
                 <FormShell
                     {...editProjectForm}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveEditForm(null)}
+                    onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
                 />
             )}
 
-            {activeEditForm === 'task' && (
+            {activeForm === 'task' && (
                 <FormShell
                     {...editTaskForm}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveEditForm(null)}
+                    onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
                 />
             )}
+
+            {/* Create Forms */}
+            {activeForm === 'createClient' && (
+                <FormShell
+                    {...createClientForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeForm === 'createProject' && (
+                <FormShell
+                    {...createProjectForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            {activeForm === 'createTask' && (
+                <FormShell
+                    {...createTaskForm}
+                    initialValues={{}}
+                    onClose={() => setActiveForm(null)}
+                    onSubmit={handleFormSubmit}
+                />
+            )}
+
+            <ConfirmActionModal
+                isOpen={!!deletingItem}
+                title={deletingItem ? t(`confirmDelete.${deletingItem.type}.title`) : ''}
+                description={deletingItem ? `${t(`confirmDelete.${deletingItem.type}.description`)} (${deletingItem.name})` : ''}
+                variant={CONFIRM_VARIANTS.DANGER}
+                confirmLabel={t('confirmDelete.confirmLabel')}
+                cancelLabel={t('confirmDelete.cancelLabel')}
+                onConfirm={handleConfirmDelete}
+                onCancel={() => setDeletingItem(null)}
+            />
         </div>
     );
 }

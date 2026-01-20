@@ -20,6 +20,14 @@
         "entries": "הגדרת דיווחי שעות",
         "employees": "ניהול עובדים"
     },
+    "createMenu": {
+        "title": "יצירה",
+        "options": {
+            "addClient": "צור לקוח חדש",
+            "addProject": "צור פרויקט חדש",
+            "addTask": "צור משימה חדשה"
+        }
+    },
     "assignmentPage": {
         "title": "שיוך עובד למשימה",
         "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
@@ -38,12 +46,6 @@
             "deleteClient": "מחק לקוח",
             "deleteProject": "מחק פרויקט",
             "deleteTask": "מחק משימה"
-        },
-        "dropDownTitle": "יצירה",
-        "dropDownOptions": {
-            "addClient": "צור לקוח חדש",
-            "addProject": "צור פרויקט חדש",
-            "addTask": "צור משימה חדשה"
         }
     },
     "employeesPage": {
@@ -157,5 +159,25 @@
         "emptyState": "לא נמצאו עובדים",
         "submitButton": "שייך עובד למשימה",
         "close": "סגור"
+    },
+    "confirmDelete": {
+        "client": {
+            "title": "מחיקת לקוח",
+            "description": "האם אתה בטוח שברצונך למחוק את הלקוח?"
+        },
+        "project": {
+            "title": "מחיקת פרויקט",
+            "description": "האם אתה בטוח שברצונך למחוק את הפרויקט?"
+        },
+        "task": {
+            "title": "מחיקת משימה",
+            "description": "האם אתה בטוח שברצונך למחוק את המשימה?"
+        },
+        "employee": {
+            "title": "מחיקת עובד",
+            "description": "האם אתה בטוח שברצונך למחוק את העובד?"
+        },
+        "confirmLabel": "מחק",
+        "cancelLabel": "ביטול"
     }
 }
