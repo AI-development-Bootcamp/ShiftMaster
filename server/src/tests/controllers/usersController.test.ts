@@ -111,13 +111,11 @@ describe('UsersController', () => {
     };
 
     // Set default user as admin for tests
-    // Set default user as admin for tests
     (mockRequest as AuthenticatedRequest).user = {
       userId: 'admin-id',
       role: 'admin',
       email: 'admin@example.com'
     };
-  });
 
   describe('createUser', () => {
     it('should create user successfully', async () => {
