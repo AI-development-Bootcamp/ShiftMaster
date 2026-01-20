@@ -22,9 +22,9 @@ import '../../styles/AssignmentPage.css';
 
 interface AssignmentTableRow {
     id: string;
-    task_id: number;
-    client_id: number;
-    project_id: number;
+    task_id: string;
+    client_id: string;
+    project_id: string;
     client_name: string;
     project_name: string;
     task_name: string;
@@ -123,8 +123,8 @@ export function AssignmentPage() {
             return {
                 id: String(task.task_id),
                 task_id: task.task_id,
-                client_id: client ? client.client_id : 0,
-                project_id: project ? project.project_id : 0,
+                client_id: client ? client.client_id : '',
+                project_id: project ? project.project_id : '',
                 client_name: client ? client.name : t('common.unknown'),
                 project_name: project ? project.name : t('common.unknown'),
                 task_name: task.name,

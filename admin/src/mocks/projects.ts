@@ -24,9 +24,9 @@ export const mockProjects: Project[] = [
         created_at: '2024-01-20T09:00:00Z',
     },
     {
-        project_id: 3,
-        client_id: 4, // Abra
-        manager_user_id: 1,
+        project_id: '750e8400-e29b-41d4-a716-446655440002',
+        client_id: '850e8400-e29b-41d4-a716-446655440003', // Abra
+        manager_user_id: '550e8400-e29b-41d4-a716-446655440000',
         name: 'מערכת משאבי אנוש',
         description: 'פלטפורמה לניהול עובדים וגיוס',
         start_date: '2024-02-01',
@@ -60,8 +60,8 @@ export const mockTasks: Task[] = [
         created_at: '2024-02-01T10:00:00Z',
     },
     {
-        task_id: 4,
-        project_id: 3,
+        task_id: '650e8400-e29b-41d4-a716-446655440003',
+        project_id: '750e8400-e29b-41d4-a716-446655440002',
         name: 'פיתוח Frontend',
         description: 'Implementing React Native screens',
         created_at: '2024-01-01T10:00:00Z',

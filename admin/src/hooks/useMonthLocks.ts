@@ -47,9 +47,9 @@ export function useMonthLocks(year: number) {
         return currentLocks.filter(lock => lock.lock_id !== existingTx.lock_id);
       } else {
         // Lock: add to pending
-        const mockAdminUserId = 1; // TODO: Replace with actual admin user ID
+        const mockAdminUserId = '550e8400-e29b-41d4-a716-446655440000'; // TODO: Replace with actual admin user ID
         const newLock: MonthLock = {
-          lock_id: Date.now() + Math.random(), // Temp ID
+          lock_id: crypto.randomUUID(), // Generate UUID
           year,
           month,
           locked_at: new Date().toISOString(),
