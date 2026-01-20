@@ -1,4 +1,4 @@
-.employees-managment-page {
+.employees-management-page {
     height: 100%;
     padding: 2rem;
     overflow: hidden;
@@ -20,6 +20,6 @@
 
 
 
-.employees-managment-page p {
+.employees-management-page p {
     color: var(--color-text-secondary, #6b7280);
 }

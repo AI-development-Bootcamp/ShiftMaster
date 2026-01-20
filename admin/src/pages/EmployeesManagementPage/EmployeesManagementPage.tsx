@@ -100,7 +100,7 @@ export function EmployeesManagementPage() {
     };
 
     return (
-        <div className="employees-managment-page">
+        <div className="employees-management-page">
             <div className="employees-page-header">
                 {/* Title Section (Right/Start) */}
                 <div className="page-header-title-group">
