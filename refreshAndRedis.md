@@ -585,11 +585,11 @@ A: Yes, good practice. Add `revokeAllUserSessions(userId)` to authService.
 
 - [x] Docker Compose Redis setup working (`npm run redis:start`)
 - [x] Redis client connects successfully in local dev and production
-- [ ] POST /api/v1/auth/login sets HttpOnly refresh cookies
-- [ ] POST /api/v1/auth/refresh returns new access token with valid cookies
-- [ ] POST /api/v1/auth/refresh rotates refresh token (old one invalid)
-- [ ] POST /api/v1/auth/refresh detects reuse and revokes session
-- [ ] POST /api/v1/auth/logout clears cookies and revokes session
+- [x] POST /api/v1/auth/login sets HttpOnly refresh cookies
+- [x] POST /api/v1/auth/refresh returns new access token with valid cookies
+- [x] POST /api/v1/auth/refresh rotates refresh token (old one invalid)
+- [x] POST /api/v1/auth/refresh detects reuse and revokes session
+- [x] POST /api/v1/auth/logout clears cookies and revokes session
 - [ ] Client and Admin frontends store access token in-memory only
 - [ ] Client and Admin frontends call /refresh on app start
 - [ ] API client retries 401 with /refresh, prevents refresh storms
