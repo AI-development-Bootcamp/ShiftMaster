@@ -87,7 +87,7 @@ This proposal introduces a set of admin-only user management endpoints that allo
   - hashPassword: server/src/utils/password.ts:19
   - comparePassword: server/src/utils/password.ts:36
 
-- **Pull Request**: https://github.com/AI-development-Bootcamp/ShiftMaster/pull/18
+- **Pull Request**: [PR `#18`](https://github.com/AI-development-Bootcamp/ShiftMaster/pull/18)
 
 ### Breaking Changes
 
