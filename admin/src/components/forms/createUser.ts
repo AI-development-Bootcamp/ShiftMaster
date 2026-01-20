@@ -1,4 +1,5 @@
 import { FormFieldSchema } from '../FormShell';
+import { FIELD_TYPES } from '../../constants/forms';
 
 export const createUserForm = {
     title: 'הוספת עובד למערכת',
@@ -7,21 +8,21 @@ export const createUserForm = {
     fields: [
         {
             id: 'fullName',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'שם מלא',
             placeholder: 'הכנס שם מלא',
             required: true,
         },
         {
             id: 'email',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'אימייל',
             placeholder: 'employee@company.com',
             required: true,
         },
         {
             id: 'password',
-            type: 'passwordBox',
+            type: FIELD_TYPES.PASSWORD_BOX,
             label: 'סיסמה ראשונית',
             placeholder: 'הזן סיסמה ראשונית (לפחות 6 תווים)',
             required: true,
@@ -29,7 +30,7 @@ export const createUserForm = {
         },
         {
             id: 'role',
-            type: 'dropdownBox',
+            type: FIELD_TYPES.DROPDOWN_BOX,
             label: 'תפקיד',
             options: [
                 { value: 'regular', label: 'עובד' },
@@ -39,7 +40,7 @@ export const createUserForm = {
         },
         {
             id: 'jobTitle',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'תואר תפקיד',
             placeholder: 'לדוגמה: ראש צוות פיתוח',
             dependsOn: {

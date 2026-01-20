@@ -1,4 +1,5 @@
 import { FormFieldSchema } from '../FormShell';
+import { FIELD_TYPES } from '../../constants/forms';
 
 export const createProjectForm = {
     title: 'הוספת פרויקט חדש',
@@ -7,14 +8,14 @@ export const createProjectForm = {
     fields: [
         {
             id: 'projectName',
-            type: 'textBox',
+            type: FIELD_TYPES.TEXT_BOX,
             label: 'שם הפרויקט',
             placeholder: 'הכנס את שם הפרויקט',
             required: true,
         },
         {
             id: 'clientId',
-            type: 'dropdownBox',
+            type: FIELD_TYPES.DROPDOWN_BOX,
             label: 'לקוח',
             placeholder: 'בחר לקוח',
             options: [
@@ -25,13 +26,13 @@ export const createProjectForm = {
         },
         {
             id: 'projectDuration',
-            type: 'dateRangeBox',
+            type: FIELD_TYPES.DATE_RANGE_BOX,
             label: 'תקופת הפרויקט',
             required: true,
         },
         {
             id: 'description',
-            type: 'largeTextBox',
+            type: FIELD_TYPES.LARGE_TEXT_BOX,
             label: 'תיאור הפרויקט',
             placeholder: 'פרטים נוספים אודות הפרויקט',
             rows: 3,
