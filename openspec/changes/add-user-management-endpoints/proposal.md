@@ -17,31 +17,13 @@ This proposal introduces a set of admin-only user management endpoints that allo
 * Managing user roles and permissions
 * Deactivating user accounts using a soft-delete mechanism instead of permanent removal
 
----
+### New API Endpoints
 
-## Impact
-
-* Admins gain full control over user management without relying on manual database operations
-* Enables scalable onboarding and offboarding workflows
-* Improves security by allowing controlled role and permission updates
-* Lays the groundwork for future admin tooling and automation
-* Existing authentication flows remain unchanged; login continues to work only for active users
-
-
-## What Changes
-
- - **BREAKING**: None.
- - **BREAKING**: Add admin-only user management endpoints:
- - POST /api/v1/users
- - GET /api/v1/users
- - GET /api/v1/users/:id
- - PATCH /api/v1/users/:id
- - DELETE /api/v1/users/:id
- - **BREAKING**: Add modules:
- - server/src/controllers/usersController.ts
- - server/src/services/usersService.ts
- - server/src/routes/users.ts
- - server/src/validations/userValidation.ts
+- POST /api/v1/users
+- GET /api/v1/users
+- GET /api/v1/users/:id
+- PATCH /api/v1/users/:id
+- DELETE /api/v1/users/:id
 
 ### New Files
 
@@ -55,7 +37,7 @@ This proposal introduces a set of admin-only user management endpoints that allo
 - `server/src/db/repositories/UserRepository.ts` - Repository pattern for data access (exists in separate branch, will be merged)
   - Uses `create()`, `findById()`, `findAll()`, `update()`, `delete()` (soft delete)
   - Uses `findByEmail()` for email uniqueness checks
-  
+
 **Note:** If UserRepository is not yet available, create temporary stub implementation that will be replaced after repository branch merge.
 
 ### Modified Files
@@ -70,7 +52,15 @@ This proposal introduces a set of admin-only user management endpoints that allo
 - Integration tests for all endpoints
 - Test coverage for validation and error cases
 
+---
+
 ## Impact
+
+* Admins gain full control over user management without relying on manual database operations
+* Enables scalable onboarding and offboarding workflows
+* Improves security by allowing controlled role and permission updates
+* Lays the groundwork for future admin tooling and automation
+* Existing authentication flows remain unchanged; login continues to work only for active users
 
 ### Affected Specs
 
@@ -78,10 +68,26 @@ This proposal introduces a set of admin-only user management endpoints that allo
 
 ### Affected Code
 
-- New routes, controller, service, and validation modules
-- Integration with existing auth middleware (`isAuthenticated`, `isAdmin`)
-- Uses existing `UserRepository` (repository pattern for data access)
-- Uses existing utilities (`password.ts` for hashing)
+- **New modules created**:
+  - server/src/routes/users.ts:1 (route definitions)
+  - server/src/controllers/usersController.ts:1 (HTTP handlers)
+  - server/src/services/usersService.ts:1 (business logic)
+  - server/src/validations/userValidation.ts:1 (Zod schemas)
+
+- **Auth middleware integration**:
+  - isAuthenticated: server/src/middleware/auth.ts:21
+  - isAdmin: server/src/middleware/auth.ts:81
+  - Applied in routes: server/src/routes/users.ts:2, :127, :227, :284, :374, :482, :533
+
+- **Repository interface dependency**:
+  - IUserRepository: server/src/db/types/repositories.ts:24
+  - UserRepository implementation: server/src/db/repositories/UserRepository.ts:7
+
+- **Password utilities used**:
+  - hashPassword: server/src/utils/password.ts:19
+  - comparePassword: server/src/utils/password.ts:36
+
+- **Pull Request**: https://github.com/AI-development-Bootcamp/ShiftMaster/pull/18
 
 ### Breaking Changes
 

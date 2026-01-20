@@ -274,10 +274,6 @@ export class UsersService {
     }
   }
 
-  // Enforce admin access at the start of updateUser body
-  // This is a bit tricky with multi-replace since we replaced the signature but not the body start.
-  // Actually, I should have put the check inside the body in the previous chunk or carefully structured it.
-  // Let me re-do the updateUser chunk to include the check at the start of the body.
 
 
   /**
