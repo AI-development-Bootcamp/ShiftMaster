@@ -50,6 +50,11 @@ interface FileUploadError {
   message?: string;
 }
 
+interface HalfVacationError {
+  code: 'HALF_VACATION_CAP' | null;
+  message?: string;
+}
+
 type TimePickerItem = number | 'AM' | 'PM';
 
 function ManualReportModal({
@@ -76,6 +81,11 @@ function ManualReportModal({
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [timeErrors, setTimeErrors] = useState<Record<string, string>>({});
   const [showMissingHoursAlert, setShowMissingHoursAlert] = useState(false);
+  const [halfVacationError, setHalfVacationError] = useState<HalfVacationError>(
+    {
+      code: null,
+    }
+  );
   const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
     type: SelectionType | null;
@@ -440,7 +450,10 @@ function ManualReportModal({
 
       // Check if day has half-vacation and work hours exceed 4.5
       if (currentDayAbsenceType === 'vacation-half' && totalHours > 4.5) {
-        alert('לא ניתן לדווח יותר מ-4.5 שעות עבודה ביום חצי חופש');
+        setHalfVacationError({
+          code: 'HALF_VACATION_CAP',
+          message: 'לא ניתן לדווח יותר מ-4.5 שעות עבודה ביום חצי חופש',
+        });
         return;
       }
 
@@ -763,6 +776,13 @@ function ManualReportModal({
   const formatTime = (hours: number, minutes: number) => {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
   };
+
+  // Clear half-vacation error when inputs change
+  useEffect(() => {
+    if (halfVacationError.code) {
+      setHalfVacationError({ code: null });
+    }
+  }, [projectEntries, entryTime, exitTime, activeTab]);
 
   // Click outside to close dropdown
   useEffect(() => {
@@ -1940,6 +1960,16 @@ function ManualReportModal({
                   }}
                 />
               </div>
+              {halfVacationError.code && (
+                <div
+                  className="file-upload-error"
+                  role="alert"
+                  data-error-code={halfVacationError.code}
+                  style={{ marginTop: '12px', marginBottom: '12px' }}
+                >
+                  {halfVacationError.message}
+                </div>
+              )}
               <button className="footer-save-btn" onClick={handleSave}>
                 שמירה
               </button>

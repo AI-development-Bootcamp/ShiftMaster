@@ -141,13 +141,19 @@
   justify-content: space-between;
   padding: 14px 16px;
   background: #f8f9fa;
+  border: none;
   border-radius: 8px;
   font-family: 'Assistant', sans-serif;
   font-size: 15px;
   font-weight: 500;
   color: #141e3e;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    box-shadow 0.2s ease,
+    outline 0.2s ease;
+  width: 100%;
+  text-align: inherit;
 }
 
 .selection-item:hover {
@@ -156,6 +162,17 @@
 
 .selection-item:active {
   background: #dee2e6;
+}
+
+.selection-item:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.selection-item:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
 }
 
 .selection-item-text {

@@ -16,6 +16,15 @@ interface SelectionModalProps {
   onSelect: (value: string) => void;
 }
 
+class SelectionError extends Error {
+  code: string;
+  constructor(message: string, code: string) {
+    super(message);
+    this.name = 'SelectionError';
+    this.code = code;
+  }
+}
+
 function SelectionModal({
   isOpen,
   onClose,
@@ -54,20 +63,47 @@ function SelectionModal({
   };
 
   const handleItemClick = (value: string) => {
-    setSelectedValue(value);
+    try {
+      setSelectedValue(value);
+    } catch (error) {
+      const selectionError = new SelectionError(
+        `Failed to select item: ${value}`,
+        'SELECTION_ERROR'
+      );
+      console.error(selectionError);
+      throw selectionError;
+    }
   };
 
   const handleConfirm = () => {
-    if (selectedValue) {
-      onSelect(selectedValue);
-      setSelectedValue(null);
-      onClose();
+    try {
+      if (selectedValue) {
+        onSelect(selectedValue);
+        setSelectedValue(null);
+        onClose();
+      }
+    } catch (error) {
+      const confirmError = new SelectionError(
+        `Failed to confirm selection: ${selectedValue}`,
+        'CONFIRM_ERROR'
+      );
+      console.error(confirmError);
+      throw confirmError;
     }
   };
 
   const handleClose = () => {
-    setSelectedValue(null);
-    onClose();
+    try {
+      setSelectedValue(null);
+      onClose();
+    } catch (error) {
+      const closeError = new SelectionError(
+        'Failed to close selection modal',
+        'CLOSE_ERROR'
+      );
+      console.error(closeError);
+      throw closeError;
+    }
   };
 
   return (
@@ -101,10 +137,12 @@ function SelectionModal({
               <h3 className="selection-group-title">{group.title}</h3>
               <div className="selection-items">
                 {group.items.map((item, itemIndex) => (
-                  <div
+                  <button
                     key={itemIndex}
+                    type="button"
                     className={`selection-item ${selectedValue === item ? 'selection-item--selected' : ''}`}
                     onClick={() => handleItemClick(item)}
+                    aria-pressed={selectedValue === item}
                   >
                     <span className="selection-item-text">{item}</span>
                     {selectedValue === item && (
@@ -126,7 +164,7 @@ function SelectionModal({
                         </svg>
                       </span>
                     )}
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
