@@ -22,7 +22,7 @@ function TimeEntryItem({ entry, onEdit }: TimeEntryItemProps) {
 
   return (
     <div className="time-entry-item">
-      <button className="edit-btn" onClick={handleEdit}>
+      <button type="button" className="edit-btn" onClick={handleEdit}>
         <svg className="edit-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
           <path
             d="M10.5 1.5L12.5 3.5L4.5 11.5L1.5 12.5L2.5 9.5L10.5 1.5Z"

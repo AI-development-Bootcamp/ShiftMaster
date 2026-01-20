@@ -6,9 +6,24 @@ interface TimerDisplayProps {
 }
 
 function TimerDisplay({ totalSeconds }: TimerDisplayProps) {
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const seconds = totalSeconds % 60;
+  // Validate and sanitize totalSeconds
+  const sanitized = Number.isFinite(+totalSeconds) ? Math.floor(+totalSeconds) : NaN;
+  let sanitizedSeconds = 0;
+
+  if (Number.isNaN(sanitized) || typeof totalSeconds !== 'number') {
+    console.error('[TD_INVALID_INPUT] TimerDisplay received invalid totalSeconds:', totalSeconds);
+    sanitizedSeconds = 0;
+  } else if (sanitized < 0) {
+    sanitizedSeconds = 0;
+  } else if (sanitized > 359999) {
+    sanitizedSeconds = 359999; // Cap at 99:59:59
+  } else {
+    sanitizedSeconds = sanitized;
+  }
+
+  const hours = Math.floor(sanitizedSeconds / 3600);
+  const minutes = Math.floor((sanitizedSeconds % 3600) / 60);
+  const seconds = sanitizedSeconds % 60;
 
   const hour1 = Math.floor(hours / 10);
   const hour2 = hours % 10;

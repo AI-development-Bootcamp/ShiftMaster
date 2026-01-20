@@ -48,9 +48,17 @@ function DailyEntryCard({
     }
   };
 
+  const panelId = `${entry.id}-panel`;
+
   return (
     <div className={`daily-entry-card ${expanded ? 'daily-entry-card--expanded' : ''}`}>
-      <button className="entry-header" onClick={handleToggle}>
+      <button
+        type="button"
+        className="entry-header"
+        onClick={handleToggle}
+        aria-expanded={expanded}
+        aria-controls={panelId}
+      >
         <span className={`chevron ${expanded ? 'chevron--expanded' : ''}`}>
           <svg width="14" height="8" viewBox="0 0 14 8" fill="none">
             <path
@@ -86,7 +94,7 @@ function DailyEntryCard({
       </button>
 
       {expanded && entry.timeEntries.length > 0 && (
-        <div className="entry-content">
+        <div id={panelId} className="entry-content">
           <div className="time-entries-list">
             {entry.timeEntries.map((timeEntry) => (
               <TimeEntryItem
@@ -111,7 +119,7 @@ function DailyEntryCard({
       )}
 
       {expanded && entry.timeEntries.length === 0 && (
-        <div className="entry-content entry-content--empty">
+        <div id={panelId} className="entry-content entry-content--empty">
           <button className="add-report-link" onClick={handleAddReport}>
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <path

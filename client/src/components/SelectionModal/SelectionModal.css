@@ -69,10 +69,24 @@
   cursor: pointer;
   color: #666;
   padding: 0;
-  transition: color 0.2s ease;
+  border-radius: 6px;
+  transition: color 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
 }
 
 .selection-modal-close-btn:hover {
+  color: #141e3e;
+}
+
+.selection-modal-close-btn:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  color: #141e3e;
+}
+
+.selection-modal-close-btn:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
   color: #141e3e;
 }
 
@@ -179,11 +193,22 @@
   font-weight: 600;
   color: #ffffff;
   cursor: pointer;
-  transition: background-color 0.2s ease, opacity 0.2s ease;
+  transition: background-color 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease, outline 0.2s ease;
 }
 
 .selection-modal-confirm-btn:hover:not(:disabled) {
   background: #1a2747;
+}
+
+.selection-modal-confirm-btn:focus:not(:disabled) {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.selection-modal-confirm-btn:focus-visible:not(:disabled) {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
 }
 
 .selection-modal-confirm-btn:active:not(:disabled) {
