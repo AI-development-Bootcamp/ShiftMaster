@@ -1,13 +1,11 @@
-name: Production CI/CD
+name: CI
 
 on:
-  push:
-    branches:
-      - production
+  pull_request:
 
 jobs:
   server:
-    name: Server - Test, Lint & Deploy
+    name: Server - Test & Lint
     runs-on: ubuntu-latest
     needs: shared
 
@@ -23,6 +21,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Build shared module
+        run: npm run build -w shared
 
       - name: Run linter
         run: npm run lint -w server
@@ -35,20 +36,8 @@ jobs:
         env:
           NODE_ENV: test
 
-      - name: Build
-        run: npm run build -w server
-
-      - name: Deploy Server
-        run: |
-          echo "🚀 Deploying server to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Or deploy to your server infrastructure
-
   client:
-    name: Client - Test, Lint & Deploy
+    name: Client - Test & Lint
     runs-on: ubuntu-latest
     needs: shared
 
@@ -64,6 +53,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Build shared module
+        run: npm run build -w shared
 
       - name: Run linter
         run: npm run lint -w client
@@ -76,20 +68,8 @@ jobs:
         env:
           NODE_ENV: test
 
-      - name: Build
-        run: npm run build -w client
-
-      - name: Deploy Client
-        run: |
-          echo "🚀 Deploying client to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
-
   admin:
-    name: Admin - Test, Lint & Deploy
+    name: Admin - Test & Lint
     runs-on: ubuntu-latest
     needs: shared
 
@@ -106,6 +86,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build shared module
+        run: npm run build -w shared
+
       - name: Run linter
         run: npm run lint -w admin
 
@@ -116,18 +99,6 @@ jobs:
         run: npm run test -w admin
         env:
           NODE_ENV: test
-
-      - name: Build
-        run: npm run build -w admin
-
-      - name: Deploy Admin
-        run: |
-          echo "🚀 Deploying admin to production..."
-          echo "TODO: Add deployment steps here"
-          # Example placeholder:
-          # - Setup Vercel CLI
-          # - Deploy to Vercel
-          # - Set environment variables
 
   shared:
     name: Shared - Test & Lint
@@ -146,6 +117,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build shared module
+        run: npm run build -w shared
+
       - name: Run linter
         run: npm run lint -w shared
 
@@ -156,6 +130,3 @@ jobs:
         run: npm run test -w shared
         env:
           NODE_ENV: test
-
-      - name: Build
-        run: npm run build -w shared

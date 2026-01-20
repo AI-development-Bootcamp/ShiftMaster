@@ -303,7 +303,7 @@ const { data, error } = await supabase
 
 ```
 JWT_SECRET=your-secret-key
-DATABASE_URL=postgresql://...
+SUPABASE_URL=postgresql://...
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-anon-key
 PORT=3000

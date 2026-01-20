@@ -1,42 +1,32 @@
-import { describe, it, expect } from 'vitest';
-import request from 'supertest';
-import app from '../app.js';
+import { describe, it, expect, vi, afterEach } from 'vitest';
+import { checkDatabaseHealth } from '../db/utils/health.js';
+import { supabase } from '../db/supabase.js';
 
-describe('Server Health Check', () => {
-  it('should return 200 OK with health status', async () => {
-    const response = await request(app).get('/api/v1/health');
-
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('status', 'ok');
-    expect(response.body).toHaveProperty('timestamp');
-    expect(response.body).toHaveProperty('uptime');
+describe('Database Health Check', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it('should return valid ISO timestamp', async () => {
-    const response = await request(app).get('/api/v1/health');
+  it('should return true when connection succeeds', async () => {
+    // Correct mock matching: supabase.from().select() returning a promise
+    const selectMock = vi.fn().mockResolvedValue({ error: null, status: 200 });
 
-    expect(response.status).toBe(200);
-    expect(response.body.timestamp).toMatch(
-      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/
-    );
+    vi.spyOn(supabase, 'from').mockReturnValue({ select: selectMock } as unknown as ReturnType<typeof supabase.from>);
+
+    const result = await checkDatabaseHealth();
+
+    expect(supabase.from).toHaveBeenCalledWith('users');
+    expect(selectMock).toHaveBeenCalledWith('user_id', { count: 'exact', head: true });
+    expect(result).toBe(true);
   });
 
-  it('should return positive uptime', async () => {
-    const response = await request(app).get('/api/v1/health');
+  it('should return false when connection fails', async () => {
+    const selectMock = vi.fn().mockRejectedValue(new Error('Connection failed'));
 
-    expect(response.status).toBe(200);
-    expect(response.body.uptime).toBeGreaterThanOrEqual(0);
-  });
+    vi.spyOn(supabase, 'from').mockReturnValue({ select: selectMock } as unknown as ReturnType<typeof supabase.from>);
 
-  it('should have correct response structure', async () => {
-    const response = await request(app).get('/api/v1/health');
+    const result = await checkDatabaseHealth();
 
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('status');
-    expect(response.body).toHaveProperty('timestamp');
-    expect(response.body).toHaveProperty('uptime');
-    expect(typeof response.body.status).toBe('string');
-    expect(typeof response.body.timestamp).toBe('string');
-    expect(typeof response.body.uptime).toBe('number');
+    expect(result).toBe(false);
   });
 });

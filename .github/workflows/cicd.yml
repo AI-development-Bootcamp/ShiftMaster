@@ -1,18 +1,16 @@
-name: Staging CI
+name:  CI/CD
 
 on:
   push:
     branches:
-      - dev
-  pull_request:
-    branches:
-      - dev
+      - production
 
 jobs:
   server:
-    name: Server - Test & Lint
+    name: Server - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: production
 
     steps:
       - name: Checkout code
@@ -38,10 +36,26 @@ jobs:
         env:
           NODE_ENV: test
 
+      - name: Build
+        run: npm run build -w server
+
+      - name: Deploy Server to Render
+        run: |
+          echo "🚀 Deploying server to Render..."
+          if [ -n "$RENDER_DEPLOY_URL_SERVER" ]; then
+            curl -X POST "$RENDER_DEPLOY_URL_SERVER" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          RENDER_DEPLOY_URL_SERVER: ${{ secrets.RENDER_DEPLOY_URL_SERVER }}
+
   client:
-    name: Client - Test & Lint
+    name: Client - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: production
 
     steps:
       - name: Checkout code
@@ -67,10 +81,26 @@ jobs:
         env:
           NODE_ENV: test
 
+      - name: Build
+        run: npm run build -w client
+
+      - name: Deploy Client to Render
+        run: |
+          echo "🚀 Deploying client to Render..."
+          if [ -n "$RENDER_DEPLOY_URL_CLIENT" ]; then
+            curl -X POST "$RENDER_DEPLOY_URL_CLIENT" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          RENDER_DEPLOY_URL_CLIENT: ${{ secrets.RENDER_DEPLOY_URL_CLIENT }}
+
   admin:
-    name: Admin - Test & Lint
+    name: Admin - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
+    environment: production
 
     steps:
       - name: Checkout code
@@ -95,6 +125,21 @@ jobs:
         run: npm run test -w admin
         env:
           NODE_ENV: test
+
+      - name: Build
+        run: npm run build -w admin
+
+      - name: Deploy Admin to Render
+        run: |
+          echo "🚀 Deploying admin to Render..."
+          if [ -n "$RENDER_DEPLOY_URL_ADMIN" ]; then
+            curl -X POST "$RENDER_DEPLOY_URL_ADMIN" \
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
+          else
+            echo "⚠️  Render deploy URL not configured - deployment skipped"
+          fi
+        env:
+          RENDER_DEPLOY_URL_ADMIN: ${{ secrets.RENDER_DEPLOY_URL_ADMIN }}
 
   shared:
     name: Shared - Test & Lint
@@ -123,3 +168,6 @@ jobs:
         run: npm run test -w shared
         env:
           NODE_ENV: test
+
+      - name: Build
+        run: npm run build -w shared
