@@ -6,7 +6,7 @@ import { logDbError } from '../utils/logger.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> implements ITaskRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('tasks', 'task_id', client);
     }
 

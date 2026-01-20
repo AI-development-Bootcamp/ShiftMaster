@@ -5,7 +5,7 @@ import { Entry, NewEntry, UpdateEntry } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class EntryRepository extends BaseRepository<Entry, NewEntry, UpdateEntry> implements IEntryRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('entries', 'entry_id', client);
     }
 

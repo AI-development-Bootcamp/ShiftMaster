@@ -3,6 +3,7 @@
  * Business logic for user CRUD operations
  */
 
+import { SupabaseClient } from '@supabase/supabase-js';
 import { UserRepository } from '../db/repositories/UserRepository.js';
 import { User, NewUser, UpdateUser } from '../db/types/entities.js';
 import { hashPassword } from '../utils/password.js';
@@ -100,8 +101,11 @@ function sanitizeUser(user: User): UserResponse {
 export class UsersService {
   private userRepo: UserRepository;
 
-  constructor() {
-    this.userRepo = new UserRepository();
+  constructor(dbConnection: SupabaseClient) {
+    if (!dbConnection) {
+      throw new Error('dbConnection is required for UsersService');
+    }
+    this.userRepo = new UserRepository(dbConnection);
   }
 
   /**

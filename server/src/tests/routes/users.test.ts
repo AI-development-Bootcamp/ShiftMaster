@@ -11,6 +11,9 @@ vi.mock('../../db/supabase.js', () => ({
   supabase: {
     from: vi.fn(),
   },
+  supabaseAdmin: {
+    from: vi.fn(),
+  },
 }));
 
 // Mock the UsersService class
@@ -259,7 +262,7 @@ describe('Users Routes', () => {
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
-      expect(serviceListUsers).toHaveBeenCalledWith(2, 10);
+      expect(serviceListUsers).toHaveBeenCalledWith({ role: 'admin' }, 2, 10);
     });
 
     it('should return 401 when not authenticated', async () => {

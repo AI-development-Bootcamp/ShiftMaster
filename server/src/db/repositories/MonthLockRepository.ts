@@ -5,7 +5,7 @@ import { MonthLock, NewMonthLock, UpdateMonthLock } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock, UpdateMonthLock> implements IMonthLockRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('month_locks', 'lock_id', client);
     }
 

@@ -3,7 +3,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { UsersService, DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
+import { UsersService, DuplicateEmailError, UserNotFoundError, AuthorizationError } from '../../services/usersService.js';
 import { User } from '../../db/types/entities.js';
 import * as passwordUtils from '../../utils/password.js';
 
@@ -53,8 +53,11 @@ describe('UsersService', () => {
     // Reset mocks
     vi.clearAllMocks();
 
-    // Create service instance
-    usersService = new UsersService();
+    // Create mock Supabase client
+    const mockSupabaseClient = {} as any;
+
+    // Create service instance with mock client
+    usersService = new UsersService(mockSupabaseClient);
 
     // Get mock repository instance (accessing private property for testing)
     mockUserRepo = (usersService as unknown as { userRepo: typeof mockUserRepo }).userRepo;
@@ -82,7 +85,8 @@ describe('UsersService', () => {
         role: newUserData.role,
       });
 
-      const result = await usersService.createUser(newUserData);
+      const actor = { role: 'admin' as const };
+      const result = await usersService.createUser(actor, newUserData);
 
       expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(newUserData.email);
       expect(passwordUtils.hashPassword).toHaveBeenCalledWith(newUserData.password);
@@ -101,7 +105,8 @@ describe('UsersService', () => {
     it('should throw DuplicateEmailError if email exists', async () => {
       mockUserRepo.findByEmail.mockResolvedValue(mockUser);
 
-      await expect(usersService.createUser(newUserData)).rejects.toThrow(
+      const actor = { role: 'admin' as const };
+      await expect(usersService.createUser(actor, newUserData)).rejects.toThrow(
         DuplicateEmailError
       );
       expect(mockUserRepo.create).not.toHaveBeenCalled();
@@ -116,7 +121,8 @@ describe('UsersService', () => {
       mockUserRepo.findByEmail.mockResolvedValue(null);
       mockUserRepo.create.mockResolvedValue(mockUser);
 
-      await usersService.createUser(dataWithoutJobTitle);
+      const actor = { role: 'admin' as const };
+      await usersService.createUser(actor, dataWithoutJobTitle);
 
       expect(mockUserRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -138,7 +144,8 @@ describe('UsersService', () => {
     it('should return paginated users with default pagination', async () => {
       mockUserRepo.findAll.mockResolvedValue(mockUsers);
 
-      const result = await usersService.listUsers();
+      const actor = { role: 'admin' as const };
+      const result = await usersService.listUsers(actor);
 
       expect(result.users).toHaveLength(5);
       expect(result.pagination).toEqual({
@@ -153,7 +160,8 @@ describe('UsersService', () => {
     it('should return correct page with custom pagination', async () => {
       mockUserRepo.findAll.mockResolvedValue(mockUsers);
 
-      const result = await usersService.listUsers(2, 2);
+      const actor = { role: 'admin' as const };
+      const result = await usersService.listUsers(actor, 2, 2);
 
       expect(result.users).toHaveLength(2);
       expect(result.users[0].user_id).toBe('123e4567-e89b-12d3-a456-426614174003');
@@ -169,7 +177,8 @@ describe('UsersService', () => {
     it('should return empty array for page beyond total', async () => {
       mockUserRepo.findAll.mockResolvedValue(mockUsers);
 
-      const result = await usersService.listUsers(10, 20);
+      const actor = { role: 'admin' as const };
+      const result = await usersService.listUsers(actor, 10, 20);
 
       expect(result.users).toHaveLength(0);
       expect(result.pagination.total).toBe(5);
@@ -179,7 +188,8 @@ describe('UsersService', () => {
     it('should exclude password_hash from all users', async () => {
       mockUserRepo.findAll.mockResolvedValue(mockUsers);
 
-      const result = await usersService.listUsers();
+      const actor = { role: 'admin' as const };
+      const result = await usersService.listUsers(actor);
 
       result.users.forEach((user) => {
         expect(user).not.toHaveProperty('password_hash');
@@ -218,7 +228,8 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue({ ...mockUser, ...updates });
 
-      const result = await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', updates);
+      const actor = { role: 'admin' as const };
+      const result = await usersService.updateUser(actor, '123e4567-e89b-12d3-a456-426614174000', updates);
 
       expect(mockUserRepo.findById).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
       expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', updates);
@@ -229,7 +240,8 @@ describe('UsersService', () => {
     it('should throw UserNotFoundError if user does not exist', async () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
-      await expect(usersService.updateUser('999e4567-e89b-12d3-a456-426614174999', updates)).rejects.toThrow(
+      const actor = { role: 'admin' as const };
+      await expect(usersService.updateUser(actor, '999e4567-e89b-12d3-a456-426614174999', updates)).rejects.toThrow(
         UserNotFoundError
       );
       expect(mockUserRepo.update).not.toHaveBeenCalled();
@@ -239,7 +251,8 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue(mockUser);
 
-      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { password: 'newpassword123' });
+      const actor = { role: 'admin' as const };
+      await usersService.updateUser(actor, '123e4567-e89b-12d3-a456-426614174000', { password: 'newpassword123' });
 
       expect(passwordUtils.hashPassword).toHaveBeenCalledWith('newpassword123');
       expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', {
@@ -253,7 +266,8 @@ describe('UsersService', () => {
       mockUserRepo.findByEmail.mockResolvedValue(null);
       mockUserRepo.update.mockResolvedValue({ ...mockUser, email: newEmail });
 
-      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: newEmail });
+      const actor = { role: 'admin' as const };
+      await usersService.updateUser(actor, '123e4567-e89b-12d3-a456-426614174000', { email: newEmail });
 
       expect(mockUserRepo.findByEmail).toHaveBeenCalledWith(newEmail);
       expect(mockUserRepo.update).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000', { email: newEmail });
@@ -264,8 +278,9 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.findByEmail.mockResolvedValue(existingUser);
 
+      const actor = { role: 'admin' as const };
       await expect(
-        usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: 'taken@example.com' })
+        usersService.updateUser(actor, '123e4567-e89b-12d3-a456-426614174000', { email: 'taken@example.com' })
       ).rejects.toThrow(DuplicateEmailError);
       expect(mockUserRepo.update).not.toHaveBeenCalled();
     });
@@ -274,7 +289,8 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.update.mockResolvedValue(mockUser);
 
-      await usersService.updateUser('123e4567-e89b-12d3-a456-426614174000', { email: mockUser.email });
+      const actor = { role: 'admin' as const };
+      await usersService.updateUser(actor, '123e4567-e89b-12d3-a456-426614174000', { email: mockUser.email });
 
       expect(mockUserRepo.findByEmail).not.toHaveBeenCalled();
     });
@@ -285,7 +301,8 @@ describe('UsersService', () => {
       mockUserRepo.findById.mockResolvedValue(mockUser);
       mockUserRepo.delete.mockResolvedValue(true);
 
-      const result = await usersService.deleteUser('123e4567-e89b-12d3-a456-426614174000');
+      const actor = { role: 'admin' as const };
+      const result = await usersService.deleteUser(actor, '123e4567-e89b-12d3-a456-426614174000');
 
       expect(mockUserRepo.findById).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
       expect(mockUserRepo.delete).toHaveBeenCalledWith('123e4567-e89b-12d3-a456-426614174000');
@@ -296,7 +313,8 @@ describe('UsersService', () => {
     it('should throw UserNotFoundError if user does not exist', async () => {
       mockUserRepo.findById.mockResolvedValue(null);
 
-      await expect(usersService.deleteUser('999e4567-e89b-12d3-a456-426614174999')).rejects.toThrow(
+      const actor = { role: 'admin' as const };
+      await expect(usersService.deleteUser(actor, '999e4567-e89b-12d3-a456-426614174999')).rejects.toThrow(
         UserNotFoundError
       );
       expect(mockUserRepo.delete).not.toHaveBeenCalled();

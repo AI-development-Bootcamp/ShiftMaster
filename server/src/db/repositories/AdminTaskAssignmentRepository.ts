@@ -5,7 +5,7 @@ import { AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment 
 import { logDbError } from '../utils/logger.js';
 
 export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment> implements IAdminTaskAssignmentRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('admin_task_assignments', 'admin_task_assignment_id', client);
     }
 

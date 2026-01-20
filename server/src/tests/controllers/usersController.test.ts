@@ -10,6 +10,9 @@ vi.mock('../../db/supabase.js', () => ({
   supabase: {
     from: vi.fn(),
   },
+  supabaseAdmin: {
+    from: vi.fn(),
+  },
 }));
 
 // Mock the UsersService class

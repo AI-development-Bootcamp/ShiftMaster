@@ -1,5 +1,5 @@
 import { SupabaseClient } from '@supabase/supabase-js';
-import { supabaseAdmin } from '../supabase.js';
+
 import { IBaseRepository } from '../types/repositories.js';
 import { logDbError } from '../utils/logger.js';
 
@@ -8,7 +8,10 @@ export abstract class BaseRepository<T, NewT, UpdateT> implements IBaseRepositor
     protected primaryKey: string;
     protected dbConnection: SupabaseClient;
 
-    constructor(table: string, primaryKey: string = 'id', dbConnection: SupabaseClient = supabaseAdmin) {
+    constructor(table: string, primaryKey: string = 'id', dbConnection: SupabaseClient) {
+        if (!dbConnection) {
+            throw new Error('dbConnection is required');
+        }
         this.table = table;
         this.primaryKey = primaryKey;
         this.dbConnection = dbConnection;

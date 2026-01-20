@@ -5,7 +5,7 @@ import { User, NewUser, UpdateUser } from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
 export class UserRepository extends BaseRepository<User, NewUser, UpdateUser> implements IUserRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('users', 'user_id', client);
     }
 

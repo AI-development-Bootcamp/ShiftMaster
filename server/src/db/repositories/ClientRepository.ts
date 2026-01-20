@@ -6,7 +6,7 @@ import { logDbError } from '../utils/logger.js';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 export class ClientRepository extends BaseRepository<Client, NewClient, UpdateClient> implements IClientRepository {
-    constructor(client?: SupabaseClient) {
+    constructor(client: SupabaseClient) {
         super('clients', 'client_id', client);
     }
 

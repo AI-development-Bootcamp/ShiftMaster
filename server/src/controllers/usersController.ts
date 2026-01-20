@@ -16,9 +16,7 @@ import {
   AuthorizationError,
   type Actor,
 } from '../services/usersService.js';
-
-// Initialize service
-const usersService = new UsersService();
+import { supabaseAdmin } from '../db/supabase.js';
 
 /**
  * Handle POST /api/v1/users - Create new user
@@ -46,6 +44,8 @@ export async function createUser(req: Request, res: Response): Promise<void> {
       role: req.user!.role,
     };
 
+    // Use admin client for admin operations
+    const usersService = new UsersService(supabaseAdmin);
     const user = await usersService.createUser(
       actor,
       validationResult.data as {
@@ -126,6 +126,7 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
 
     // Get users list
     const actor: Actor = { role: req.user!.role };
+    const usersService = new UsersService(supabaseAdmin);
     const result = await usersService.listUsers(actor, page, limit);
 
     // Return success response
@@ -178,7 +179,8 @@ export async function getCurrentUser(req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Get user
+    // Get user (admin client for bypassing RLS)
+    const usersService = new UsersService(supabaseAdmin);
     const user = await usersService.getUserById(userId);
 
     // Return success response
@@ -236,7 +238,8 @@ export async function getUser(req: Request, res: Response): Promise<void> {
 
     const userId = validationResult.data.id; // UUID string
 
-    // Get user
+    // Get user (admin client for bypassing RLS)
+    const usersService = new UsersService(supabaseAdmin);
     const user = await usersService.getUserById(userId);
 
     // Return success response
@@ -311,6 +314,7 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
 
     // Update user
     const actor: Actor = { role: req.user!.role };
+    const usersService = new UsersService(supabaseAdmin);
     const user = await usersService.updateUser(
       actor,
       userId,
@@ -405,6 +409,7 @@ export async function deleteUser(req: Request, res: Response): Promise<void> {
 
     // Delete user
     const actor: Actor = { role: req.user!.role };
+    const usersService = new UsersService(supabaseAdmin);
     const result = await usersService.deleteUser(actor, userId);
 
     // Return success response
