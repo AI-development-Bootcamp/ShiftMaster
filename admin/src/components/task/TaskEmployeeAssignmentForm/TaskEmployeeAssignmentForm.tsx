@@ -22,7 +22,7 @@ export function TaskEmployeeAssignmentForm({
     onClose,
     initialSelectedIds = []
 }: TaskEmployeeAssignmentFormProps) {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     // --- State ---
     const [localPage, setLocalPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>(null);
@@ -30,6 +30,11 @@ export function TaskEmployeeAssignmentForm({
     const [error, setError] = useState<string | null>(null);
     const [dynamicPageSize, setDynamicPageSize] = useState(DEFAULT_PAGE_SIZE);
     const tableWrapperRef = useRef<HTMLDivElement>(null);
+
+    // Sync selectedKeys with initialSelectedIds prop
+    useEffect(() => {
+        setSelectedKeys(new Set(initialSelectedIds));
+    }, [initialSelectedIds]);
 
     // --- Dynamic Page Size Logic ---
     useEffect(() => {
@@ -128,7 +133,7 @@ export function TaskEmployeeAssignmentForm({
         <div className="task-employee-form__overlay" onClick={onClose}>
             <div
                 className="task-employee-form"
-                dir="rtl"
+                dir={i18n.dir()}
                 onClick={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"

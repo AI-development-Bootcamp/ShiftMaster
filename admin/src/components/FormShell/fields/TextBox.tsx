@@ -29,12 +29,12 @@ export function TextBox({
     const isPassword = type === 'password';
 
     const safeT = (key: string) => {
-        try {
-            return t(key);
-        } catch (err) {
-            console.error({ code: 'TEXTBOX_I18N_MISSING', message: 'Translation failed', error: err, key });
+        const translated = t(key);
+        if (translated === key) {
+            console.error({ code: 'TEXTBOX_I18N_MISSING', message: 'Missing translation', key, value: translated });
             return key;
         }
+        return translated;
     };
 
     return (
