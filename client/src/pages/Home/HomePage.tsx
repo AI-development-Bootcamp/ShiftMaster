@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import DailyEntryCard, { DailyEntry } from '../../components/DailyEntryCard/DailyEntryCard';
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
+import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import './HomePage.css';
 
 // Mock data for testing
@@ -141,6 +142,17 @@ const loadEntriesForMonth = (month: number, year: number): DailyEntry[] => {
   return [];
 };
 
+// Helper function to check if a month/year is in the future
+const isFutureMonth = (month: number, year: number): boolean => {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+
+  if (year > currentYear) return true;
+  if (year === currentYear && month > currentMonth) return true;
+  return false;
+};
+
 function HomePage() {
   const navigate = useNavigate();
   const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October
@@ -152,11 +164,17 @@ function HomePage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [isLoadingEntries, setIsLoadingEntries] = useState(false);
 
   // Load entries when month/year changes
   useEffect(() => {
-    const loadedEntries = loadEntriesForMonth(currentMonthIndex, currentYear);
-    setEntries(loadedEntries);
+    setIsLoadingEntries(true);
+    // Simulate loading delay (remove when connecting to API)
+    setTimeout(() => {
+      const loadedEntries = loadEntriesForMonth(currentMonthIndex, currentYear);
+      setEntries(loadedEntries);
+      setIsLoadingEntries(false);
+    }, 300);
   }, [currentMonthIndex, currentYear]);
 
   useEffect(() => {
@@ -187,25 +205,33 @@ function HomePage() {
   const handlePrevMonth = () => {
     setPrevMonthIndex(currentMonthIndex);
     setMonthDirection('right');
-    setCurrentMonthIndex((prev) => {
-      if (prev === 0) {
-        setCurrentYear((y) => y - 1);
-        return 11;
-      }
-      return prev - 1;
-    });
+
+    let newMonth = currentMonthIndex - 1;
+    let newYear = currentYear;
+
+    if (currentMonthIndex === 0) {
+      newMonth = 11;
+      newYear = currentYear - 1;
+    }
+
+    setCurrentMonthIndex(newMonth);
+    setCurrentYear(newYear);
   };
 
   const handleNextMonth = () => {
     setPrevMonthIndex(currentMonthIndex);
     setMonthDirection('left');
-    setCurrentMonthIndex((prev) => {
-      if (prev === 11) {
-        setCurrentYear((y) => y + 1);
-        return 0;
-      }
-      return prev + 1;
-    });
+
+    let newMonth = currentMonthIndex + 1;
+    let newYear = currentYear;
+
+    if (currentMonthIndex === 11) {
+      newMonth = 0;
+      newYear = currentYear + 1;
+    }
+
+    setCurrentMonthIndex(newMonth);
+    setCurrentYear(newYear);
   };
 
   const handleToggleEntry = (id: string) => {
@@ -269,7 +295,7 @@ function HomePage() {
                   : 'month-hidden'
               }`}
             >
-              {HEBREW_MONTHS[prevMonthIndex]}
+              {HEBREW_MONTHS[prevMonthIndex]} {currentYear}
             </span>
             <span
               className={`month-label ${
@@ -280,7 +306,7 @@ function HomePage() {
                   : ''
               }`}
             >
-              {HEBREW_MONTHS[currentMonthIndex]}
+              {HEBREW_MONTHS[currentMonthIndex]} {currentYear}
             </span>
           </div>
           <button className="month-nav-btn" onClick={handlePrevMonth}>
@@ -292,7 +318,12 @@ function HomePage() {
       {/* Main content - entries list */}
       <main className="home-content">
         <div className="entries-list">
-          {entries.length > 0 ? (
+          {isLoadingEntries ? (
+            <div className="loading-state">
+              <div className="spinner"></div>
+              <p className="loading-text">טוען דיווחים...</p>
+            </div>
+          ) : entries.length > 0 ? (
             entries.map((entry) => (
               <DailyEntryCard
                 key={entry.id}
@@ -305,16 +336,29 @@ function HomePage() {
             ))
           ) : (
             <div className="empty-state">
-              <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                <circle cx="40" cy="40" r="38" stroke="#E0E0E0" strokeWidth="4" />
-                <path
-                  d="M40 20V40M40 40V60M40 40H60M40 40H20"
-                  stroke="#E0E0E0"
-                  strokeWidth="4"
-                  strokeLinecap="round"
+              <div className="empty-state-circle">
+                <img
+                  src={WelcomeIllustration}
+                  alt="No reports"
+                  className="empty-state-illustration"
                 />
-              </svg>
-              <p className="empty-state-text">אין דיווחים לחודש זה</p>
+                <div className="empty-state-content">
+                  {isFutureMonth(currentMonthIndex, currentYear) ? (
+                    <>
+                      <p className="empty-state-title">לא הגעת לחודש הזה 😌</p>
+                      <p className="empty-state-subtitle">תן לזמן לעשות את שלו - ואז תוכל לדווח גם כאן.</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="empty-state-title">עוד לא דווח כלום החודש 😅</p>
+                      <p className="empty-state-subtitle">
+                        זה הזמן להכניס את השעות הראשונות<br />
+                        הזנה אחת ואתה בעניינים.
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
