@@ -13,6 +13,8 @@ import {
   UsersService,
   DuplicateEmailError,
   UserNotFoundError,
+  AuthorizationError,
+  type Actor,
 } from '../services/usersService.js';
 
 // Initialize service
@@ -40,13 +42,20 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     }
 
     // Create user
-    const user = await usersService.createUser(validationResult.data as {
-      full_name: string;
-      email: string;
-      password: string;
-      role: 'admin' | 'regular';
-      job_title?: string;
-    });
+    const actor: Actor = {
+      role: req.user!.role,
+    };
+
+    const user = await usersService.createUser(
+      actor,
+      validationResult.data as {
+        full_name: string;
+        email: string;
+        password: string;
+        role: 'admin' | 'regular';
+        job_title?: string;
+      }
+    );
 
     // Return success response
     res.status(201).json({
@@ -59,6 +68,18 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     // Handle duplicate email error
     if (error instanceof DuplicateEmailError) {
       res.status(400).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
+    // Handle authorization error
+    if (error instanceof AuthorizationError) {
+      res.status(403).json({
         success: false,
         error: {
           message: error.message,
@@ -104,7 +125,8 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
     const { page, limit } = validationResult.data;
 
     // Get users list
-    const result = await usersService.listUsers(page, limit);
+    const actor: Actor = { role: req.user!.role };
+    const result = await usersService.listUsers(actor, page, limit);
 
     // Return success response
     res.status(200).json({
@@ -112,6 +134,18 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
       data: result,
     });
   } catch (error) {
+    // Handle authorization error
+    if (error instanceof AuthorizationError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
     // Handle unexpected errors
     console.error('List users error:', error);
     res.status(500).json({
@@ -276,14 +310,19 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
     const userId = paramValidation.data.id; // UUID string
 
     // Update user
-    const user = await usersService.updateUser(userId, bodyValidation.data as {
-      full_name?: string;
-      email?: string;
-      password?: string;
-      role?: 'admin' | 'regular';
-      job_title?: string;
-      active?: boolean;
-    });
+    const actor: Actor = { role: req.user!.role };
+    const user = await usersService.updateUser(
+      actor,
+      userId,
+      bodyValidation.data as {
+        full_name?: string;
+        email?: string;
+        password?: string;
+        role?: 'admin' | 'regular';
+        job_title?: string;
+        active?: boolean;
+      }
+    );
 
     // Return success response
     res.status(200).json({
@@ -308,6 +347,18 @@ export async function updateUser(req: Request, res: Response): Promise<void> {
     // Handle duplicate email error
     if (error instanceof DuplicateEmailError) {
       res.status(400).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
+    // Handle authorization error
+    if (error instanceof AuthorizationError) {
+      res.status(403).json({
         success: false,
         error: {
           message: error.message,
@@ -353,7 +404,8 @@ export async function deleteUser(req: Request, res: Response): Promise<void> {
     const userId = validationResult.data.id; // UUID string
 
     // Delete user
-    const result = await usersService.deleteUser(userId);
+    const actor: Actor = { role: req.user!.role };
+    const result = await usersService.deleteUser(actor, userId);
 
     // Return success response
     res.status(200).json({
@@ -364,6 +416,18 @@ export async function deleteUser(req: Request, res: Response): Promise<void> {
     // Handle user not found error
     if (error instanceof UserNotFoundError) {
       res.status(404).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
+    // Handle authorization error
+    if (error instanceof AuthorizationError) {
+      res.status(403).json({
         success: false,
         error: {
           message: error.message,

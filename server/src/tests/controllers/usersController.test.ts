@@ -40,6 +40,12 @@ vi.mock('../../services/usersService.js', () => {
         super(`User with ID ${userId} not found`);
       }
     },
+    AuthorizationError: class AuthorizationError extends Error {
+      code = 'FORBIDDEN';
+      constructor(message: string = 'Access denied') {
+        super(message);
+      }
+    },
     // Export mocks for testing
     __mocks: {
       mockCreateUser,
@@ -100,6 +106,14 @@ describe('UsersController', () => {
       status: statusMock,
       json: jsonMock,
     };
+
+    // Set default user as admin for tests
+    // Set default user as admin for tests
+    (mockRequest as AuthenticatedRequest).user = {
+      userId: 'admin-id',
+      role: 'admin',
+      email: 'admin@example.com'
+    };
   });
 
   describe('createUser', () => {
@@ -126,6 +140,15 @@ describe('UsersController', () => {
 
       await createUser(mockRequest as Request, mockResponse as Response);
 
+      const actor = { role: 'admin' };
+      expect(mockCreateUser).toHaveBeenCalledWith(
+        expect.objectContaining(actor),
+        expect.objectContaining({
+          full_name: 'Jane Doe',
+          email: 'jane@example.com',
+          role: 'admin',
+        })
+      );
       expect(statusMock).toHaveBeenCalledWith(201);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -227,7 +250,7 @@ describe('UsersController', () => {
 
       await listUsers(mockRequest as Request, mockResponse as Response);
 
-      expect(mockListUsers).toHaveBeenCalledWith(1, 20);
+      expect(mockListUsers).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 1, 20);
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -251,7 +274,7 @@ describe('UsersController', () => {
 
       await listUsers(mockRequest as Request, mockResponse as Response);
 
-      expect(mockListUsers).toHaveBeenCalledWith(2, 10);
+      expect(mockListUsers).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 2, 10);
       expect(statusMock).toHaveBeenCalledWith(200);
     });
 
@@ -430,10 +453,14 @@ describe('UsersController', () => {
 
       await updateUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockUpdateUser).toHaveBeenCalledWith(userId, {
-        full_name: 'Updated Name',
-        job_title: 'Senior Engineer',
-      });
+      expect(mockUpdateUser).toHaveBeenCalledWith(
+        expect.objectContaining({ role: 'admin' }),
+        userId,
+        {
+          full_name: 'Updated Name',
+          job_title: 'Senior Engineer',
+        }
+      );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
@@ -514,7 +541,7 @@ describe('UsersController', () => {
 
       await deleteUser(mockRequest as Request, mockResponse as Response);
 
-      expect(mockDeleteUser).toHaveBeenCalledWith(userId);
+      expect(mockDeleteUser).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), userId);
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,

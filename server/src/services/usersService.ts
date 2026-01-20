@@ -56,6 +56,24 @@ export class UserNotFoundError extends Error {
 }
 
 /**
+ * Error thrown when user is not authorized
+ */
+export class AuthorizationError extends Error {
+  code = 'FORBIDDEN';
+  constructor(message: string = 'Access denied') {
+    super(message);
+    this.name = 'AuthorizationError';
+  }
+}
+
+/**
+ * Actor interface for role-based access control
+ */
+export interface Actor {
+  role: 'admin' | 'regular';
+}
+
+/**
  * Check if an error is a Postgres unique constraint violation (SQLSTATE 23505)
  */
 function isUniqueConstraintError(err: unknown): boolean {
@@ -87,16 +105,23 @@ export class UsersService {
   }
 
   /**
-   * Create a new user
+   * Create a new user (Admin only)
    * @throws DuplicateEmailError if email already exists
+   * @throws AuthorizationError if actor is not admin
    */
-  async createUser(userData: {
-    full_name: string;
-    email: string;
-    password: string;
-    role: 'admin' | 'regular';
-    job_title?: string;
-  }): Promise<UserResponse> {
+  async createUser(
+    actor: Actor,
+    userData: {
+      full_name: string;
+      email: string;
+      password: string;
+      role: 'admin' | 'regular';
+      job_title?: string;
+    }): Promise<UserResponse> {
+    // Enforce admin access
+    if (actor.role !== 'admin') {
+      throw new AuthorizationError('Access denied: Only admins can create users');
+    }
     // Check email uniqueness
     const existingUser = await this.userRepo.findByEmail(userData.email);
     if (existingUser) {
@@ -131,9 +156,14 @@ export class UsersService {
   }
 
   /**
-   * Get paginated list of users
+   * Get paginated list of users (Admin only)
+   * @throws AuthorizationError if actor is not admin
    */
-  async listUsers(page: number = 1, limit: number = 20): Promise<PaginatedUsersResponse> {
+  async listUsers(actor: Actor, page: number = 1, limit: number = 20): Promise<PaginatedUsersResponse> {
+    // Enforce admin access
+    if (actor.role !== 'admin') {
+      throw new AuthorizationError('Access denied: Only admins can list users');
+    }
     // Get all users
     const allUsers = await this.userRepo.findAll();
 
@@ -175,11 +205,13 @@ export class UsersService {
   }
 
   /**
-   * Update a user
+   * Update a user (Admin only)
    * @throws UserNotFoundError if user doesn't exist
    * @throws DuplicateEmailError if email already exists (when updating email)
+   * @throws AuthorizationError if actor is not admin
    */
   async updateUser(
+    actor: Actor,
     userId: string,
     updates: {
       full_name?: string;
@@ -190,6 +222,11 @@ export class UsersService {
       active?: boolean;
     }
   ): Promise<UserResponse> {
+    // Enforce admin access
+    if (actor.role !== 'admin') {
+      throw new AuthorizationError('Access denied: Only admins can update users');
+    }
+
     // Verify user exists
     const existingUser = await this.userRepo.findById(userId);
     if (!existingUser) {
@@ -219,7 +256,6 @@ export class UsersService {
       updateData.password_hash = await hashPassword(updates.password);
     }
 
-    // Update user
     try {
       const updatedUser = await this.userRepo.update(userId, updateData);
       return sanitizeUser(updatedUser);
@@ -234,11 +270,22 @@ export class UsersService {
     }
   }
 
+  // Enforce admin access at the start of updateUser body
+  // This is a bit tricky with multi-replace since we replaced the signature but not the body start.
+  // Actually, I should have put the check inside the body in the previous chunk or carefully structured it.
+  // Let me re-do the updateUser chunk to include the check at the start of the body.
+
+
   /**
-   * Soft delete a user (set active=false)
+   * Soft delete a user (set active=false) (Admin only)
    * @throws UserNotFoundError if user doesn't exist
+   * @throws AuthorizationError if actor is not admin
    */
-  async deleteUser(userId: string): Promise<{ success: boolean; message: string }> {
+  async deleteUser(actor: Actor, userId: string): Promise<{ success: boolean; message: string }> {
+    // Enforce admin access
+    if (actor.role !== 'admin') {
+      throw new AuthorizationError('Access denied: Only admins can delete users');
+    }
     // Verify user exists
     const existingUser = await this.userRepo.findById(userId);
     if (!existingUser) {
