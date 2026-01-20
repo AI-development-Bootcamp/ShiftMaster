@@ -56,6 +56,18 @@ export class UserNotFoundError extends Error {
 }
 
 /**
+ * Check if an error is a Postgres unique constraint violation (SQLSTATE 23505)
+ */
+function isUniqueConstraintError(err: unknown): boolean {
+  if (typeof err === 'object' && err !== null) {
+    const error = err as { code?: string; message?: string };
+    // Postgres unique_violation error code is 23505
+    return error.code === '23505';
+  }
+  return false;
+}
+
+/**
  * Remove password_hash from user object
  */
 function sanitizeUser(user: User): UserResponse {
@@ -104,9 +116,18 @@ export class UsersService {
       active: true,
     };
 
-    const createdUser = await this.userRepo.create(newUser);
-
-    return sanitizeUser(createdUser);
+    try {
+      const createdUser = await this.userRepo.create(newUser);
+      return sanitizeUser(createdUser);
+    } catch (err) {
+      // Handle race condition: another request created a user with this email
+      // between our pre-check and the insert
+      if (isUniqueConstraintError(err)) {
+        throw new DuplicateEmailError(userData.email);
+      }
+      // Re-throw other errors unchanged
+      throw err;
+    }
   }
 
   /**
@@ -199,9 +220,18 @@ export class UsersService {
     }
 
     // Update user
-    const updatedUser = await this.userRepo.update(userId, updateData);
-
-    return sanitizeUser(updatedUser);
+    try {
+      const updatedUser = await this.userRepo.update(userId, updateData);
+      return sanitizeUser(updatedUser);
+    } catch (err) {
+      // Handle race condition: another request updated/created a user with this email
+      // between our pre-check and the update
+      if (isUniqueConstraintError(err)) {
+        throw new DuplicateEmailError(updates.email || existingUser.email);
+      }
+      // Re-throw other errors unchanged
+      throw err;
+    }
   }
 
   /**

@@ -55,11 +55,17 @@ vi.mock('../../services/usersService.js', () => {
 import {
   createUser,
   listUsers,
+  getCurrentUser,
   getUser,
   updateUser,
   deleteUser,
 } from '../../controllers/usersController.js';
 import { DuplicateEmailError, UserNotFoundError } from '../../services/usersService.js';
+import type { DecodedToken } from '../../utils/jwt.js';
+
+interface AuthenticatedRequest extends Request {
+  user?: Partial<DecodedToken>;
+}
 
 // Get mocks from the mocked module
 const usersServiceModule = await vi.importMock<typeof import('../../services/usersService.js')>('../../services/usersService.js');
@@ -263,6 +269,78 @@ describe('UsersController', () => {
           }),
         })
       );
+    });
+  });
+
+  describe('getCurrentUser', () => {
+    it('should get current user successfully', async () => {
+      const mockUser = {
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
+        full_name: 'Current User',
+        email: 'current@example.com',
+        role: 'regular' as const,
+        job_title: 'Developer',
+        active: true,
+        created_at: '2024-01-01T00:00:00Z',
+      };
+
+
+
+      (mockRequest as AuthenticatedRequest).user = {
+        userId: mockUser.user_id,
+        role: mockUser.role,
+        email: mockUser.email,
+      };
+      mockGetUserById.mockResolvedValue(mockUser);
+
+      await getCurrentUser(mockRequest as Request, mockResponse as Response);
+
+      expect(mockGetUserById).toHaveBeenCalledWith(mockUser.user_id);
+      expect(statusMock).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          user: mockUser,
+        },
+      });
+    });
+
+    it('should return 401 if user ID not found in token', async () => {
+      (mockRequest as AuthenticatedRequest).user = undefined;
+
+      await getCurrentUser(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(jsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success: false,
+          error: expect.objectContaining({
+            code: 'UNAUTHORIZED',
+          }),
+        })
+      );
+    });
+
+    it('should return 500 for unexpected errors', async () => {
+      const userId = '550e8400-e29b-41d4-a716-446655440000';
+      (mockRequest as AuthenticatedRequest).user = {
+        userId,
+        role: 'regular',
+        email: 'test@example.com',
+      };
+
+      mockGetUserById.mockRejectedValue(new Error('Unexpected error'));
+
+      await getCurrentUser(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(500);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Internal server error',
+          code: 'INTERNAL_SERVER_ERROR',
+        },
+      });
     });
   });
 
