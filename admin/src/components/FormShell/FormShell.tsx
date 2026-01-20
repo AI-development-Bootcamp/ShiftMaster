@@ -1,10 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { parseLocalDate } from '@abra-shift-master/shared';
 import { FormShellProps, FormFieldSchema, FormValues, FormErrors, DateRangeValue } from './types';
 import { FormHeader } from './FormHeader';
 import { FormFooter } from './FormFooter';
 import { CollapsibleSection } from './CollapsibleSection';
 import { TextBox, LargeTextBox, DropdownBox, DateBox, DateRangeBox } from './fields';
+import { FIELD_TYPES } from '../../constants/forms';
 import '../../styles/FormShell.css';
 import '../../styles/FormFields.css';
 
@@ -25,12 +27,14 @@ function shouldFieldBeVisible(
 }
 
 /**
- * Initialize form values from schema
+ * Initialize form values from schema and optional initial values
  */
-function initializeValues(fields: FormFieldSchema[]): FormValues {
+function initializeValues(fields: FormFieldSchema[], initialValues?: FormValues): FormValues {
     const values: FormValues = {};
     fields.forEach((field) => {
-        if (field.type === 'dateRangeBox') {
+        if (initialValues && initialValues[field.id] !== undefined) {
+            values[field.id] = initialValues[field.id];
+        } else if (field.type === 'dateRangeBox') {
             values[field.id] = { start: '', end: '' };
         } else {
             values[field.id] = '';
@@ -55,8 +59,10 @@ export function FormShell({
     fields,
     isSubmitting = false,
     serverError,
+    initialValues,
 }: FormShellProps) {
-    const [values, setValues] = useState<FormValues>(() => initializeValues(fields));
+    const { t } = useTranslation();
+    const [values, setValues] = useState<FormValues>(() => initializeValues(fields, initialValues));
     const [errors, setErrors] = useState<FormErrors>({});
     const [clickCount, setClickCount] = useState(0);
     const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -119,7 +125,7 @@ export function FormShell({
             // Clear values of fields that become hidden
             fields.forEach((field) => {
                 if (field.dependsOn && !shouldFieldBeVisible(field, newValues)) {
-                    if (field.type === 'dateRangeBox') {
+                    if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                         newValues[field.id] = { start: '', end: '' };
                     } else {
                         newValues[field.id] = '';
@@ -148,25 +154,25 @@ export function FormShell({
             if (field.required) {
                 const value = values[field.id];
 
-                if (field.type === 'dateRangeBox') {
+                if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                     const rangeValue = value as DateRangeValue;
                     if (!rangeValue.start || !rangeValue.end) {
-                        newErrors[field.id] = 'שדה חובה';
+                        newErrors[field.id] = t('formShell.validation.required');
                         isValid = false;
                     } else {
                         const startDate = parseLocalDate(rangeValue.start);
                         const endDate = parseLocalDate(rangeValue.end);
 
                         if (startDate && endDate && endDate < startDate) {
-                            newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                            newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                             isValid = false;
                         }
                     }
                 } else if (!value || (typeof value === 'string' && !value.trim())) {
-                    newErrors[field.id] = 'שדה חובה';
+                    newErrors[field.id] = t('formShell.validation.required');
                     isValid = false;
                 }
-            } else if (field.type === 'dateRangeBox') {
+            } else if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                 // Determine if partial range needs validation even if not required
                 // (Optional: if one is filled, the other might be needed, or just validate logic if both exist)
                 const rangeValue = values[field.id] as DateRangeValue;
@@ -174,7 +180,7 @@ export function FormShell({
                     const startDate = parseLocalDate(rangeValue.start);
                     const endDate = parseLocalDate(rangeValue.end);
                     if (startDate && endDate && endDate < startDate) {
-                        newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                        newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                         isValid = false;
                     }
                 }
@@ -183,7 +189,7 @@ export function FormShell({
 
         setErrors(newErrors);
         return isValid;
-    }, [fields, values]);
+    }, [fields, values, t]);
 
     // Handle submit
     const handleSubmit = useCallback(() => {
@@ -200,7 +206,7 @@ export function FormShell({
 
         const fieldElement = (() => {
             switch (field.type) {
-                case 'textBox':
+                case FIELD_TYPES.TEXT_BOX:
                     return (
                         <TextBox
                             id={field.id}
@@ -214,7 +220,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'passwordBox':
+                case FIELD_TYPES.PASSWORD_BOX:
                     return (
                         <TextBox
                             id={field.id}
@@ -229,7 +235,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'largeTextBox':
+                case FIELD_TYPES.LARGE_TEXT_BOX:
                     return (
                         <LargeTextBox
                             id={field.id}
@@ -244,7 +250,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dropdownBox':
+                case FIELD_TYPES.DROPDOWN_BOX:
                     return (
                         <DropdownBox
                             id={field.id}
@@ -258,7 +264,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dateBox':
+                case FIELD_TYPES.DATE_BOX:
                     return (
                         <DateBox
                             id={field.id}
@@ -271,7 +277,7 @@ export function FormShell({
                             onChange={(v) => handleFieldChange(field.id, v)}
                         />
                     );
-                case 'dateRangeBox':
+                case FIELD_TYPES.DATE_RANGE_BOX:
                     return (
                         <DateRangeBox
                             id={field.id}

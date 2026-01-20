@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { FormShell } from '../components/FormShell';
@@ -99,7 +99,7 @@ describe('FormShell', () => {
                 />
             );
 
-            expect(screen.getByRole('button', { name: /סגור טופס/i })).toBeInTheDocument();
+            expect(screen.getByRole('button', { name: 'formShell.closeForm' })).toBeInTheDocument();
         });
     });
 
@@ -119,7 +119,7 @@ describe('FormShell', () => {
             fireEvent.click(submitButton);
 
             await waitFor(() => {
-                expect(screen.getByText('שדה חובה')).toBeInTheDocument();
+                expect(screen.getByText('formShell.validation.required')).toBeInTheDocument();
             });
 
             expect(mockOnSubmit).not.toHaveBeenCalled();
@@ -136,18 +136,18 @@ describe('FormShell', () => {
                 />
             );
 
+            // Fill required field
             const nameInput = screen.getByLabelText(/שם/);
-            fireEvent.change(nameInput, { target: { value: 'משימה חדשה' } });
+            fireEvent.change(nameInput, { target: { value: 'ישראל ישראלי' } });
 
+            // Submit
             const submitButton = screen.getByRole('button', { name: /שלח/i });
             fireEvent.click(submitButton);
 
             await waitFor(() => {
-                expect(mockOnSubmit).toHaveBeenCalledWith(
-                    expect.objectContaining({
-                        name: 'משימה חדשה',
-                    })
-                );
+                expect(mockOnSubmit).toHaveBeenCalledWith(expect.objectContaining({
+                    name: 'ישראל ישראלי'
+                }));
             });
         });
 
@@ -167,15 +167,15 @@ describe('FormShell', () => {
             fireEvent.click(submitButton);
 
             await waitFor(() => {
-                expect(screen.getByText('שדה חובה')).toBeInTheDocument();
+                expect(screen.getByText('formShell.validation.required')).toBeInTheDocument();
             });
 
-            // Fill the field
+            // ... (rest of test)
             const nameInput = screen.getByLabelText(/שם/);
             fireEvent.change(nameInput, { target: { value: 'ערך כלשהו' } });
 
             await waitFor(() => {
-                expect(screen.queryByText('שדה חובה')).not.toBeInTheDocument();
+                expect(screen.queryByText('formShell.validation.required')).not.toBeInTheDocument();
             });
         });
     });
@@ -290,7 +290,7 @@ describe('FormShell', () => {
                 />
             );
 
-            const closeButton = screen.getByRole('button', { name: /סגור טופס/i });
+            const closeButton = screen.getByRole('button', { name: 'formShell.closeForm' });
             fireEvent.click(closeButton);
 
             expect(mockOnClose).toHaveBeenCalled();

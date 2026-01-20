@@ -1,13 +1,21 @@
 .assignment-page {
     padding: 2rem;
     height: 100%;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Prevent page scroll, let table scroll */
+    display: flex;
+    flex-direction: column;
 }
 
-.assignment-page h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    color: #333;
+
+
+.assignment-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    /* Fixed and identical spacing */
+    padding-top: 1rem;
 }
 
 .assignment-page p {

@@ -97,3 +97,38 @@ export const EyeOffIcon = (props: IconProps) => (
         <line x1="1" y1="1" x2="23" y2="23" />
     </svg>
 );
+
+export const EditIcon = (props: IconProps) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <path d="M3 21h6" />
+        <path d="M14.5 4.5l5 5" />
+        <path d="M6 18l3.5-.5L20 7a1.5 1.5 0 0 0 0-2l-1-1a1.5 1.5 0 0 0-2 0L6.5 14.5 6 18z" />
+    </svg>
+);
+
+
+export const DeleteIcon = (props: IconProps) => (
+    <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        {...props}
+    >
+        <path d="M4 7h16" />
+        <path d="M9 7V5h6v2" />
+        <rect x="6" y="7" width="12" height="14" rx="2" ry="2" />
+        <path d="M10 11v6" />
+        <path d="M14 11v6" />
+    </svg>
+);

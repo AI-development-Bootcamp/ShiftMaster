@@ -23,6 +23,17 @@ export const mockProjects: Project[] = [
         active: true,
         created_at: '2024-01-20T09:00:00Z',
     },
+    {
+        project_id: '750e8400-e29b-41d4-a716-446655440002',
+        client_id: '850e8400-e29b-41d4-a716-446655440003', // Abra
+        manager_user_id: '550e8400-e29b-41d4-a716-446655440000',
+        name: 'מערכת משאבי אנוש',
+        description: 'פלטפורמה לניהול עובדים וגיוס',
+        start_date: '2024-02-01',
+        time_format_type: ProjectTimeFormatType.SUM,
+        active: true,
+        created_at: '2024-01-20T09:00:00Z',
+    },
 ];
 
 export const mockTasks: Task[] = [
@@ -47,5 +58,12 @@ export const mockTasks: Task[] = [
         project_id: '750e8400-e29b-41d4-a716-446655440001',
         name: 'אפיון ועיצוב',
         created_at: '2024-02-01T10:00:00Z',
+    },
+    {
+        task_id: '650e8400-e29b-41d4-a716-446655440003',
+        project_id: '750e8400-e29b-41d4-a716-446655440002',
+        name: 'פיתוח Frontend',
+        description: 'Implementing React Native screens',
+        created_at: '2024-01-01T10:00:00Z',
     },
 ];

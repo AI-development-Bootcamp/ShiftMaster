@@ -1,22 +1,24 @@
 import React from 'react';
 import type { NavItemConfig } from '../components/RightSidebarTaskbar';
 import { EmployeesManageIcon, HoursIcon, UserBadgeIcon } from '../constants/icons';
-export const navigationItems: NavItemConfig[] = [
+import { TFunction } from 'i18next';
+
+export const getNavigationItems = (t: TFunction): NavItemConfig[] => [
   {
     id: 'assignment',
-    label: 'ניהול לקוחות/פרויקטים',
+    label: t('navigation.assignment'),
     path: '/assignment',
     icon: React.createElement(UserBadgeIcon),
   },
   {
     id: 'entries',
-    label: 'הגדרת דיווחי שעות',
+    label: t('navigation.entries'),
     path: '/entries',
     icon: React.createElement(HoursIcon),
   },
   {
     id: 'employees',
-    label: 'ניהול עובדים',
+    label: t('navigation.employees'),
     path: '/employees',
     icon: React.createElement(EmployeesManageIcon),
   },

@@ -1,0 +1,42 @@
+/* TableSearch.css */
+
+.table-search {
+    position: relative;
+    width: 250px;
+    /* Default fixed width */
+}
+
+.table-search__icon {
+    position: absolute;
+    right: 10px;
+    /* RTL start */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--color-text-secondary, #6b7280);
+    pointer-events: none;
+}
+
+.table-search__input {
+    width: 100%;
+    height: 40px;
+    /* Standardized height */
+    padding: 0 32px 0 12px;
+    /* RTL padding: Right 32px, Left 12px */
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 6px);
+    font-size: 13px;
+    direction: rtl;
+    background-color: var(--color-bg-primary, #ffffff);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.table-search__input:focus {
+    outline: none;
+    border-color: var(--color-primary, #0052D6);
+    box-shadow: 0 0 0 3px rgba(0, 82, 214, 0.1);
+}
+
+.table-search__input::placeholder {
+    color: var(--color-text-tertiary, #9ca3af);
+}

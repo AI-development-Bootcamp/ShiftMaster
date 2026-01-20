@@ -1,7 +1,16 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import { fileURLToPath } from 'url';
 import { existsSync } from 'fs';
+
+let __dirname;
+try {
+  const __filename = fileURLToPath(import.meta.url);
+  __dirname = path.dirname(__filename);
+} catch (error) {
+  throw new Error(`ERR_FILEURL_RESOLUTION: Failed to resolve file paths. ${error}`);
+}
 
 // Resolve shared package - prefer dist (for production builds), fallback to source (for dev)
 // The prebuild script ensures dist exists before vite build runs

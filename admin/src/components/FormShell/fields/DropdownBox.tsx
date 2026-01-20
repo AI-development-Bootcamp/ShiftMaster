@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { DropdownBoxProps } from '../types';
+import { useTranslation } from 'react-i18next';
 
 /**
  * DropdownBox component for selecting an option from a list.
@@ -19,12 +20,13 @@ export function DropdownBox({
     disabled,
     onChange,
 }: DropdownBoxProps) {
+    const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
 
     // Find selected option label
     const selectedOption = options.find((opt) => opt.value === value);
-    const displayValue = selectedOption ? selectedOption.label : placeholder || 'בחר אפשרות';
+    const displayValue = selectedOption ? selectedOption.label : placeholder || t('formShell.dropdownBox.placeholder');
 
     // Handle click outside to close
     useEffect(() => {

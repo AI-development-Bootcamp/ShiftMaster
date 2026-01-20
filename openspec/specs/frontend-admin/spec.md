@@ -179,212 +179,156 @@ The sidebar navigation SHALL be fully accessible via keyboard and screen readers
 - **WHEN** a screen reader reads the active navigation item
 - **THEN** it announces the current page using `aria-current="page"`
 
-### Requirement: Mock Data Integration
+### Requirement: Month Lock Management UI
 
-The Admin application SHALL include a mock data layer to allow frontend development and testing without a backend connection.
+The admin application SHALL provide a Month Lock management interface accessible only to admin users from the Entries Management Page.
 
-#### Scenario: Developing UI without Backend
-- **Given** the backend is not running or implemented
-- **When** a developer works on the Admin UI
-- **Then** they can import typed mock data from `admin/src/mocks` that matches the shared data models and API response structure.
+#### Scenario: Admin-only button visibility
 
-#### Scenario: API Response Simulation
-- **Given** a need to test error handling or success states
-- **When** using mock data utilities
-- **Then** the data is wrapped in the standard `ApiResponse<T>` format defined in the project documentation.
+- **WHEN** an admin user views the Entries Management Page
+- **THEN** a "Month Locks" button is displayed in the page header
 
-### Requirement: FormShell Modal Component
+#### Scenario: Non-admin button hidden
 
-The admin application SHALL provide a `FormShell` component that renders forms as centered modal dialogs with a consistent structure.
+- **WHEN** a non-admin user views the Entries Management Page
+- **THEN** the "Month Locks" button is not rendered (not just disabled)
 
-#### Scenario: Modal display
+#### Scenario: Modal open on button click
 
-- **WHEN** FormShell is rendered
-- **THEN** it displays a semi-transparent backdrop overlay and a centered white container with rounded corners
+- **WHEN** an admin clicks the "Month Locks" button
+- **THEN** a modal overlay opens displaying the month lock management interface
 
-#### Scenario: Modal close via backdrop
+### Requirement: Month Lock Modal
 
-- **WHEN** the user clicks the backdrop outside the form container
-- **THEN** the onClose callback is invoked
+The Month Lock modal SHALL display a year navigator and a 12-month grid for lock management.
 
-#### Scenario: Modal close via button
+#### Scenario: Modal structure
 
-- **WHEN** the user clicks the close button in the header
-- **THEN** the onClose callback is invoked
+- **WHEN** the modal is open
+- **THEN** it displays a year navigation header, a 12-month tile grid, and close controls (X button, overlay click, ESC key)
 
-#### Scenario: Modal close via Escape key
+#### Scenario: RTL layout and Hebrew text
 
-- **WHEN** the modal is open and the user presses Escape
-- **THEN** the onClose callback is invoked
+- **WHEN** viewing the modal
+- **THEN** all text is in Hebrew, layout is RTL, and month names are displayed in full (ינואר, פברואר, ..., דצמבר)
 
----
+#### Scenario: Close via X button
 
-### Requirement: FormShell Schema-Driven Fields
+- **WHEN** the admin clicks the X button in the modal
+- **THEN** the modal closes
 
-The FormShell SHALL render input fields dynamically based on a provided schema array.
+#### Scenario: Close via overlay click
 
-#### Scenario: TextBox field rendering
+- **WHEN** the admin clicks outside the modal content area
+- **THEN** the modal closes
 
-- **WHEN** a field with type `textBox` is in the schema
-- **THEN** a labeled text input is rendered with the specified placeholder
+#### Scenario: Close via ESC key
 
-#### Scenario: LargeTextBox field rendering
-
-- **WHEN** a field with type `largeTextBox` is in the schema
-- **THEN** a labeled textarea is rendered with multiple rows
-
-#### Scenario: DropdownBox field rendering
-
-- **WHEN** a field with type `dropdownBox` is in the schema
-- **THEN** a labeled select input is rendered with the provided options
-
-#### Scenario: DateBox field rendering
-
-- **WHEN** a field with type `dateBox` is in the schema
-- **THEN** clicking the input opens a custom calendar picker popup
-
-#### Scenario: DateRangeBox field rendering
-
-- **WHEN** a field with type `dateRangeBox` is in the schema
-- **THEN** two date inputs (start and end) are rendered with a custom calendar picker for each
-
-#### Scenario: DateRangeBox validation
-
-- **WHEN** the end date is earlier than the start date
-- **THEN** an error message is displayed below the field
-
----
-
-### Requirement: FormShell Conditional Fields
-
-The FormShell SHALL support conditional field visibility based on other fields' values.
-
-#### Scenario: Dependent field appears
-
-- **WHEN** a field has `dependsOn` configured and the parent field's value matches
-- **THEN** the dependent field becomes visible with an expand animation
-
-#### Scenario: Dependent field hides
-
-- **WHEN** a field has `dependsOn` configured and the parent field's value does not match
-- **THEN** the dependent field is hidden and its value is cleared
-
-#### Scenario: Collapsible section toggle
-
-- **WHEN** a visible conditional field has `collapsible: true`
-- **THEN** a collapse/expand button is displayed allowing the user to toggle the field visibility
-
----
-
-### Requirement: FormShell Validation
-
-The FormShell SHALL validate required fields before submission and display inline errors.
-
-#### Scenario: Required field validation
-
-- **WHEN** a required field is empty and the user submits
-- **THEN** an error message is displayed below the field and submission is blocked
-
-#### Scenario: Successful submission
-
-- **WHEN** all required fields are filled and the user submits
-- **THEN** the onSubmit callback is invoked with field values as key-value pairs
-
----
-
-### Requirement: FormShell Accessibility
-
-The FormShell SHALL be fully accessible via keyboard and assistive technologies.
+- **WHEN** the admin presses the ESC key while the modal is open
+- **THEN** the modal closes
 
 #### Scenario: Focus trap
 
 - **WHEN** the modal is open
-- **THEN** keyboard focus is trapped within the modal
+- **THEN** keyboard focus is trapped within the modal and does not escape to background content
 
-#### Scenario: Screen reader support
+### Requirement: Year Navigation
 
-- **WHEN** a screen reader reads the modal
-- **THEN** the title is announced as the dialog label via `aria-labelledby`
+The modal SHALL allow navigation between years with no past limit and optional future navigation.
 
-### Requirement: LoginPage
+#### Scenario: Current year display
 
-The admin application SHALL display a LoginPage when the user is not authenticated.
+- **WHEN** the modal opens
+- **THEN** the current year is displayed in the year navigator
 
-#### Scenario: Background display
+#### Scenario: Previous year navigation
 
-- **WHEN** viewing the LoginPage
-- **THEN** the background is `login_background.svg`, centered and covering the full screen
+- **WHEN** the admin clicks the "previous year" button
+- **THEN** the year decrements by 1 and the month grid updates for that year
 
-#### Scenario: Login card placement
+#### Scenario: Next year navigation
 
-- **WHEN** viewing the LoginPage
-- **THEN** a `LoginWelcomeCard` is displayed at the center of the screen
+- **WHEN** the admin clicks the "next year" button
+- **THEN** the year increments by 1 and the month grid updates for that year
 
-#### Scenario: Login fields
+#### Scenario: Infinite past navigation
 
-- **WHEN** interacting with the `LoginWelcomeCard`
-- **THEN** it contains email and password input fields
+- **WHEN** the admin navigates to past years
+- **THEN** there is no lower limit on year selection
 
-#### Scenario: Navigation after input
+### Requirement: Month Lock Toggle
 
-- **WHEN** both email and password fields are filled
-- **THEN** clicking the login button navigates to `/assignment`
+Each month tile SHALL display the current lock state and allow toggling between locked and unlocked.
 
----
+#### Scenario: Locked month display
 
-### Requirement: AssignmentPage
+- **WHEN** a month is locked (exists in mockMonthLocks data)
+- **THEN** the tile displays with a red background
 
-The admin application SHALL provide an AssignmentPage for worker-to-task assignment.
+#### Scenario: Unlocked month display
 
-#### Scenario: Sidebar visibility
+- **WHEN** a month is unlocked (does not exist in mockMonthLocks data)
+- **THEN** the tile displays with a gray background
 
-- **WHEN** viewing the AssignmentPage
-- **THEN** the `RightSidebarTaskbar` is displayed
+#### Scenario: Toggle to locked
 
-#### Scenario: Placeholder content
+- **WHEN** an admin clicks an unlocked month tile
+- **THEN** the tile immediately changes to red (locked) and a "prepare create" payload is logged to console with `{ year, month, lockedByUserId }`
 
-- **WHEN** viewing the AssignmentPage
-- **THEN** placeholder text is shown (to be replaced in future)
+#### Scenario: Toggle to unlocked
 
----
+- **WHEN** an admin clicks a locked month tile
+- **THEN** the tile immediately changes to gray (unlocked) and a "prepare delete" payload is logged to console with `{ lockId }` or `{ year, month }`
 
-### Requirement: EntriesManagementPage
+#### Scenario: Optimistic UI update
 
-The admin application SHALL provide an EntriesManagementPage for managing data entries.
+- **WHEN** a month is toggled
+- **THEN** the UI updates immediately without waiting for server confirmation
 
-#### Scenario: Sidebar visibility
+### Requirement: Loading States
 
-- **WHEN** viewing the EntriesManagementPage
-- **THEN** the `RightSidebarTaskbar` is displayed
+The modal SHALL display skeleton loading states during data fetches.
 
-#### Scenario: Placeholder content
+#### Scenario: Year transition loading
 
-- **WHEN** viewing the EntriesManagementPage
-- **THEN** placeholder text is shown (to be replaced in future)
+- **WHEN** the admin changes the year
+- **THEN** a skeleton grid (12 tiles) is displayed while loading lock data for the new year
 
----
+#### Scenario: Initial load skeleton
 
-### Requirement: Page Routing
+- **WHEN** the modal first opens
+- **THEN** a skeleton grid is displayed while loading lock data for the current year
 
-The admin application SHALL route users between pages via the sidebar and URL.
+### Requirement: Mock Data Integration
 
-#### Scenario: Login route
+The Month Lock UI SHALL consume data from `admin/src/mocks/monthLocks.ts` via an API-ready abstraction layer.
 
-- **WHEN** navigating to `/`
-- **THEN** the LoginPage is displayed without the sidebar
+#### Scenario: Mock data consumption
 
-#### Scenario: Assignment route
+- **WHEN** the modal loads lock data
+- **THEN** it uses a `useMonthLocks(year)` hook that reads from mockMonthLocks.ts
 
-- **WHEN** navigating to `/assignment`
-- **THEN** the AssignmentPage is displayed with the sidebar
+#### Scenario: No direct mock imports in components
 
-#### Scenario: Entries route
+- **WHEN** examining component code
+- **THEN** components do not import mockMonthLocks.ts directly; they use the hook abstraction
 
-- **WHEN** navigating to `/entries`
-- **THEN** the EntriesManagementPage is displayed with the sidebar
+#### Scenario: API-ready hook structure
 
-#### Scenario: Sidebar navigation
+- **WHEN** reviewing the useMonthLocks hook
+- **THEN** it returns `{ locks, isLoading, toggleLock }` with a structure compatible for future API integration
 
-- **WHEN** clicking a navigation item in the sidebar
-- **THEN** the application navigates to the corresponding route
+### Requirement: Internationalization
+
+All Month Lock UI text SHALL be translated using the i18n system with Hebrew translations.
+
+#### Scenario: Month names in Hebrew
+
+- **WHEN** viewing month tiles
+- **THEN** month names are displayed in Hebrew using i18n keys (e.g., `t('monthNames.january')` → "ינואר")
+
+#### Scenario: UI labels in Hebrew
+
+- **WHEN** viewing the modal and button
+- **THEN** all UI text (button label, modal title, etc.) uses Hebrew translations from `admin/src/locales/he/translation.json`
 

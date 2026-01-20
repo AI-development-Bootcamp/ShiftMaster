@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { TextBoxProps } from '../types';
 import { EyeIcon, EyeOffIcon } from '../../../constants/icons';
+import { useTranslation } from 'react-i18next';
 
 /**
  * TextBox component for single-line text input.
@@ -21,10 +22,20 @@ export function TextBox({
     type = 'text',
     onChange,
 }: TextBoxProps) {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
 
     const inputType = type === 'password' ? (showPassword ? 'text' : 'password') : type;
     const isPassword = type === 'password';
+
+    const safeT = (key: string) => {
+        const translated = t(key);
+        if (translated === key) {
+            console.error({ code: 'TEXTBOX_I18N_MISSING', message: 'Missing translation', key, value: translated });
+            return key;
+        }
+        return translated;
+    };
 
     return (
         <div className="form-field">
@@ -51,7 +62,7 @@ export function TextBox({
                         type="button"
                         className="form-field__password-toggle"
                         onClick={() => setShowPassword(!showPassword)}
-                        aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
+                        aria-label={showPassword ? safeT('formShell.textBox.hidePassword') : safeT('formShell.textBox.showPassword')}
                         tabIndex={-1}
                     >
                         {showPassword ? (
