@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import './ManualReportModal.css';
 import SelectionModal, { SelectionType, SelectionGroup } from '../SelectionModal/SelectionModal';
 
@@ -125,7 +125,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   // Generate hours (1-12), minutes (0-59), and periods (AM/PM)
   const hours = Array.from({ length: 12 }, (_, i) => i + 1);
   const minutes = Array.from({ length: 60 }, (_, i) => i);
-  const periods: ('AM' | 'PM')[] = ['AM', 'PM'];
+  const periods: ('AM' | 'PM')[] = useMemo(() => ['AM', 'PM'], []);
 
   // Convert time to minutes since midnight for comparison
   const timeToMinutes = (time: TimeValue): number => {
@@ -445,7 +445,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
   };
 
   // Get current time value being edited
-  const getCurrentTime = (): TimeValue => {
+  const getCurrentTime = useCallback((): TimeValue => {
     if (editingField === 'entry') return entryTime;
     if (editingField === 'exit') return exitTime;
     if (typeof editingField === 'string' && editingField.startsWith('project-')) {
@@ -456,7 +456,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
       }
     }
     return entryTime;
-  };
+  }, [editingField, entryTime, exitTime, projectEntries]);
 
   // Set current time value being edited
   const setCurrentTime = (newTime: TimeValue) => {
@@ -500,7 +500,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
         periodRef.current.scrollTop = periodIndex * 40;
       }
     }
-  }, [editingField]);
+  }, [editingField, getCurrentTime, hours, periods]);
 
   // Handle scroll to update selected time
   const handleScroll = (
@@ -630,7 +630,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
           {activeTab === 'work' && (
             <>
               <div className="info-row">
-            <div className="date-display">יום ב' 06/10/25</div>
+            <div className="date-display">יום ב&apos; 06/10/25</div>
             <div className="daily-quota">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <circle cx="7" cy="7" r="6" stroke="#22C55E" strokeWidth="2" fill="none" />
@@ -1027,7 +1027,7 @@ function ManualReportModal({ isOpen, onClose }: ManualReportModalProps) {
           {activeTab === 'absence' && (
             <>
               <div className="info-row">
-                <div className="date-display">יום ב' 06/10/25</div>
+                <div className="date-display">יום ב&apos; 06/10/25</div>
               </div>
 
               {/* Absence Type Selector */}
