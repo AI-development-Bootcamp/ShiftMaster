@@ -1,14 +1,32 @@
 # Change: Add User Management Endpoints
 
+
 ## Why
 
-Admins need the ability to create, read, update, and delete user accounts through the API to manage employees and their access to the system. Currently, there is no programmatic way for admins to manage users - they can only authenticate existing users through the login endpoint.
+Enable admins to manage user accounts programmatically via the API, supporting onboarding, role management, updates, and account deactivation.
 
-This change enables:
-- Onboarding new employees
-- Managing user roles and permissions
-- Deactivating user accounts (soft delete)
-- Updating user information
+---
+
+## What Changes
+
+This proposal introduces a set of admin-only user management endpoints that allow full lifecycle management of user accounts, including:
+
+* Creating new user accounts for onboarding new employees
+* Reading and listing existing users
+* Updating user information (e.g., name, email, role, status)
+* Managing user roles and permissions
+* Deactivating user accounts using a soft-delete mechanism instead of permanent removal
+
+---
+
+## Impact
+
+* Admins gain full control over user management without relying on manual database operations
+* Enables scalable onboarding and offboarding workflows
+* Improves security by allowing controlled role and permission updates
+* Lays the groundwork for future admin tooling and automation
+* Existing authentication flows remain unchanged; login continues to work only for active users
+
 
 ## What Changes
 
