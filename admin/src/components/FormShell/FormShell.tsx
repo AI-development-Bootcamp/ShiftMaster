@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { parseLocalDate } from '@abra-shift-master/shared';
 import { FormShellProps, FormFieldSchema, FormValues, FormErrors, DateRangeValue } from './types';
 import { FormHeader } from './FormHeader';
@@ -26,12 +27,14 @@ function shouldFieldBeVisible(
 }
 
 /**
- * Initialize form values from schema
+ * Initialize form values from schema and optional initial values
  */
-function initializeValues(fields: FormFieldSchema[]): FormValues {
+function initializeValues(fields: FormFieldSchema[], initialValues?: FormValues): FormValues {
     const values: FormValues = {};
     fields.forEach((field) => {
-        if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
+        if (initialValues && initialValues[field.id] !== undefined) {
+            values[field.id] = initialValues[field.id];
+        } else if (field.type === 'dateRangeBox') {
             values[field.id] = { start: '', end: '' };
         } else {
             values[field.id] = '';
@@ -56,8 +59,10 @@ export function FormShell({
     fields,
     isSubmitting = false,
     serverError,
+    initialValues,
 }: FormShellProps) {
-    const [values, setValues] = useState<FormValues>(() => initializeValues(fields));
+    const { t } = useTranslation();
+    const [values, setValues] = useState<FormValues>(() => initializeValues(fields, initialValues));
     const [errors, setErrors] = useState<FormErrors>({});
     const [clickCount, setClickCount] = useState(0);
     const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -152,19 +157,19 @@ export function FormShell({
                 if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
                     const rangeValue = value as DateRangeValue;
                     if (!rangeValue.start || !rangeValue.end) {
-                        newErrors[field.id] = 'שדה חובה';
+                        newErrors[field.id] = t('formShell.validation.required');
                         isValid = false;
                     } else {
                         const startDate = parseLocalDate(rangeValue.start);
                         const endDate = parseLocalDate(rangeValue.end);
 
                         if (startDate && endDate && endDate < startDate) {
-                            newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                            newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                             isValid = false;
                         }
                     }
                 } else if (!value || (typeof value === 'string' && !value.trim())) {
-                    newErrors[field.id] = 'שדה חובה';
+                    newErrors[field.id] = t('formShell.validation.required');
                     isValid = false;
                 }
             } else if (field.type === FIELD_TYPES.DATE_RANGE_BOX) {
@@ -175,7 +180,7 @@ export function FormShell({
                     const startDate = parseLocalDate(rangeValue.start);
                     const endDate = parseLocalDate(rangeValue.end);
                     if (startDate && endDate && endDate < startDate) {
-                        newErrors[field.id] = 'תאריך הסיום חייב להיות אחרי תאריך ההתחלה';
+                        newErrors[field.id] = t('formShell.validation.endDateAfterStartDate');
                         isValid = false;
                     }
                 }
@@ -184,7 +189,7 @@ export function FormShell({
 
         setErrors(newErrors);
         return isValid;
-    }, [fields, values]);
+    }, [fields, values, t]);
 
     // Handle submit
     const handleSubmit = useCallback(() => {

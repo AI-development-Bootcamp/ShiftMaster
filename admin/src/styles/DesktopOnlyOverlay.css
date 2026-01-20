@@ -1,0 +1,75 @@
+.desktop-only-overlay {
+    display: none;
+    /* Hidden by default on big screens */
+    /* Fixed positioning relative to the viewport (since it's in body) */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    /* Ensure full coverage */
+    width: 100vw;
+    height: 100vh;
+
+    @supports (height: 100dvh) {
+        height: 100dvh;
+    }
+
+    /* Modern mobile viewport unit */
+
+    /* Reset margins/padding */
+    margin: 0;
+    padding: 20px;
+
+    /* Styling */
+    background-color: #f3f4f6;
+    background-image: url('../assets/login_background.svg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    /* High z-index to stay on top */
+    z-index: 99999;
+
+    /* Flex layout for content alignment */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    direction: rtl;
+}
+
+.desktop-only-content {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 90%;
+    opacity: 90%;
+}
+
+.desktop-only-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.desktop-only-content h1 {
+    font-size: 1.5rem;
+    color: #111827;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.desktop-only-content p {
+    color: #6b7280;
+    line-height: 1.5;
+    font-size: 1rem;
+}
+
+/* Show on screens smaller than 1024px (Tablets and Mobiles) */
+@media screen and (max-width: 1023px) {
+    .desktop-only-overlay {
+        display: flex;
+    }
+}

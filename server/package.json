@@ -12,7 +12,10 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "lint": "eslint . --ext ts --report-unused-disable-directives --max-warnings 0",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "db:migrate": "tsx --env-file=../.env src/db/utils/migrate.ts",
+    "db:reset": "tsx --env-file=../.env src/db/utils/reset.ts",
+    "seed:dev": "tsx --env-file=../.env src/db/seeds/index.ts"
   },
   "dependencies": {
     "@abra-shift-master/shared": "*",
@@ -24,8 +27,10 @@
     "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.3",
     "morgan": "^1.10.0",
+    "pg": "^8.17.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.0",
+    "uuid": "^13.0.0",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -35,6 +40,7 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.5",
+    "@types/pg": "^8.16.0",
     "@types/supertest": "^6.0.2",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.6",

@@ -3,6 +3,7 @@ import { he } from 'date-fns/locale';
 import { formatDate, parseLocalDate } from '@abra-shift-master/shared';
 import { useMemo } from 'react';
 import { DateBoxProps } from '../types';
+import { useTranslation } from 'react-i18next';
 import 'react-datepicker/dist/react-datepicker.css';
 
 // Register Hebrew locale
@@ -25,6 +26,7 @@ export function DateBox({
     disabled,
     onChange,
 }: DateBoxProps) {
+    const { t } = useTranslation();
     // Parse string date to Date object using shared utility
     const selectedDate = useMemo(() => parseLocalDate(value), [value]);
 
@@ -48,7 +50,7 @@ export function DateBox({
                 onChange={handleChange}
                 locale="he"
                 dateFormat="dd/MM/yyyy"
-                placeholderText={placeholder || 'בחר תאריך'}
+                placeholderText={placeholder || t('formShell.dateBox.placeholder')}
                 className={`form-field__input form-field__datepicker ${error ? 'form-field__input--error' : ''}`}
                 disabled={disabled}
                 calendarStartDay={0}

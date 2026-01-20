@@ -1,0 +1,183 @@
+{
+    "common": {
+        "unknown": "לא ידוע",
+        "unknownUser": "משתמש לא ידוע",
+        "actions": "פעולות",
+        "appName": "Shift Master",
+        "show": "הצג",
+        "hide": "הסתר",
+        "search": "חיפוש",
+        "searchPlaceholder": "חיפוש...",
+        "selectRow": "בחר שורה"
+    },
+    "desktopOnlyOverlay": {
+        "title": "מערכת למחשב שולחני בלבד",
+        "message": "מערכת זו מותאמת לעבודה על מחשב בלבד. אנא התחבר דרך דפדפן במחשב שולחני או לפטופ."
+    },
+    "navigation": {
+        "home": "עמוד הבית",
+        "assignment": "ניהול לקוחות/פרויקטים",
+        "entries": "הגדרת דיווחי שעות",
+        "employees": "ניהול עובדים"
+    },
+    "createMenu": {
+        "title": "יצירה",
+        "options": {
+            "addClient": "צור לקוח חדש",
+            "addProject": "צור פרויקט חדש",
+            "addTask": "צור משימה חדשה"
+        }
+    },
+    "assignmentPage": {
+        "title": "שיוך עובד למשימה",
+        "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
+        "searchBarHint": "חיפוש לפי שם עובד",
+        "tableHeaders": {
+            "clientName": "שם לקוח",
+            "projectName": "שם הפרויקט",
+            "taskName": "שם משימה",
+            "assignees": "עובדים משויכים"
+        },
+        "actions": {
+            "editClient": "ערוך לקוח",
+            "editProject": "ערוך פרוייקט",
+            "editTask": "ערוך משימה",
+            "editAssignment": "ערוך שיוך עובדים",
+            "deleteClient": "מחק לקוח",
+            "deleteProject": "מחק פרויקט",
+            "deleteTask": "מחק משימה"
+        }
+    },
+    "employeesPage": {
+        "title": "ניהול עובדים",
+        "subtitle": "כאן תוכל לנהל את רשימת העובדים, להוסיף חדשים ולעדכן פרטים",
+        "addEmployee": "+ עובד חדש",
+        "tableHeaders": {
+            "employeeId": "מספר עובד",
+            "fullName": "שם מלא",
+            "email": "כתובת מייל",
+            "role": "סוג עובד",
+            "jobTitle": "תואר תפקיד"
+        },
+        "roles": {
+            "admin": "מנהל",
+            "employee": "עובד"
+        },
+        "confirmDelete": "האם למחוק את העובד"
+    },
+    "formShell": {
+        "dateBox": {
+            "placeholder": "בחר תאריך"
+        },
+        "dateRangeBox": {
+            "startDateLabel": "מתאריך",
+            "endDateLabel": "עד תאריך",
+            "startDatePlaceholder": "בחר תאריך התחלה",
+            "endDatePlaceholder": "בחר תאריך סיום",
+            "validationError": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
+        },
+        "dropdownBox": {
+            "placeholder": "בחר אפשרות"
+        },
+        "textBox": {
+            "showPassword": "הצג סיסמה",
+            "hidePassword": "הסתר סיסמה"
+        },
+        "closeForm": "סגור טופס",
+        "validation": {
+            "required": "שדה חובה",
+            "endDateAfterStartDate": "תאריך הסיום חייב להיות אחרי תאריך ההתחלה"
+        }
+    },
+    "login": {
+        "welcomeTitle": "👋 ברוכים הבאים למערכת הניהול של אברא",
+        "emailLabel": "כתובת מייל",
+        "emailPlaceholder": "name@example.com",
+        "passwordLabel": "סיסמה",
+        "submitButton": "התחברות",
+        "submittingButton": "מתחבר...",
+        "showPassword": "הצג סיסמה",
+        "hidePassword": "הסתר סיסמה"
+    },
+    "entriesPage": {
+        "title": "הגדרת דיווחי שעות",
+        "subtitle": "כאן תוכל להגדיר את סוג דיווחי השעות של העובדים בפרויקטים השונים.",
+        "searchBarHint": "פרויקט/חיפוש לפי שם לקוח",
+        "tableHeaders": {
+            "clientName": "שם לקוח",
+            "projectName": "שם הפרויקט",
+            "reportType": "סוג הדיווח"
+        },
+        "reportTypes": {
+            "sum": "סכום שעות",
+            "startEnd": "כניסה /יציאה"
+        }
+    },
+    "monthNames": {
+        "january": "ינואר",
+        "february": "פברואר",
+        "march": "מרץ",
+        "april": "אפריל",
+        "may": "מאי",
+        "june": "יוני",
+        "july": "יולי",
+        "august": "אוגוסט",
+        "september": "ספטמבר",
+        "october": "אוקטובר",
+        "november": "נובמבר",
+        "december": "דצמבר"
+    },
+    "monthLocks": {
+        "button": "נעילת חודשים",
+        "modalTitle": "ניהול נעילת חודשים",
+        "yearNavigator": {
+            "previousYear": "שנה קודמת",
+            "nextYear": "שנה הבאה"
+        },
+        "actions": {
+            "save": "שמור שינויים"
+        },
+        "closeModal": "סגור",
+        "loading": "טוען נתוני נעילה...",
+        "locked": "נעול",
+        "unlocked": "פתוח",
+        "gridLabel": "רשת חודשים"
+    },
+    "taskEmployeeAssignmentForm": {
+        "title": "שייך עובד חדש למשימה",
+        "subtitle": "כאן תוכל לשייך עובד חדש מהמאגר לטובת",
+        "searchPlaceholder": "חיפוש לפי שם עובד",
+        "columns": {
+            "selection": "",
+            "employeeName": "שם העובד",
+            "employeeType": "סוג עובד",
+            "role": "תפקיד"
+        },
+        "errors": {
+            "selectAtLeastOne": "יש לבחור לפחות עובד אחד"
+        },
+        "emptyState": "לא נמצאו עובדים",
+        "submitButton": "שייך עובד למשימה",
+        "close": "סגור"
+    },
+    "confirmDelete": {
+        "client": {
+            "title": "מחיקת לקוח",
+            "description": "האם אתה בטוח שברצונך למחוק את הלקוח?"
+        },
+        "project": {
+            "title": "מחיקת פרויקט",
+            "description": "האם אתה בטוח שברצונך למחוק את הפרויקט?"
+        },
+        "task": {
+            "title": "מחיקת משימה",
+            "description": "האם אתה בטוח שברצונך למחוק את המשימה?"
+        },
+        "employee": {
+            "title": "מחיקת עובד",
+            "description": "האם אתה בטוח שברצונך למחוק את העובד?"
+        },
+        "confirmLabel": "מחק",
+        "cancelLabel": "ביטול"
+    }
+}

@@ -73,6 +73,14 @@ export const swaggerInitPromise = Promise.all([
   });
 
 // API Routes - All routes are automatically prefixed with /api/v1
+app.get('/', (_, res, next) => {
+  try {
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error('Error in root route handler:', err);
+    next(err);
+  }
+});
 app.use('/api/v1', apiRouter);
 
 // 404 handler

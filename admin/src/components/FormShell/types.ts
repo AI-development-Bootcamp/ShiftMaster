@@ -90,6 +90,7 @@ export interface FormShellProps {
     fields: FormFieldSchema[];
     isSubmitting?: boolean;
     serverError?: string;  // General error from server
+    initialValues?: FormValues; // Pre-filled values for edit mode
 }
 
 /**

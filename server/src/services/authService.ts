@@ -2,14 +2,14 @@
  * Authentication service for user login and credential verification
  */
 
-import { supabase } from '../db/supabase.js';
+import { supabaseAdmin } from '../db/supabase.js';
 import { comparePassword } from '../utils/password.js';
 
 /**
  * User data returned from the database
  */
 interface UserFromDB {
-  user_id: number;
+  user_id: string; // UUID
   full_name: string;
   email: string;
   password_hash: string;
@@ -22,7 +22,7 @@ interface UserFromDB {
  * User data returned after successful authentication (without password_hash)
  */
 export interface AuthenticatedUser {
-  user_id: number;
+  user_id: string; // UUID
   full_name: string;
   email: string;
   role: 'admin' | 'regular';
@@ -51,7 +51,7 @@ export async function authenticateUser(
   password: string
 ): Promise<AuthenticatedUser> {
   // Query user by email
-  const { data: user, error } = await supabase
+  const { data: user, error } = await supabaseAdmin
     .from('users')
     .select(
       'user_id, full_name, email, password_hash, role, active, created_at'

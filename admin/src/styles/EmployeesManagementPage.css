@@ -1,0 +1,25 @@
+.employees-management-page {
+    height: 100%;
+    padding: 2rem;
+    overflow: hidden;
+    /* Prevent page scroll, let table scroll */
+    display: flex;
+    flex-direction: column;
+}
+
+.employees-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    /* Fixed and identical spacing */
+    padding-top: 1rem;
+}
+
+
+
+
+
+.employees-management-page p {
+    color: var(--color-text-secondary, #6b7280);
+}

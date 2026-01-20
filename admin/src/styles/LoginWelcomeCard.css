@@ -99,6 +99,30 @@
   color: var(--color-text-light);
 }
 
+.login-card__password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.login-card__input--with-toggle {
+  padding-left: 40px;
+  /* Space for the absolute icon on the left */
+}
+
+
+.login-card__password-toggle {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  color: #666;
+}
+
 /* LTR input for email */
 .login-card__input--ltr {
   direction: ltr;
@@ -190,7 +214,15 @@
     font-size: var(--font-size-xl);
   }
 
-  .login-card__welcome-subtitle {
-    font-size: var(--font-size-base);
+
+  .login-card__password-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    height: 100%;
   }
 }

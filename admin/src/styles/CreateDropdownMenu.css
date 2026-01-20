@@ -7,35 +7,23 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    /* Center content horizontally */
-    gap: 10px;
-    /* Icon-text gap */
+    gap: 8px;
 
-    height: 48px;
-    width: 106px;
-    /* Explicit width as requested */
-    min-width: 0;
-    /* Reset min-width */
-    padding: 0 8px;
-    /* Reduced padding to fit content in smaller width */
+    height: 40px;
+    min-width: 140px;
+    padding: 0 16px;
 
-    background-color: #1F6FEB;
-    /* Pixel-perfect Blue */
-    color: #FFFFFF;
+    background-color: var(--color-primary, #0052D6);
+    color: var(--color-text-on-primary, #ffffff);
 
     border: none;
-    border-radius: 10px;
-    /* Rounded 10px */
-    box-shadow: none;
-    /* Flat */
+    border-radius: var(--radius-md, 6px);
 
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 0px;
-    line-height: 20px;
+    font-size: 14px;
+    font-weight: 500;
 
     cursor: pointer;
-    transition: background-color 120ms ease-out;
+    transition: background-color 0.2s;
 
     /* Ensure LTR layout for Icon-Left */
     flex-direction: row;
@@ -43,11 +31,12 @@
 }
 
 .create-menu__trigger:hover {
-    background-color: #1A5FD1;
+    background-color: var(--color-primary-hover, #0c69ff);
 }
 
 .create-menu__trigger:active {
-    background-color: #174FB0;
+    background-color: #0041a8;
+    /* Fallback active darker */
 }
 
 .create-menu__trigger:disabled {
@@ -58,12 +47,15 @@
 .create-menu__icon {
     width: 18px;
     height: 18px;
-    color: #FFFFFF;
+    color: currentColor;
+    /* Use text color */
     flex-shrink: 0;
 }
 
+.create-menu__trigger:focus-visible,
 .create-menu__trigger:focus {
-    outline: none;
+    outline: 2px solid var(--color-primary, #0052D6);
+    outline-offset: 2px;
 }
 
 /* Dropdown styling */
