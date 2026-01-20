@@ -30,6 +30,7 @@ export async function createUser(req: Request, res: Response): Promise<void> {
     if (!validationResult.success) {
       res.status(400).json({
         success: false,
+        data: null,
         error: {
           message: 'Validation error',
           code: 'VALIDATION_ERROR',
@@ -63,6 +64,7 @@ export async function createUser(req: Request, res: Response): Promise<void> {
       data: {
         user,
       },
+      error: null,
     });
   } catch (error) {
     // Handle duplicate email error
@@ -163,7 +165,10 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
  * Handle GET /api/v1/users/me - Get current user's information
  * @authenticated
  */
-export async function getCurrentUser(req: Request, res: Response): Promise<void> {
+export async function getCurrentUser(
+  req: Request,
+  res: Response
+): Promise<void> {
   try {
     // Get user ID from JWT token (set by isAuthenticated middleware)
     const userId = req.user?.userId;
