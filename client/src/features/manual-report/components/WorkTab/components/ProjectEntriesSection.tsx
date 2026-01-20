@@ -1,11 +1,12 @@
 import { ProjectEntry } from '../../../types/manualReport';
+import { ProjectTimeValidationError } from '../../../utils/validation';
 import ProjectEntryCard from './ProjectEntryCard';
 import { PlusCircleIcon } from '../../icons';
 import { SelectionType } from '../../../../../components/SelectionModal/SelectionModal';
 
 interface ProjectEntriesSectionProps {
   projectEntries: ProjectEntry[];
-  timeErrors: Record<string, string>;
+  timeErrors: Record<string, ProjectTimeValidationError>;
   editingField: string | null;
   onAddProject: () => void;
   onOpenSelection: (type: SelectionType, projectId: string) => void;

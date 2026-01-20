@@ -6,7 +6,7 @@ The ManualReportModal component has been refactored from a 1989-line monolithic 
 
 ## Folder Structure
 
-````
+```text
 client/src/features/manual-report/
 ├── components/
 │   ├── icons/
@@ -64,7 +64,7 @@ client/src/features/manual-report/
 │   └── manualReportModal.css
 ├── index.ts
 └── REFACTORING_NOTES.md (this file)
-```text
+```
 
 ## Migration Guide
 

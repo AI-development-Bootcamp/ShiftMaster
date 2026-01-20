@@ -1,4 +1,5 @@
 import { ProjectEntry } from '../../../types/manualReport';
+import { ProjectTimeValidationError } from '../../../utils/validation';
 import { formatTime } from '../../../utils/time';
 import TimePicker from './TimePicker';
 import { SelectionType } from '../../../../../components/SelectionModal/SelectionModal';
@@ -6,7 +7,7 @@ import { SelectionType } from '../../../../../components/SelectionModal/Selectio
 interface ProjectEntryCardProps {
   project: ProjectEntry;
   editingField: string | null;
-  timeError?: string;
+  timeError?: ProjectTimeValidationError;
   onOpenSelection: (type: SelectionType, projectId: string) => void;
   onTimeClick: (field: string) => void;
   onDescriptionChange: (projectId: string, description: string) => void;
@@ -138,8 +139,12 @@ function ProjectEntryCard({
       </button>
 
       {timeError && (
-        <div className="project-time-error" role="alert">
-          {timeError}
+        <div
+          className="project-time-error"
+          role="alert"
+          data-error-code={timeError.code}
+        >
+          {timeError.message}
         </div>
       )}
     </div>

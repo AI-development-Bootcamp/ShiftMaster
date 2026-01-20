@@ -101,7 +101,7 @@ function DateRangePicker({
       </button>
 
       {openCalendar === 'start' && (
-        <div className="calendar-dropdown">
+        <div className="calendar-dropdown" id="start-calendar">
           <div className="calendar-dropdown-header">
             <span className="calendar-header-date">
               {formatDateForCalendar(startDate)}
@@ -162,16 +162,16 @@ function DateRangePicker({
       <button
         type="button"
         className="date-row"
-        onClick={() => handleToggleCalendar('start')}
-        aria-expanded={openCalendar === 'start'}
-        aria-controls="start-calendar"
+        onClick={() => handleToggleCalendar('end')}
+        aria-expanded={openCalendar === 'end'}
+        aria-controls="end-calendar"
       >
         <span className="date-value">{formatDate(endDate)}</span>
         <span className="date-label">תאריך סיום</span>
       </button>
 
       {openCalendar === 'end' && (
-        <div className="calendar-dropdown">
+        <div className="calendar-dropdown" id="end-calendar">
           <div className="calendar-dropdown-header">
             <span className="calendar-header-date">
               {formatDateForCalendar(endDate)}

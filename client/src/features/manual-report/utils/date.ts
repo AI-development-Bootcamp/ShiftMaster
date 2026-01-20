@@ -32,17 +32,31 @@ export const formatDateDisplay = (date: Date): string => {
 
  const formatDateBase = (date: DateValue): string => {
    assertValidDateValue(date);
-   return `${date.day.toString().padStart(2, '0')} ${HEBREW_MONTHS_SHORT[date.month]} $date.year}`;
+   return `${date.day.toString().padStart(2, '0')} ${HEBREW_MONTHS_SHORT[date.month]} ${date.year}`;
  };
 
  export const formatDate = formatDateBase;
  export const formatDateForCalendar = formatDateBase;
 
 export const getDaysInMonth = (month: number, year: number): number => {
+  const isValidMonth = Number.isInteger(month) && month >= 0 && month <= 11;
+  const isValidYear = Number.isInteger(year) && Number.isFinite(year);
+  if (!isValidMonth || !isValidYear) {
+    const error = new Error('Invalid month or year');
+    (error as { code?: string }).code = 'INVALID_MONTH_YEAR';
+    throw error;
+  }
   return new Date(year, month + 1, 0).getDate();
 };
 
 export const getFirstDayOfMonth = (month: number, year: number): number => {
+  const isValidMonth = Number.isInteger(month) && month >= 0 && month <= 11;
+  const isValidYear = Number.isInteger(year) && Number.isFinite(year);
+  if (!isValidMonth || !isValidYear) {
+    const error = new Error('Invalid month or year');
+    (error as { code?: string }).code = 'INVALID_MONTH_YEAR';
+    throw error;
+  }
   return new Date(year, month, 1).getDay();
 };
 

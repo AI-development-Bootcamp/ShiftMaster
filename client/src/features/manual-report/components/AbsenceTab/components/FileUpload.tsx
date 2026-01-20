@@ -1,11 +1,12 @@
+import { type RefObject, type ChangeEvent } from 'react';
 import { FileUploadError } from '../../../types/manualReport';
 import { FileUploadIcon, FileIcon, CloseIcon } from '../../icons';
 
 interface FileUploadProps {
   uploadedFile: File | null;
   fileUploadError: FileUploadError;
-  fileInputRef: React.RefObject<HTMLInputElement>;
-  onFileUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  fileInputRef: RefObject<HTMLInputElement>;
+  onFileUpload: (event: ChangeEvent<HTMLInputElement>) => void;
   onRemoveFile: () => void;
 }
 

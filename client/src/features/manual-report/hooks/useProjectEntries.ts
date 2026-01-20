@@ -1,10 +1,15 @@
 import { useState, useCallback } from 'react';
 import { ProjectEntry, TimeValue } from '../types/manualReport';
-import { validateProjectTime } from '../utils/validation';
+import {
+  validateProjectTime,
+  ProjectTimeValidationError,
+} from '../utils/validation';
 
 export function useProjectEntries() {
   const [projectEntries, setProjectEntries] = useState<ProjectEntry[]>([]);
-  const [timeErrors, setTimeErrors] = useState<Record<string, string>>({});
+  const [timeErrors, setTimeErrors] = useState<
+    Record<string, ProjectTimeValidationError>
+  >({});
 
   const addProject = useCallback(() => {
     const newProject: ProjectEntry = {
@@ -55,7 +60,7 @@ const updateProjectTime = useCallback(
             setTimeErrors((prevErrors) => {
               const newErrors = { ...prevErrors };
               if (error) {
-                newErrors[projectId] = error.message || error.toString(); // Convert to string
+                newErrors[projectId] = error;
               } else {
                 delete newErrors[projectId];
               }
