@@ -1,5 +1,5 @@
 import AnimatedDigit from '../AnimatedDigit/AnimatedDigit';
-import './TimerDisplay.css';
+import '../../styles/TimerDisplay.css';
 
 interface TimerDisplayProps {
   totalSeconds: number;
