@@ -122,12 +122,15 @@ export async function listUsers(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const { page, limit } = validationResult.data;
+    const { page, limit, active, search } = validationResult.data;
 
     // Get users list
     const actor: Actor = { role: req.user!.role };
     const usersService = new UsersService(supabaseAdmin);
-    const result = await usersService.listUsers(actor, page, limit);
+    const result = await usersService.listUsers(actor, page, limit, {
+      active,
+      search,
+    });
 
     // Return success response
     res.status(200).json({

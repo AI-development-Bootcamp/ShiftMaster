@@ -23,7 +23,11 @@ export interface IBaseRepository<T, NewT, UpdateT> {
 
 export interface IUserRepository extends IBaseRepository<User, NewUser, UpdateUser> {
     findByEmail(email: string): Promise<User | null>;
-    findPaginated(page: number, limit: number): Promise<{ data: User[]; count: number }>;
+    findPaginated(
+        page: number,
+        limit: number,
+        filters?: { active?: boolean; search?: string }
+    ): Promise<{ data: User[]; count: number }>;
 }
 
 export interface IClientRepository extends IBaseRepository<Client, NewClient, UpdateClient> {

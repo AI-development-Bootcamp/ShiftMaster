@@ -124,12 +124,16 @@ export const listUsersSchema = z
       .union([z.string(), z.number()])
       .transform((val) => Number(val))
       .refine((val) => !isNaN(val), { message: 'Limit must be a positive integer' })
-      .refine((val) => val >= 1 && val <= 100, { message: 'Limit must be between 1 and 100' })
+      .refine((val) => val >= 1 && val <= 1000, { message: 'Limit must be between 1 and 1000' })
       .optional()
       .default('20'),
     active: z
       .union([z.boolean(), z.string()])
-      .transform((val) => String(val) === 'true')
+      .transform((val) => {
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        return Boolean(val);
+      })
       .optional(),
     search: z.string().trim().optional(),
   })
