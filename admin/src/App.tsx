@@ -15,12 +15,12 @@ import { LoginPage } from './pages/LoginPage';
 import { AssignmentPage } from './pages/AssignmentPage';
 import { EntriesManagementPage } from './pages/EntriesManagementPage';
 import { EmployeesManagementPage } from './pages/EmployeesManagementPage';
-import { mockCurrentUser } from './mocks/users';
 import { DesktopOnlyOverlay } from './components/DesktopOnlyOverlay/DesktopOnlyOverlay';
 import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from './store';
 import { initializeAuth } from './store/slices/authSlice';
+import { User } from '@shared/types';
 
 /**
  * Login route wrapper
@@ -44,8 +44,7 @@ function AppContent() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { isAuthenticated } = useAppSelector((state) => state.auth);
-
+  const { isAuthenticated, user } = useAppSelector((state) => state.auth);
   useEffect(() => {
     // Initialize auth on app startup (check for refresh token)
     dispatch(initializeAuth())
@@ -63,10 +62,7 @@ function AppContent() {
   return (
     <div className="app" dir="rtl">
       {!isLoginPage && isAuthenticated && (
-        <RightSidebarTaskbar
-          navItems={navigationItems}
-          user={mockCurrentUser}
-        />
+        <RightSidebarTaskbar navItems={navigationItems} user={user as User} />
       )}
       <main className={!isLoginPage ? 'main-content' : 'login-content'}>
         <Routes>
