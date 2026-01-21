@@ -88,6 +88,7 @@ export const env = {
   corsOrigins: process.env.CORS_ORIGINS
     ? process.env.CORS_ORIGINS.split(',').map((origin) => origin.trim())
     : ['http://localhost:5173', 'http://localhost:5174'],
+  redisUrl: process.env.REDIS_URL || 'redis://localhost:6379',
 };
 
 /**

@@ -1,0 +1,50 @@
+.logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #141e3e;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.logout-btn:hover {
+  background-color: #f3f4f6;
+  color: #EE2662;
+}
+
+.logout-btn:active {
+  transform: scale(0.95);
+}
+
+.logout-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logout-btn-text {
+  display: inline;
+}
+
+/* Hide text on small screens (mobile) */
+@media (max-width: 640px) {
+  .logout-btn {
+    width: 40px;
+    padding: 0;
+  }
+
+  .logout-btn-text {
+    display: none;
+  }
+}
