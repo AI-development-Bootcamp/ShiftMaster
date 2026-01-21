@@ -4,6 +4,18 @@
 
 import { supabaseAdmin } from '../db/supabase.js';
 import { comparePassword } from '../utils/password.js';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  generateRefreshToken,
+  hashRefreshToken,
+  verifyRefreshToken,
+} from '../utils/crypto.js';
+import {
+  setRefreshSession,
+  getRefreshSession,
+  updateRefreshSession,
+  deleteRefreshSession,
+} from '../db/redis.js';
 
 /**
  * User data returned from the database
@@ -61,6 +73,27 @@ export class AuthenticationError extends Error {
   }
 }
 
+export class RefreshSessionNotFoundError extends Error {
+  constructor(message = 'Refresh session not found or expired') {
+    super(message);
+    this.name = 'RefreshSessionNotFoundError';
+  }
+}
+
+export class RefreshTokenInvalidError extends Error {
+  constructor(message = 'Refresh token is invalid') {
+    super(message);
+    this.name = 'RefreshTokenInvalidError';
+  }
+}
+
+export class TokenReuseDetectedError extends Error {
+  constructor(message = 'Token reuse detected - possible theft') {
+    super(message);
+    this.name = 'TokenReuseDetectedError';
+  }
+}
+
 /**
  * Authenticate a user by email and password
  * @param email - User's email address
@@ -113,4 +146,101 @@ export async function authenticateUser(
     role: userFromDB.role,
     active: userFromDB.active,
   };
+}
+
+/**
+ * Create a new refresh token session
+ * Generates a refresh token, hashes it, and stores in Redis
+ *
+ * @param {string} userId - User ID to create session for
+ * @param {string} userAgent - Optional user agent string
+ * @param {string} ipAddress - Optional IP address
+ * @returns {Promise<{sessionId: string, refreshToken: string}>} Session ID and refresh token
+ */
+export async function createRefreshSession(
+  userId: string,
+  userAgent?: string,
+  ipAddress?: string
+): Promise<{ sessionId: string; refreshToken: string }> {
+  const sessionId = uuidv4();
+  const refreshToken = generateRefreshToken(32); // 32 bytes = 64 hex chars
+  const refreshTokenHash = hashRefreshToken(refreshToken);
+
+  await setRefreshSession(sessionId, {
+    userId,
+    refreshTokenHash,
+    createdAt: new Date().toISOString(),
+    userAgent,
+    ipAddress,
+  });
+
+  return { sessionId, refreshToken };
+}
+
+/**
+ * Validate a refresh token session
+ * Checks if session exists and token hash matches
+ *
+ * @param {string} sessionId - Session ID to validate
+ * @param {string} refreshToken - Refresh token to validate
+ * @returns {Promise<{userId: string}>} User ID if valid
+ * @throws {RefreshSessionNotFoundError} If session doesn't exist
+ * @throws {TokenReuseDetectedError} If token hash doesn't match (possible theft)
+ */
+export async function validateRefreshSession(
+  sessionId: string,
+  refreshToken: string
+): Promise<{ userId: string }> {
+  const session = await getRefreshSession(sessionId);
+
+  if (!session) {
+    throw new RefreshSessionNotFoundError();
+  }
+
+  // Verify token hash
+  const isValid = verifyRefreshToken(refreshToken, session.refreshTokenHash);
+
+  if (!isValid) {
+    // Token mismatch = possible theft, revoke session immediately
+    await deleteRefreshSession(sessionId);
+    throw new TokenReuseDetectedError();
+  }
+
+  return { userId: session.userId };
+}
+
+/**
+ * Rotate refresh token (generate new token, update session)
+ * Used during token refresh to invalidate old token
+ *
+ * @param {string} sessionId - Session ID to rotate token for
+ * @returns {Promise<{refreshToken: string}>} New refresh token
+ * @throws {RefreshSessionNotFoundError} If session doesn't exist
+ */
+export async function rotateRefreshToken(
+  sessionId: string
+): Promise<{ refreshToken: string }> {
+  const newRefreshToken = generateRefreshToken(32);
+  const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
+
+  const updated = await updateRefreshSession(sessionId, {
+    refreshTokenHash: newRefreshTokenHash,
+  });
+
+  if (!updated) {
+    throw new RefreshSessionNotFoundError();
+  }
+
+  return { refreshToken: newRefreshToken };
+}
+
+/**
+ * Revoke a refresh token session (logout)
+ * Deletes session from Redis
+ *
+ * @param {string} sessionId - Session ID to revoke
+ * @returns {Promise<void>}
+ */
+export async function revokeRefreshSession(sessionId: string): Promise<void> {
+  await deleteRefreshSession(sessionId);
 }
