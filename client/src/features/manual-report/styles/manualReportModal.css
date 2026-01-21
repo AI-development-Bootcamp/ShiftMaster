@@ -621,7 +621,7 @@
 
 .progress-text-left {
   text-align: left;
-  direction: ltr;
+  direction: rtl;
 }
 
 .progress-bar-container {

@@ -56,6 +56,12 @@ function ManualReportModal({
     onClose();
   };
 
+  // Calculate displayed hours matching the save gate logic
+  const displayedWorkedHours = Math.floor(totalHours);
+  const displayedRemainingHours = Math.ceil(
+    Math.max(0, DAILY_QUOTA_HOURS - totalHours)
+  );
+
   const handleRequestDeleteProject = (
     projectId: string,
     actualDeleteFn: (projectId: string) => void
@@ -152,13 +158,13 @@ function ManualReportModal({
               <div className="progress-text-container">
                 <p className="progress-text progress-text-right">
                   {t('manualReport.progressTextRight', {
-                    hours: Math.round(totalHours),
+                    hours: displayedWorkedHours,
                     quota: DAILY_QUOTA_HOURS,
                   })}
                 </p>
                 <p className="progress-text progress-text-left">
                   {t('manualReport.progressTextLeft', {
-                    remaining: Math.max(0, Math.round(DAILY_QUOTA_HOURS - totalHours)),
+                    remaining: displayedRemainingHours,
                   })}
                 </p>
               </div>
