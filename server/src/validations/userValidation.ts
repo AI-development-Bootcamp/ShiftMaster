@@ -114,19 +114,22 @@ export const getUserSchema = z
 export const listUsersSchema = z
   .object({
     page: z
-      .string()
-      .regex(/^\d+$/, 'Page must be a positive integer')
-      .transform(Number)
-      .refine((val) => val >= 1, 'Page must be at least 1')
+      .union([z.string(), z.number()])
+      .transform((val) => Number(val))
+      .refine((val) => !isNaN(val) && val >= 1, 'Page must be at least 1')
       .optional()
       .default('1'),
     limit: z
-      .string()
-      .regex(/^\d+$/, 'Limit must be a positive integer')
-      .transform(Number)
-      .refine((val) => val >= 1 && val <= 100, 'Limit must be between 1 and 100')
+      .union([z.string(), z.number()])
+      .transform((val) => Number(val))
+      .refine((val) => !isNaN(val) && val >= 1 && val <= 100, 'Limit must be between 1 and 100')
       .optional()
       .default('20'),
+    active: z
+      .union([z.boolean(), z.string()])
+      .transform((val) => String(val) === 'true')
+      .optional(),
+    search: z.string().trim().optional(),
   })
   .strict();
 

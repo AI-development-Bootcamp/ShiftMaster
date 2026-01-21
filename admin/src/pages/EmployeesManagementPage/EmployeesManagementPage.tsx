@@ -17,27 +17,27 @@ import '../../styles/Toast.css';
 
 // Error message mapping
 const ERROR_MESSAGES: Record<string, string> = {
-  [UserApiErrorCode.EMAIL_EXISTS]: 'כתובת האימייל כבר קיימת במערכת',
-  [UserApiErrorCode.DUPLICATE_EMAIL]: 'כתובת האימייל כבר קיימת במערכת',
-  [UserApiErrorCode.USER_NOT_FOUND]: 'המשתמש לא נמצא',
-  [UserApiErrorCode.VALIDATION_ERROR]: 'אימות נתונים נכשל',
-  [UserApiErrorCode.FORBIDDEN]: 'אין הרשאה לביצוע פעולה זו',
-  [UserApiErrorCode.UNAUTHORIZED]: 'נדרשת התחברות מחדש',
-  NETWORK_ERROR: 'שגיאת רשת, בדוק את החיבור לאינטרנט',
-  SERVER_ERROR: 'שגיאת שרת, נסה שוב מאוחר יותר',
+    [UserApiErrorCode.EMAIL_EXISTS]: 'כתובת האימייל כבר קיימת במערכת',
+    [UserApiErrorCode.DUPLICATE_EMAIL]: 'כתובת האימייל כבר קיימת במערכת',
+    [UserApiErrorCode.USER_NOT_FOUND]: 'המשתמש לא נמצא',
+    [UserApiErrorCode.VALIDATION_ERROR]: 'אימות נתונים נכשל',
+    [UserApiErrorCode.FORBIDDEN]: 'אין הרשאה לביצוע פעולה זו',
+    [UserApiErrorCode.UNAUTHORIZED]: 'נדרשת התחברות מחדש',
+    NETWORK_ERROR: 'שגיאת רשת, בדוק את החיבור לאינטרנט',
+    SERVER_ERROR: 'שגיאת שרת, נסה שוב מאוחר יותר',
 };
 
 function getErrorMessage(error: unknown): string {
-  if (error instanceof AxiosError) {
-    const errorCode = error.response?.data?.error?.code;
-    if (errorCode && errorCode in ERROR_MESSAGES) {
-      return ERROR_MESSAGES[errorCode];
+    if (error instanceof AxiosError) {
+        const errorCode = error.response?.data?.error?.code;
+        if (errorCode && errorCode in ERROR_MESSAGES) {
+            return ERROR_MESSAGES[errorCode];
+        }
+        if (!error.response) {
+            return ERROR_MESSAGES.NETWORK_ERROR;
+        }
     }
-    if (!error.response) {
-      return ERROR_MESSAGES.NETWORK_ERROR;
-    }
-  }
-  return ERROR_MESSAGES.SERVER_ERROR;
+    return ERROR_MESSAGES.SERVER_ERROR;
 }
 
 export function EmployeesManagementPage() {
@@ -71,7 +71,7 @@ export function EmployeesManagementPage() {
         setError(null);
 
         try {
-            const response = await apiClient.get<UserListResponse['data']>('/api/v1/users', {
+            const response = await apiClient.get<UserListResponse['data']>('/users', {
                 params: {
                     page,
                     limit: 11,
@@ -137,7 +137,7 @@ export function EmployeesManagementPage() {
 
             setFormSubmitting(true);
             try {
-                await apiClient.post('/api/v1/users', userData);
+                await apiClient.post('/users', userData);
                 showSuccess('עובד נוסף בהצלחה');
                 setActiveForm(null);
                 // Refresh user list
@@ -171,7 +171,7 @@ export function EmployeesManagementPage() {
 
             setFormSubmitting(true);
             try {
-                await apiClient.patch(`/api/v1/users/${editingUserId}`, userData);
+                await apiClient.patch(`/users/${editingUserId}`, userData);
                 showSuccess('פרטי העובד עודכנו בהצלחה');
                 setActiveForm(null);
                 setEditingUserId(null);

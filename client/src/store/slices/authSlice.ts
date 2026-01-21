@@ -1,4 +1,5 @@
 import { tokenStore } from '@/auth/tokenStore';
+import { env } from '../../config/env';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 interface User {
@@ -29,7 +30,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: { code: string; message: string } }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+    const response = await fetch(`${env.apiUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +65,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      await fetch(`${env.apiUrl}/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Include cookies
       });
@@ -85,12 +86,16 @@ export const logoutUser = createAsyncThunk(
 );
 
 // Async thunk for initializing auth on app start (refresh flow)
-export const initializeAuth = createAsyncThunk(
+export const initializeAuth = createAsyncThunk<
+  { user: User | null },
+  void,
+  { rejectValue: { code: string; message: string } }
+>(
   'auth/initialize',
   async (_, { rejectWithValue }) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/refresh`,
+        `${env.apiUrl}/auth/refresh`,
         {
           method: 'POST',
           credentials: 'include', // Include cookies
@@ -101,10 +106,7 @@ export const initializeAuth = createAsyncThunk(
         // Refresh failed, user needs to login
         tokenStore.clearAccessToken();
         localStorage.removeItem('user');
-        return rejectWithValue({
-          message: 'Session expired',
-          code: 'SESSION_EXPIRED',
-        });
+        return { user: null };
       }
 
       const data = await response.json();
@@ -123,10 +125,7 @@ export const initializeAuth = createAsyncThunk(
     } catch (err) {
       tokenStore.clearAccessToken();
       localStorage.removeItem('user');
-      return rejectWithValue({
-        message: 'Failed to initialize auth',
-        code: 'INIT_ERROR',
-      });
+      return { user: null };
     }
   }
 );
@@ -164,8 +163,13 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
+        if (action.payload.user) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+        } else {
+          state.isAuthenticated = false;
+          state.user = null;
+        }
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;
