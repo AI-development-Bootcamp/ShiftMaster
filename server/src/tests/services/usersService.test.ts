@@ -181,7 +181,7 @@ describe('UsersService', () => {
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor);
 
-      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(1, 20);
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(1, 20, undefined);
       expect(result.users).toHaveLength(5);
       expect(result.pagination).toEqual({
         total: 5,
@@ -214,7 +214,7 @@ describe('UsersService', () => {
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor, 2, 2);
 
-      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(2, 2);
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(2, 2, undefined);
       expect(result.users).toHaveLength(2);
       expect(result.users[0].user_id).toBe(
         '123e4567-e89b-12d3-a456-426614174003'
@@ -239,10 +239,20 @@ describe('UsersService', () => {
       const actor = { role: 'admin' as const };
       const result = await usersService.listUsers(actor, 10, 20);
 
-      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(10, 20);
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(10, 20, undefined);
       expect(result.users).toHaveLength(0);
       expect(result.pagination.total).toBe(5);
       expect(result.pagination.page).toBe(10);
+      expect(result.pagination.limit).toBe(20);
+    });
+
+    it('should pass filters to repository', async () => {
+      const actor = { role: 'admin' as const };
+      const filters = { active: true, search: 'test' };
+
+      await usersService.listUsers(actor, 1, 20, filters);
+
+      expect(mockUserRepo.findPaginated).toHaveBeenCalledWith(1, 20, filters);
     });
 
     it('should exclude password_hash from all users', async () => {

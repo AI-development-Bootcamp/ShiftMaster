@@ -264,7 +264,8 @@ describe('UsersController', () => {
       expect(mockListUsers).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
         1,
-        20
+        20,
+        { active: undefined, search: undefined }
       );
       expect(statusMock).toHaveBeenCalledWith(200);
       expect(jsonMock).toHaveBeenCalledWith({
@@ -292,7 +293,8 @@ describe('UsersController', () => {
       expect(mockListUsers).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
         2,
-        10
+        10,
+        { active: undefined, search: undefined }
       );
       expect(statusMock).toHaveBeenCalledWith(200);
     });

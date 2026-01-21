@@ -25,14 +25,27 @@ export class UserRepository extends BaseRepository<User, NewUser, UpdateUser> im
         return data as User;
     }
 
-    async findPaginated(page: number, limit: number): Promise<{ data: User[]; count: number }> {
+    async findPaginated(
+        page: number,
+        limit: number,
+        filters?: { active?: boolean; search?: string }
+    ): Promise<{ data: User[]; count: number }> {
         const from = (page - 1) * limit;
         const to = from + limit - 1;
 
-        const { data, error, count } = await this.dbConnection
+        let query = this.dbConnection
             .from(this.table)
-            .select('*', { count: 'exact' })
-            .range(from, to);
+            .select('*', { count: 'exact' });
+
+        if (filters?.active !== undefined) {
+            query = query.eq('active', filters.active);
+        }
+
+        if (filters?.search) {
+            query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%`);
+        }
+
+        const { data, error, count } = await query.range(from, to);
 
         if (error) {
             logDbError('UserRepository.findPaginated', error);

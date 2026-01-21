@@ -129,7 +129,11 @@ export const listUsersSchema = z
       .default('20'),
     active: z
       .union([z.boolean(), z.string()])
-      .transform((val) => String(val) === 'true')
+      .transform((val) => {
+        if (val === 'true') return true;
+        if (val === 'false') return false;
+        return Boolean(val);
+      })
       .optional(),
     search: z.string().trim().optional(),
   })
