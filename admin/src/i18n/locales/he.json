@@ -170,6 +170,57 @@
         "submitButton": "שייך עובד למשימה",
         "close": "סגור"
     },
+    "clientForm": {
+        "createTitle": "טופס יצירת לקוח",
+        "createSubtitle": "פה תוכל להוסיף לקוחות למערכת",
+        "editTitle": "עריכת פרטי לקוח",
+        "editSubtitle": "עדכן את פרטי הלקוח",
+        "createButton": "צור לקוח",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "clientName": "שם הלקוח",
+            "clientNamePlaceholder": "הכנס את שם הלקוח",
+            "contactDetails": "פרטי איש קשר",
+            "contactDetailsPlaceholder": "הכנס פרטים מלאים"
+        }
+    },
+    "projectForm": {
+        "createTitle": "הוספת פרויקט חדש",
+        "createSubtitle": "הגדר את פרטי הפרויקט",
+        "editTitle": "עריכת פרויקט",
+        "editSubtitle": "עדכן את פרטי הפרויקט",
+        "createButton": "צור פרויקט",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "projectName": "שם הפרויקט",
+            "projectNamePlaceholder": "הכנס את שם הפרויקט",
+            "client": "לקוח",
+            "clientPlaceholder": "בחר לקוח",
+            "manager": "מנהל פרויקט",
+            "managerPlaceholder": "בחר מנהל",
+            "dates": "תקופת הפרויקט",
+            "description": "תיאור הפרויקט",
+            "descriptionPlaceholder": "פרטים נוספים אודות הפרויקט",
+            "timeFormat": "שיטת דיווח שעות"
+        }
+    },
+    "taskForm": {
+        "createTitle": "יצירת משימה חדשה",
+        "createSubtitle": "הקצה משימה לעובד",
+        "editTitle": "עריכת משימה",
+        "editSubtitle": "עדכן את פרטי המשימה",
+        "createButton": "צור משימה",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "taskTitle": "כותרת המשימה",
+            "taskTitlePlaceholder": "מה צריך לעשות?",
+            "project": "פרויקט משוייך",
+            "projectPlaceholder": "בחר פרויקט",
+            "dueDate": "תאריך יעד",
+            "description": "תיאור המשימה",
+            "descriptionPlaceholder": "הוראות ביצוע..."
+        }
+    },
     "confirmDelete": {
         "client": {
             "title": "מחיקת לקוח",

@@ -1,32 +1,27 @@
 import { FormFieldSchema } from '../FormShell';
+import { TFunction } from 'i18next';
 
+export const getClientForm = (t: TFunction, mode: 'create' | 'edit' = 'create') => {
+    const fields: FormFieldSchema[] = [
+        {
+            id: 'clientName',
+            type: 'textBox',
+            label: t('clientForm.fields.clientName'),
+            placeholder: t('clientForm.fields.clientNamePlaceholder'),
+            required: true,
+        },
+        {
+            id: 'contactDetails',
+            type: 'largeTextBox',
+            label: t('clientForm.fields.contactDetails'),
+            placeholder: t('clientForm.fields.contactDetailsPlaceholder'),
+        },
+    ];
 
-export const clientFields: FormFieldSchema[] = [
-    {
-        id: 'clientName',
-        type: 'textBox',
-        label: 'שם הלקוח',
-        placeholder: 'הכנס את שם הלקוח',
-        required: true,
-    },
-    {
-        id: 'contactDetails',
-        type: 'largeTextBox',
-        label: 'פרטי איש קשר',
-        placeholder: 'הכנס פרטים מלאים',
-    },
-];
-
-export const createClientForm = {
-    title: 'טופס יצירת לקוח',
-    subtitle: 'פה תוכל להוסיף לקוחות למערכת',
-    primaryActionLabel: 'צור לקוח',
-    fields: clientFields,
-};
-
-export const editClientForm = {
-    title: 'עריכת פרטי לקוח',
-    subtitle: 'עדכן את פרטי הלקוח',
-    primaryActionLabel: 'שמור שינויים',
-    fields: clientFields,
+    return {
+        title: mode === 'create' ? t('clientForm.createTitle') : t('clientForm.editTitle'),
+        subtitle: mode === 'create' ? t('clientForm.createSubtitle') : t('clientForm.editSubtitle'),
+        primaryActionLabel: mode === 'create' ? t('clientForm.createButton') : t('clientForm.editButton'),
+        fields,
+    };
 };

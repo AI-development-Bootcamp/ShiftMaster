@@ -35,7 +35,10 @@ export class ProjectsService {
         this.tasksService = new TasksService(client);
     }
 
-    async listProjects(): Promise<Project[]> {
+    async listProjects(includeInactive = false): Promise<Project[]> {
+        if (includeInactive) {
+            return this.projectRepo.findAll();
+        }
         return this.projectRepo.findActive();
     }
 

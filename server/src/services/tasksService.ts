@@ -29,7 +29,10 @@ export class TasksService {
         this.projectRepo = new ProjectRepository(client);
     }
 
-    async listTasks(): Promise<Task[]> {
+    async listTasks(includeInactive = false): Promise<Task[]> {
+        if (includeInactive) {
+            return this.taskRepo.findAll();
+        }
         return this.taskRepo.findActive();
     }
 

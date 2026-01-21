@@ -1,0 +1,254 @@
+{
+    "common": {
+        "unknown": "Unknown",
+        "unknownUser": "Unknown User",
+        "actions": "Actions",
+        "appName": "Shift Master",
+        "show": "Show",
+        "hide": "Hide",
+        "search": "Search",
+        "searchPlaceholder": "Search...",
+        "selectRow": "Select Row",
+        "retry": "Retry",
+        "notImplemented": "Not implemented yet",
+        "error": "Error occurred"
+    },
+    "desktopOnlyOverlay": {
+        "title": "Desktop Only System",
+        "message": "This system is optimized for desktop use. Please login via a desktop or laptop browser."
+    },
+    "navigation": {
+        "home": "Home",
+        "assignment": "Client/Project Management",
+        "entries": "Time Entries Setup",
+        "employees": "Employee Management"
+    },
+    "createMenu": {
+        "title": "Create",
+        "options": {
+            "addClient": "Add New Client",
+            "addProject": "Add New Project",
+            "addTask": "Add New Task"
+        }
+    },
+    "assignmentPage": {
+        "title": "Task Assignment",
+        "subtitle": "Assign employees to tasks within client projects",
+        "searchBarHint": "Search by employee name",
+        "tableHeaders": {
+            "clientName": "Client Name",
+            "projectName": "Project Name",
+            "taskName": "Task Name",
+            "assignees": "Assigned Employees"
+        },
+        "actions": {
+            "editClient": "Edit Client",
+            "editProject": "Edit Project",
+            "editTask": "Edit Task",
+            "editAssignment": "Edit Assignment",
+            "deleteClient": "Delete Client",
+            "deleteProject": "Delete Project",
+            "deleteTask": "Delete Task"
+        },
+        "success": {
+            "assigned": "Employees assigned successfully"
+        },
+        "errors": {
+            "loadFailed": "Failed to load data",
+            "assignFailed": "Failed to assign employees"
+        }
+    },
+    "employeesPage": {
+        "title": "Employee Management",
+        "subtitle": "Manage employee list, add new ones and update details",
+        "addEmployee": "+ New Employee",
+        "tableHeaders": {
+            "employeeId": "Employee ID",
+            "fullName": "Full Name",
+            "email": "Email Address",
+            "role": "Role",
+            "jobTitle": "Job Title"
+        },
+        "roles": {
+            "admin": "Admin",
+            "employee": "Employee"
+        },
+        "confirmDelete": "Delete employee"
+    },
+    "formShell": {
+        "dateBox": {
+            "placeholder": "Select Date"
+        },
+        "dateRangeBox": {
+            "startDateLabel": "From Date",
+            "endDateLabel": "To Date",
+            "startDatePlaceholder": "Start Date",
+            "endDatePlaceholder": "End Date",
+            "validationError": "End date must be after start date"
+        },
+        "dropdownBox": {
+            "placeholder": "Select Option"
+        },
+        "textBox": {
+            "showPassword": "Show Password",
+            "hidePassword": "Hide Password"
+        },
+        "closeForm": "Close Form",
+        "validation": {
+            "required": "Required",
+            "endDateAfterStartDate": "End date must be after start date"
+        }
+    },
+    "login": {
+        "welcomeTitle": "👋 Welcome to Abra Management System",
+        "emailLabel": "Email Address",
+        "emailPlaceholder": "name@example.com",
+        "passwordLabel": "Password",
+        "submitButton": "Login",
+        "submittingButton": "Logging in...",
+        "showPassword": "Show Password",
+        "hidePassword": "Hide Password"
+    },
+    "entriesPage": {
+        "title": "Time Entries Setup",
+        "subtitle": "Configure time entry types for employees in different projects.",
+        "searchBarHint": "Project / Search by Client Name",
+        "tableHeaders": {
+            "clientName": "Client Name",
+            "projectName": "Project Name",
+            "reportType": "Report Type"
+        },
+        "reportTypes": {
+            "sum": "Hours Sum",
+            "startEnd": "Start / End"
+        }
+    },
+    "monthNames": {
+        "january": "January",
+        "february": "February",
+        "march": "March",
+        "april": "April",
+        "may": "May",
+        "june": "June",
+        "july": "July",
+        "august": "August",
+        "september": "September",
+        "october": "October",
+        "november": "November",
+        "december": "December"
+    },
+    "monthLocks": {
+        "button": "Month Locks",
+        "modalTitle": "Manage Month Locks",
+        "yearNavigator": {
+            "previousYear": "Previous Year",
+            "nextYear": "Next Year"
+        },
+        "actions": {
+            "save": "Save Changes"
+        },
+        "closeModal": "Close",
+        "loading": "Loading locks...",
+        "locked": "Locked",
+        "unlocked": "Unlocked",
+        "gridLabel": "Months Grid"
+    },
+    "taskEmployeeAssignmentForm": {
+        "title": "Assign New Employee to Task",
+        "subtitle": "Assign a new employee from the pool for",
+        "searchPlaceholder": "Search by employee name",
+        "columns": {
+            "selection": "",
+            "employeeName": "Employee Name",
+            "employeeType": "Employee Type",
+            "role": "Role"
+        },
+        "errors": {
+            "selectAtLeastOne": "Please select at least one employee"
+        },
+        "emptyState": "No employees found",
+        "submitButton": "Assign Employee",
+        "close": "Close"
+    },
+    "clientForm": {
+        "createTitle": "Create Client Form",
+        "createSubtitle": "Add clients to the system",
+        "editTitle": "Edit Client Details",
+        "editSubtitle": "Update client details",
+        "createButton": "Create Client",
+        "editButton": "Save Changes",
+        "fields": {
+            "clientName": "Client Name",
+            "clientNamePlaceholder": "Enter client name",
+            "contactDetails": "Contact Details",
+            "contactDetailsPlaceholder": "Enter full details"
+        }
+    },
+    "projectForm": {
+        "createTitle": "Add New Project",
+        "createSubtitle": "Define project details",
+        "editTitle": "Edit Project",
+        "editSubtitle": "Update project details",
+        "createButton": "Create Project",
+        "editButton": "Save Changes",
+        "fields": {
+            "projectName": "Project Name",
+            "projectNamePlaceholder": "Enter project name",
+            "client": "Client",
+            "clientPlaceholder": "Select Client",
+            "manager": "Project Manager",
+            "managerPlaceholder": "Select Manager",
+            "dates": "Project Duration",
+            "description": "Project Description",
+            "descriptionPlaceholder": "Additional project details",
+            "timeFormat": "Time Reporting Method"
+        }
+    },
+    "taskForm": {
+        "createTitle": "Create New Task",
+        "createSubtitle": "Assign task to employee",
+        "editTitle": "Edit Task",
+        "editSubtitle": "Update task details",
+        "createButton": "Create Task",
+        "editButton": "Save Changes",
+        "fields": {
+            "taskTitle": "Task Title",
+            "taskTitlePlaceholder": "What needs to be done?",
+            "project": "Assigned Project",
+            "projectPlaceholder": "Select Project",
+            "dueDate": "Due Date",
+            "description": "Task Description",
+            "descriptionPlaceholder": "Instructions..."
+        }
+    },
+    "confirmDelete": {
+        "client": {
+            "title": "Delete Client",
+            "description": "Are you sure you want to delete this client?"
+        },
+        "project": {
+            "title": "Delete Project",
+            "description": "Are you sure you want to delete this project?"
+        },
+        "task": {
+            "title": "Delete Task",
+            "description": "Are you sure you want to delete this task?"
+        },
+        "employee": {
+            "title": "Delete Employee",
+            "description": "Are you sure you want to delete this employee?"
+        },
+        "confirmLabel": "Delete",
+        "cancelLabel": "Cancel"
+    },
+    "errors": {
+        "INVALID_CREDENTIALS": "Invalid email or password",
+        "ACCESS_DENIED": "Access denied",
+        "VALIDATION_ERROR": "Validation error",
+        "INTERNAL_SERVER_ERROR": "Internal server error",
+        "NETWORK_ERROR": "Network error, please try again",
+        "auth": {
+            "invalidCredentials": "Invalid email or password"
+        }
+    }
+}

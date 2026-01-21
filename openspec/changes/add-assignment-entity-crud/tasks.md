@@ -60,11 +60,11 @@
 
 ## Phase 4: Backend Tests
 
-11. **Add clientsController.test.ts** - Test CRUD operations
-12. **Add projectsController.test.ts** - Test CRUD operations
-13. **Extend tasksController.test.ts** - Add create/update/delete tests
-14. **Add clientsService.test.ts** - Test cascade delete
-15. **Add projectsService.test.ts** - Test cascade delete
+11. [x] **Add clientsController.test.ts** - Test CRUD operations
+12. [x] **Add projectsController.test.ts** - Test CRUD operations
+13. [x] **Extend tasksController.test.ts** - Add create/update/delete tests
+14. [x] **Add clientsService.test.ts** - Test cascade delete
+15. [x] **Add projectsService.test.ts** - Test cascade delete
 
 **Verification**: `cd server && npm test` — all tests pass
 
@@ -72,24 +72,24 @@
 
 ## Phase 5: Frontend Translations
 
-16. **Update he.json** - Add form field translations
-17. **Update en.json** - Add English translations
+16. [x] **Update he.json** - Add form field translations
+17. [x] **Update en.json** - Add English translations
 
 ---
 
 ## Phase 6: Frontend Forms
 
-18. **Refactor createClient.ts** - Convert to i18n, export as function
-19. **Refactor createProject.ts** - Add manager dropdown, time_format_type, convert to i18n
-20. **Refactor createTask.ts** - Convert to i18n
+18. [x] **Refactor createClient.ts** - Convert to i18n, export as function
+19. [x] **Refactor createProject.ts** - Add manager dropdown, time_format_type, convert to i18n
+20. [x] **Refactor createTask.ts** - Convert to i18n
 
 ---
 
 ## Phase 7: Frontend Service & Page
 
-21. **Extend assignmentService.ts** - Add CRUD methods for clients, projects, tasks
+21. [x] **Extend assignmentService.ts** - Add CRUD methods for clients, projects, tasks
 
-22. **Update AssignmentPage.tsx**:
+22. [x] **Update AssignmentPage.tsx**:
     - Wire `handleFormSubmit` to call correct API based on form type
     - Wire `handleConfirmDelete` to call correct delete API
     - Pass dynamic options (clients, projects, users) to form fields

@@ -4,10 +4,11 @@ import { ProjectsService, ProjectNotFoundError, InvalidReferenceError } from '..
 import { Actor, AuthorizationError } from '../services/usersService.js';
 import { createProjectSchema, updateProjectSchema, getProjectSchema } from '../validations/projectValidation.js';
 
-export async function listProjects(_req: Request, res: Response): Promise<void> {
+export async function listProjects(req: Request, res: Response): Promise<void> {
     try {
+        const includeInactive = req.query.active === 'false';
         const projectsService = new ProjectsService(supabaseAdmin);
-        const projects = await projectsService.listProjects();
+        const projects = await projectsService.listProjects(includeInactive);
         res.status(200).json({
             success: true,
             data: projects,
@@ -193,7 +194,9 @@ export async function deleteProject(req: Request, res: Response): Promise<void> 
 
         res.status(200).json({
             success: true,
-            message: `Project ${id} has been deactivated`,
+            data: {
+                message: `Project ${id} has been deactivated`
+            }
         });
 
     } catch (error) {

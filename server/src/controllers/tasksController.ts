@@ -5,10 +5,11 @@ import { AssignmentsService } from '../services/assignmentsService.js';
 import { Actor, AuthorizationError } from '../services/usersService.js';
 import { createTaskSchema, updateTaskSchema, getTaskSchema } from '../validations/taskValidation.js';
 
-export async function listTasks(_req: Request, res: Response): Promise<void> {
+export async function listTasks(req: Request, res: Response): Promise<void> {
     try {
+        const includeInactive = req.query.active === 'false';
         const tasksService = new TasksService(supabaseAdmin);
-        const tasks = await tasksService.listTasks();
+        const tasks = await tasksService.listTasks(includeInactive);
         res.status(200).json({
             success: true,
             data: tasks,
@@ -194,7 +195,9 @@ export async function deleteTask(req: Request, res: Response): Promise<void> {
 
         res.status(200).json({
             success: true,
-            message: `Task ${id} has been deactivated`,
+            data: {
+                message: `Task ${id} has been deactivated`
+            }
         });
 
     } catch (error) {
@@ -297,7 +300,9 @@ export async function assignEmployees(req: Request, res: Response): Promise<void
 
         res.status(200).json({
             success: true,
-            message: 'Assignments updated successfully'
+            data: {
+                message: 'Assignments updated successfully'
+            }
         });
     } catch (error) {
         console.error('Assign employees error:', error);

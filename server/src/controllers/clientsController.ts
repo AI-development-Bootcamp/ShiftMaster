@@ -4,10 +4,11 @@ import { ClientsService, ClientNotFoundError } from '../services/clientsService.
 import { Actor, AuthorizationError } from '../services/usersService.js';
 import { createClientSchema, updateClientSchema, getClientSchema } from '../validations/clientValidation.js';
 
-export async function listClients(_req: Request, res: Response): Promise<void> {
+export async function listClients(req: Request, res: Response): Promise<void> {
     try {
+        const includeInactive = req.query.active === 'false';
         const clientsService = new ClientsService(supabaseAdmin);
-        const clients = await clientsService.listClients();
+        const clients = await clientsService.listClients(includeInactive);
         res.status(200).json({
             success: true,
             data: clients,
@@ -171,7 +172,9 @@ export async function deleteClient(req: Request, res: Response): Promise<void> {
 
         res.status(200).json({
             success: true,
-            message: `Client ${id} has been deactivated`,
+            data: {
+                message: `Client ${id} has been deactivated`
+            }
         });
 
     } catch (error) {

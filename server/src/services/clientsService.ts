@@ -21,7 +21,10 @@ export class ClientsService {
         this.projectsService = new ProjectsService(client);
     }
 
-    async listClients(): Promise<Client[]> {
+    async listClients(includeInactive = false): Promise<Client[]> {
+        if (includeInactive) {
+            return this.clientRepo.findAll();
+        }
         return this.clientRepo.findActive();
     }
 
