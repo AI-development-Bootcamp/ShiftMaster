@@ -1,4 +1,4 @@
-import './TimeEntryItem.css';
+import '../../styles/TimeEntryItem.css';
 
 export interface TimeEntry {
   id: string;
