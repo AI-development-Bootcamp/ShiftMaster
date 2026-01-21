@@ -35,5 +35,9 @@ export function hashRefreshToken(token: string): string {
  */
 export function verifyRefreshToken(token: string, hash: string): boolean {
   const tokenHash = hashRefreshToken(token);
+  // timingSafeEqual requires equal length buffers
+  if (tokenHash.length !== hash.length) {
+    return false;
+  }
   return crypto.timingSafeEqual(Buffer.from(tokenHash), Buffer.from(hash));
 }

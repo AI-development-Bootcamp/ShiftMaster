@@ -45,6 +45,7 @@ export interface AuthenticatedUser {
  * Custom error classes for authentication failures
  */
 export class UserNotFoundError extends Error {
+  code = 'USER_NOT_FOUND';
   constructor(message = 'User not found') {
     super(message);
     this.name = 'UserNotFoundError';
@@ -52,6 +53,7 @@ export class UserNotFoundError extends Error {
 }
 
 export class AccountInactiveError extends Error {
+  code = 'ACCOUNT_INACTIVE';
   constructor(message = 'Account is inactive') {
     super(message);
     this.name = 'AccountInactiveError';
@@ -59,6 +61,7 @@ export class AccountInactiveError extends Error {
 }
 
 export class InvalidPasswordError extends Error {
+  code = 'INVALID_PASSWORD';
   constructor(message = 'Invalid password') {
     super(message);
     this.name = 'InvalidPasswordError';
@@ -67,6 +70,7 @@ export class InvalidPasswordError extends Error {
 
 // Keep generic for backward compatibility or catch-all
 export class AuthenticationError extends Error {
+  code = 'AUTHENTICATION_ERROR';
   constructor(message: string) {
     super(message);
     this.name = 'AuthenticationError';
@@ -74,6 +78,7 @@ export class AuthenticationError extends Error {
 }
 
 export class RefreshSessionNotFoundError extends Error {
+  code = 'REFRESH_SESSION_NOT_FOUND';
   constructor(message = 'Refresh session not found or expired') {
     super(message);
     this.name = 'RefreshSessionNotFoundError';
@@ -81,6 +86,7 @@ export class RefreshSessionNotFoundError extends Error {
 }
 
 export class RefreshTokenInvalidError extends Error {
+  code = 'REFRESH_TOKEN_INVALID';
   constructor(message = 'Refresh token is invalid') {
     super(message);
     this.name = 'RefreshTokenInvalidError';
@@ -88,6 +94,7 @@ export class RefreshTokenInvalidError extends Error {
 }
 
 export class TokenReuseDetectedError extends Error {
+  code = 'TOKEN_REUSE_DETECTED';
   constructor(message = 'Token reuse detected - possible theft') {
     super(message);
     this.name = 'TokenReuseDetectedError';

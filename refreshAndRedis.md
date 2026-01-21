@@ -212,8 +212,12 @@ Use Redis client helpers from `server/src/db/redis.ts`.
 Update CORS settings:
 
 ```typescript
+const origins = (process.env.FRONTEND_URL || 'http://localhost:3000')
+  .split(',')
+  .map((origin) => origin.trim());
+
 cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: origins,
   credentials: true, // CRITICAL: Allow cookies
 });
 ```
