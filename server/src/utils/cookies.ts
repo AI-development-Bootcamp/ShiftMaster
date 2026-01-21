@@ -15,6 +15,7 @@ interface CookieOptions {
   sameSite: 'strict' | 'lax' | 'none';
   maxAge: number;
   path: string;
+  domain?: string;
 }
 
 /**
@@ -27,13 +28,19 @@ interface CookieOptions {
 function getCookieOptions(maxAge: number): CookieOptions {
   const isProduction = env.nodeEnv === 'production';
 
-  return {
+  const options: CookieOptions = {
     httpOnly: true, // Prevents JavaScript access (XSS protection)
     secure: isProduction, // Only send over HTTPS in production
     sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-domain in production
     maxAge, // Cookie expiration in milliseconds
     path: '/', // Must be '/' to work across domains
   };
+
+  // In development, don't set domain so cookies work across localhost ports
+  // In production, don't set domain to use the default (current domain)
+  // This allows cookies to be shared between frontend and backend on different ports
+
+  return options;
 }
 
 /**
