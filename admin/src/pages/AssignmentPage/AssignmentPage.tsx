@@ -21,6 +21,16 @@ import { useToast, ToastContainer } from '../../components/Toast';
 
 import '../../styles/AssignmentPage.css';
 
+// Stable error codes for traceable logging
+export const ERROR_CODES = {
+    ASSIGNMENT_LOAD_FAILED: 'ASSIGNMENT_LOAD_FAILED',
+    FORM_SUBMIT_FAILED: 'FORM_SUBMIT_FAILED',
+    DELETE_FAILED: 'DELETE_FAILED',
+    ASSIGNMENT_FAILED: 'ASSIGNMENT_FAILED',
+} as const;
+
+export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
+
 interface AssignmentTableRow {
     id: string;
     task_id: string;
@@ -83,9 +93,10 @@ export function AssignmentPage() {
             setAssignments(fetchedAssignments);
             setUsers(fetchedUsers);
         } catch (err) {
-            console.error('Failed to fetch assignment data:', err);
+            const code = ERROR_CODES.ASSIGNMENT_LOAD_FAILED;
+            console.error(`[${code}] Failed to fetch assignment data:`, err);
             setError(t('assignmentPage.errors.loadFailed'));
-            showError(t('assignmentPage.errors.loadFailed'));
+            showError({ message: t('assignmentPage.errors.loadFailed'), code });
         } finally {
             setIsLoading(false);
         }
@@ -102,8 +113,9 @@ export function AssignmentPage() {
             showInfo(t('common.notImplemented'));
             setActiveForm(null);
         } catch (formError) {
-            console.error('Form submission failed:', formError);
-            showError(t('common.error') || 'An error occurred');
+            const code = ERROR_CODES.FORM_SUBMIT_FAILED;
+            console.error(`[${code}] Form submission failed:`, formError);
+            showError({ message: t('common.error') || 'An error occurred', code });
         }
     };
 
@@ -157,8 +169,9 @@ export function AssignmentPage() {
             showInfo(t('common.notImplemented'));
             setDeletingItem(null);
         } catch (deleteError) {
-            console.error('Delete failed:', deleteError);
-            showError(t('common.error') || 'An error occurred');
+            const code = ERROR_CODES.DELETE_FAILED;
+            console.error(`[${code}] Delete failed:`, deleteError);
+            showError({ message: t('common.error') || 'An error occurred', code });
         }
     };
 
@@ -254,8 +267,9 @@ export function AssignmentPage() {
             setEditingAssignment(null);
             fetchData(); // Refresh data to show updates
         } catch (assignError) {
-            console.error('Assignment failed:', assignError);
-            showError(t('assignmentPage.errors.assignFailed'));
+            const code = ERROR_CODES.ASSIGNMENT_FAILED;
+            console.error(`[${code}] Assignment failed:`, assignError);
+            showError({ message: t('assignmentPage.errors.assignFailed'), code });
         }
     };
 
