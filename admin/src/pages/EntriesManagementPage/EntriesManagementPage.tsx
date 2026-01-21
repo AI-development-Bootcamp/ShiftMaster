@@ -1,10 +1,9 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState } from '../../components/TableShell/types';
 import { Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
-import { mockProjects } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
 import { mockCurrentUser } from '../../mocks/users';
 import { MonthLockButton, MonthLockModal } from '../../components/MonthLocks';
@@ -14,6 +13,7 @@ import { createProjectForm } from '../../components/forms/createProject';
 import { createTaskForm } from '../../components/forms/createTask';
 import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDropdownMenu';
 import { useTranslation } from 'react-i18next';
+import { fetchProjects, updateProject } from '../../api/projectsApi';
 import '../../styles/EntriesManagementPage.css';
 
 export function EntriesManagementPage() {
@@ -39,21 +39,53 @@ export function EntriesManagementPage() {
         }
     };
 
+
+
+    // Local state for projects data (will be replaced with API data in the future)
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [projectsLoading, setProjectsLoading] = useState(true);
+    const [projectsError, setProjectsError] = useState<string | null>(null);
+
     const createDropdownOptions = useMemo(() => [
         { id: 'client', label: t('createMenu.options.addClient'), onSelect: () => setActiveForm('createClient') },
         { id: 'project', label: t('createMenu.options.addProject'), onSelect: () => setActiveForm('createProject') },
         { id: 'task', label: t('createMenu.options.addTask'), onSelect: () => setActiveForm('createTask') },
     ], [t]);
 
-    // Local state for projects data (will be replaced with API data in the future)
-    const [projects, setProjects] = useState<Project[]>(mockProjects);
+    const projectOptions = useMemo(() => {
+        return projects
+            .filter(p => p.active)
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .map(p => ({ value: p.project_id, label: p.name }));
+    }, [projects]);
 
-    // Handle radio change - updates local state (TODO: integrate with API)
-    const handleRadioChange = ({ row, columnKey, nextValue }: {
+    const loadProjects = useCallback(async () => {
+        try {
+            setProjectsLoading(true);
+            setProjectsError(null);
+            // Fetch projects including inactive ones for management
+            const { projects: fetchedProjects } = await fetchProjects({ include_inactive: true });
+            setProjects(fetchedProjects);
+        } catch (error) {
+            console.error('Failed to load projects:', error);
+            setProjectsError(t('errors.failedToLoadProjects'));
+        } finally {
+            setProjectsLoading(false);
+        }
+    }, [t]);
+
+    useEffect(() => {
+        loadProjects();
+    }, [loadProjects]);
+
+    // Handle radio change - updates local state and calls API
+    const handleRadioChange = async ({ row, columnKey, nextValue }: {
         row: Project;
         columnKey: string;
         nextValue: string;
     }) => {
+        // Optimistic update
+        const originalProjects = [...projects];
         setProjects(prevProjects =>
             prevProjects.map(project =>
                 project.project_id === row.project_id
@@ -62,13 +94,17 @@ export function EntriesManagementPage() {
             )
         );
 
-        // TODO: Call API to update project in database
-        console.log('Radio Change (local update):', {
-            projectId: row.project_id,
-            projectName: row.name,
-            field: columnKey,
-            newValue: nextValue
-        });
+        try {
+            // Only patch if value changed (TableShell/RadioCell handles this check usually, but we ensure here)
+            if (row.time_format_type !== nextValue) {
+                await updateProject(row.project_id, { time_format_type: nextValue as ProjectTimeFormatType });
+            }
+        } catch (error) {
+            console.error('Failed to update project:', error);
+            // Revert on failure
+            setProjects(originalProjects);
+            // Optional: show notification
+        }
     };
 
     // --- Search Logic (Reusable) ---
@@ -188,6 +224,26 @@ export function EntriesManagementPage() {
                 </div>
             </div>
 
+            {projectsError && (
+                <div style={{
+                    backgroundColor: '#FEE2E2',
+                    color: '#DC2626',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {projectsError}
+                </div>
+            )}
+
             <TableShell
                 tableId="projects-table"
                 data={data}
@@ -203,7 +259,7 @@ export function EntriesManagementPage() {
                 sort={sort}
                 onSortChange={setSort}
                 onRadioChange={handleRadioChange}
-                isLoading={false}
+                isLoading={projectsLoading}
             />
 
             {/* Create Forms */}
@@ -228,6 +284,7 @@ export function EntriesManagementPage() {
             {activeForm === 'createTask' && (
                 <FormShell
                     {...createTaskForm}
+                    fields={createTaskForm.fields.map(f => f.id === 'projectId' ? { ...f, options: projectOptions } : f)}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
