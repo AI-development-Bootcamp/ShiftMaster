@@ -16,9 +16,14 @@ vi.mock('../../services/authService.js', async (importOriginal) => {
   return {
     ...actual,
     authenticateUser: vi.fn(),
+    createRefreshSession: vi.fn(),
   };
 });
 vi.mock('../../utils/jwt.js');
+vi.mock('../../utils/cookies.js', () => ({
+  setRefreshCookies: vi.fn(),
+  clearRefreshCookies: vi.fn(),
+}));
 
 // Import after mocking
 import { login } from '../../controllers/authController.js';
@@ -59,15 +64,23 @@ describe('AuthController', () => {
       };
 
       const mockToken = 'mock.jwt.token';
+      const mockRefreshToken = 'mock.refresh.token';
+      const mockSessionId = 'mock-session-id';
 
       mockRequest.body = {
         email: 'john@example.com',
         password: 'SecurePassword123!',
         source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: mockSessionId,
+        refreshToken: mockRefreshToken,
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -89,7 +102,7 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
         data: {
-          token: mockToken,
+          accessToken: mockToken,
           user: {
             user_id: '550e8400-e29b-41d4-a716-446655440000',
             full_name: 'John Doe',
@@ -110,15 +123,23 @@ describe('AuthController', () => {
       };
 
       const mockToken = 'admin.jwt.token';
+      const mockRefreshToken = 'mock.refresh.token';
+      const mockSessionId = 'mock-session-id';
 
       mockRequest.body = {
         email: 'admin@example.com',
         password: 'AdminPassword123!',
         source: 'admin',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockAdmin);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: mockSessionId,
+        refreshToken: mockRefreshToken,
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -126,7 +147,7 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
         data: {
-          token: mockToken,
+          accessToken: mockToken,
           user: {
             user_id: '550e8400-e29b-41d4-a716-446655440001',
             full_name: 'Admin User',
@@ -440,9 +461,15 @@ describe('AuthController', () => {
         password: 'SecurePassword123!',
         source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: 'mock-session-id',
+        refreshToken: 'mock-refresh-token',
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -465,9 +492,15 @@ describe('AuthController', () => {
         password: 'SecurePassword123!',
         source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: 'mock-session-id',
+        refreshToken: 'mock-refresh-token',
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 

@@ -17,9 +17,14 @@ vi.mock('../../services/authService.js', async (importOriginal) => {
   return {
     ...actual,
     authenticateUser: vi.fn(),
+    createRefreshSession: vi.fn(),
   };
 });
 vi.mock('../../utils/jwt.js');
+vi.mock('../../utils/cookies.js', () => ({
+  setRefreshCookies: vi.fn(),
+  clearRefreshCookies: vi.fn(),
+}));
 
 import authRouter from '../../routes/auth.js';
 import * as authService from '../../services/authService.js';
@@ -45,9 +50,15 @@ describe('POST /auth/login', () => {
     };
 
     const mockToken = 'mock.jwt.token';
+    const mockRefreshToken = 'mock.refresh.token';
+    const mockSessionId = 'mock-session-id';
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: mockSessionId,
+      refreshToken: mockRefreshToken,
+    });
 
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
@@ -59,7 +70,7 @@ describe('POST /auth/login', () => {
     expect(response.body).toEqual({
       success: true,
       data: {
-        token: mockToken,
+        accessToken: mockToken,
         user: {
           user_id: '550e8400-e29b-41d4-a716-446655440000',
           full_name: 'John Doe',
@@ -178,6 +189,10 @@ describe('POST /auth/login', () => {
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: 'mock-session-id',
+      refreshToken: 'mock-refresh-token',
+    });
 
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
@@ -199,6 +214,10 @@ describe('POST /auth/login', () => {
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: 'mock-session-id',
+      refreshToken: 'mock-refresh-token',
+    });
 
     const response = await request(app)
       .post('/auth/login')
