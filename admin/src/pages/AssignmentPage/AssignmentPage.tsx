@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
@@ -12,12 +12,12 @@ import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDr
 import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
 import { CONFIRM_VARIANTS } from '../../constants/ui';
 import { useTranslation } from 'react-i18next';
-import { UserRole } from '@abra-shift-master/shared';
+import { Client, UserRole } from '@abra-shift-master/shared';
 
 import { mockProjects, mockTasks } from '../../mocks/projects';
-import { mockClients } from '../../mocks/clients';
 import { mockUsers } from '../../mocks/users';
 import { mockAdminTaskAssignments } from '../../mocks/adminTaskAssignments';
+import { fetchClients, createClient, updateClient, deleteClient } from '../../api/clientsApi';
 import '../../styles/AssignmentPage.css';
 
 interface AssignmentTableRow {
@@ -40,25 +40,80 @@ export function AssignmentPage() {
     ]);
     const [editingAssignment, setEditingAssignment] = useState<AssignmentTableRow | null>(null);
 
+    // --- Client Data State (from API) ---
+    const [clients, setClients] = useState<Client[]>([]);
+    const [clientsLoading, setClientsLoading] = useState(true);
+    const [clientsError, setClientsError] = useState<string | null>(null);
+    const [editingClientId, setEditingClientId] = useState<string | null>(null);
+
     // --- Edit/Create Form State ---
     const [activeForm, setActiveForm] = useState<'client' | 'project' | 'task' | 'createClient' | 'createProject' | 'createTask' | null>(null);
     const [formInitialValues, setFormInitialValues] = useState<FormValues>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     // --- Delete Confirmation State ---
     const [deletingItem, setDeletingItem] = useState<{ type: 'client' | 'project' | 'task', id: string, name: string } | null>(null);
 
+    // --- Fetch Clients from API ---
+    const loadClients = useCallback(async () => {
+        try {
+            setClientsLoading(true);
+            setClientsError(null);
+            const response = await fetchClients({ include_inactive: false });
+            setClients(response.clients);
+        } catch (error) {
+            console.error('Failed to fetch clients:', error);
+            setClientsError(t('errors.failedToLoadClients'));
+        } finally {
+            setClientsLoading(false);
+        }
+    }, [t]);
+
+    useEffect(() => {
+        loadClients();
+    }, [loadClients]);
+
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeForm} form:`, values);
-        setActiveForm(null);
+        try {
+            setIsSubmitting(true);
+
+            if (activeForm === 'createClient') {
+                // Create new client
+                await createClient({
+                    name: values.clientName as string,
+                    contact_info: values.contactDetails as string || undefined,
+                });
+                await loadClients(); // Refresh client list
+            } else if (activeForm === 'client' && editingClientId) {
+                // Update existing client
+                await updateClient(editingClientId, {
+                    name: values.clientName as string,
+                    contact_info: values.contactDetails as string || undefined,
+                });
+                await loadClients(); // Refresh client list
+            } else {
+                // Handle other forms (project, task) - still using console.log for now
+                console.log(`Submitted ${activeForm} form:`, values);
+            }
+
+            setActiveForm(null);
+            setEditingClientId(null);
+        } catch (error) {
+            console.error(`Failed to submit ${activeForm} form:`, error);
+            // TODO: Show error to user
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleEditClient = (row: AssignmentTableRow) => {
-        const client = mockClients.find(c => c.client_id === row.client_id);
+        const client = clients.find(c => c.client_id === row.client_id);
         if (client) {
             setFormInitialValues({
                 clientName: client.name,
                 contactDetails: client.contact_info || '',
             });
+            setEditingClientId(client.client_id);
             setActiveForm('client');
         }
     };
@@ -94,17 +149,34 @@ export function AssignmentPage() {
         setDeletingItem({ type, id, name });
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (!deletingItem) return;
-        console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
-        setDeletingItem(null);
+
+        try {
+            setIsSubmitting(true);
+
+            if (deletingItem.type === 'client') {
+                await deleteClient(deletingItem.id);
+                await loadClients(); // Refresh client list
+            } else {
+                // Handle other deletes (project, task) - still using console.log for now
+                console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
+            }
+
+            setDeletingItem(null);
+        } catch (error) {
+            console.error(`Failed to delete ${deletingItem.type}:`, error);
+            // TODO: Show error to user
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     // --- Data Aggregation (Raw Rows) ---
     const rawRows = useMemo(() => {
         return mockTasks.map(task => {
             const project = mockProjects.find(p => p.project_id === task.project_id);
-            const client = project ? mockClients.find(c => c.client_id === project.client_id) : null;
+            const client = project ? clients.find(c => c.client_id === project.client_id) : null;
 
             // Find active assignments for this task
             const taskAssignments = mockAdminTaskAssignments.filter(
@@ -131,7 +203,7 @@ export function AssignmentPage() {
                 assignees
             };
         });
-    }, [t]);
+    }, [t, clients]);
 
     // --- Search Logic (Reusable) ---
     const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
@@ -255,6 +327,26 @@ export function AssignmentPage() {
                 </div>
             </div>
 
+            {clientsError && (
+                <div style={{
+                    backgroundColor: '#FEE2E2',
+                    color: '#DC2626',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {clientsError}
+                </div>
+            )}
+
             <TableShell
                 tableId="assignments-table"
                 data={data}
@@ -269,7 +361,7 @@ export function AssignmentPage() {
                 onPageChange={setPage}
                 sort={sort}
                 onSortChange={setSort}
-                isLoading={false}
+                isLoading={clientsLoading}
                 rowActions={{
                     showEdit: true,
                     showDelete: true,
@@ -316,7 +408,19 @@ export function AssignmentPage() {
 
             {activeForm === 'project' && (
                 <FormShell
-                    {...editProjectForm}
+                    {...JSON.parse(JSON.stringify(editProjectForm))} // Deep clone to avoid mutating original
+                    fields={editProjectForm.fields.map(field => {
+                        if (field.id === 'clientId') {
+                            return {
+                                ...field,
+                                options: clients
+                                    .filter(c => c.active)
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map(c => ({ value: c.client_id, label: c.name }))
+                            };
+                        }
+                        return field;
+                    })}
                     initialValues={formInitialValues}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
@@ -344,7 +448,19 @@ export function AssignmentPage() {
 
             {activeForm === 'createProject' && (
                 <FormShell
-                    {...createProjectForm}
+                    {...JSON.parse(JSON.stringify(createProjectForm))} // Deep clone to avoid mutating original
+                    fields={createProjectForm.fields.map(field => {
+                        if (field.id === 'clientId') {
+                            return {
+                                ...field,
+                                options: clients
+                                    .filter(c => c.active)
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map(c => ({ value: c.client_id, label: c.name }))
+                            };
+                        }
+                        return field;
+                    })}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
@@ -369,6 +485,7 @@ export function AssignmentPage() {
                 cancelLabel={t('confirmDelete.cancelLabel')}
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setDeletingItem(null)}
+                isLoading={isSubmitting}
             />
         </div>
     );
