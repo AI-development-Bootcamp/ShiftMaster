@@ -14,6 +14,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  isRefreshing: boolean; // Track if refresh is in progress to prevent concurrent calls
 }
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  isRefreshing: false,
 };
 
 // Async thunk for login
@@ -89,40 +91,51 @@ export const logoutUser = createAsyncThunk(
 export const initializeAuth = createAsyncThunk<
   { user: User | null },
   void,
-  { rejectValue: { code: string; message: string } }
->('auth/initialize', async (_) => {
-  try {
-    const response = await fetch(`${env.apiUrl}/auth/refresh`, {
-      method: 'POST',
-      credentials: 'include', // Include cookies
-    });
+  { rejectValue: { code: string; message: string }; state: { auth: AuthState } }
+>(
+  'auth/initialize',
+  async (_) => {
+    try {
+      const response = await fetch(`${env.apiUrl}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include', // Include cookies
+      });
 
-    if (!response.ok) {
-      // Refresh failed, user needs to login
+      if (!response.ok) {
+        // Refresh failed, user needs to login
+        tokenStore.clearAccessToken();
+        localStorage.removeItem('user');
+        return { user: null };
+      }
+
+      const data = await response.json();
+
+      // Store new access token in memory
+      tokenStore.setAccessToken(data.data.accessToken);
+
+      // Get user from localStorage
+      const userStr = localStorage.getItem('user');
+      if (!userStr) {
+        throw new Error('User data not found');
+      }
+
+      const user = JSON.parse(userStr);
+      return { user };
+    } catch (err) {
       tokenStore.clearAccessToken();
       localStorage.removeItem('user');
       return { user: null };
     }
-
-    const data = await response.json();
-
-    // Store new access token in memory
-    tokenStore.setAccessToken(data.data.accessToken);
-
-    // Get user from localStorage
-    const userStr = localStorage.getItem('user');
-    if (!userStr) {
-      throw new Error('User data not found');
-    }
-
-    const user = JSON.parse(userStr);
-    return { user };
-  } catch (err) {
-    tokenStore.clearAccessToken();
-    localStorage.removeItem('user');
-    return { user: null };
+  },
+  {
+    // Prevent concurrent refresh requests
+    condition: (_, { getState }) => {
+      const { auth } = getState();
+      // Don't start if already refreshing
+      return !auth.isRefreshing;
+    },
   }
-});
+);
 
 const authSlice = createSlice({
   name: 'auth',
@@ -154,9 +167,11 @@ const authSlice = createSlice({
       // Initialize auth cases
       .addCase(initializeAuth.pending, (state) => {
         state.loading = true;
+        state.isRefreshing = true;
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
+        state.isRefreshing = false;
         if (action.payload.user) {
           state.isAuthenticated = true;
           state.user = action.payload.user;
@@ -167,6 +182,7 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;
+        state.isRefreshing = false;
         state.isAuthenticated = false;
         state.user = null;
       });
