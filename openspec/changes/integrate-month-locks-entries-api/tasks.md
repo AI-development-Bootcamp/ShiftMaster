@@ -2,32 +2,32 @@
 
 ## 1. Backend - Month Locks Service
 
-- [ ] 1.1 Create `MonthLocksService` (`server/src/services/monthLocksService.ts`)
+- [x] 1.1 Create `MonthLocksService` (`server/src/services/monthLocksService.ts`)
   - Method: `getLocksForYear(year: number): Promise<MonthLock[]>` - Returns active locks (unlocked_at is null)
   - Method: `batchUpdate(actorId: string, year: number, toLock: number[], toUnlock: number[])` - Batch lock/unlock
 
-- [ ] 1.2 Add `findByYear(year: number)` method to `MonthLockRepository` for efficient year queries
+- [x] 1.2 Add `findByYear(year: number)` method to `MonthLockRepository` for efficient year queries
 
 ## 2. Backend - Month Locks Controller
 
-- [ ] 2.1 Create `monthLocksController.ts` (`server/src/controllers/monthLocksController.ts`)
+- [x] 2.1 Create `monthLocksController.ts` (`server/src/controllers/monthLocksController.ts`)
   - Handler: `listLocks(req, res)` - GET /month-locks?year=XXXX
   - Handler: `batchUpdateLocks(req, res)` - PUT /month-locks/batch
 
-- [ ] 2.2 Add Zod validation schemas for request validation (year query param, batch update body)
+- [x] 2.2 Add Zod validation schemas for request validation (year query param, batch update body)
 
 ## 3. Backend - Month Locks Routes
 
-- [ ] 3.1 Create `monthLocks.ts` route file (`server/src/routes/monthLocks.ts`)
+- [x] 3.1 Create `monthLocks.ts` route file (`server/src/routes/monthLocks.ts`)
   - GET / - List locks for year (admin-only)
   - PUT /batch - Batch update locks (admin-only)
 
-- [ ] 3.2 Register monthLocks router in `routes/index.ts`
+- [x] 3.2 Register monthLocks router in `routes/index.ts`
 
 ## 4. Backend - Tests
 
-- [ ] 4.1 Add unit tests for `MonthLocksService` (`server/src/tests/monthLocksService.test.ts`)
-- [ ] 4.2 Add controller tests for `monthLocksController` (`server/src/tests/monthLocksController.test.ts`)
+- [x] 4.1 Add unit tests for `MonthLocksService` (`server/src/tests/services/monthLocksService.test.ts`)
+- [x] 4.2 Add controller tests for `monthLocksController` (`server/src/tests/controllers/monthLocksController.test.ts`)
 
 ## 5. Frontend - Month Locks Service
 
