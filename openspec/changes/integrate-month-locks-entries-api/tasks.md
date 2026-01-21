@@ -10,11 +10,11 @@
 
 ## 2. Backend - Month Locks Controller
 
-- [ ] 2.1 Create `monthLocksController.ts` (`server/src/controllers/monthLocksController.ts`)
+- [x] 2.1 Create `monthLocksController.ts` (`server/src/controllers/monthLocksController.ts`)
   - Handler: `listLocks(req, res)` - GET /month-locks?year=XXXX
   - Handler: `batchUpdateLocks(req, res)` - PUT /month-locks/batch
 
-- [ ] 2.2 Add Zod validation schemas for request validation (year query param, batch update body)
+- [x] 2.2 Add Zod validation schemas for request validation (year query param, batch update body)
 
 ## 3. Backend - Month Locks Routes
 
