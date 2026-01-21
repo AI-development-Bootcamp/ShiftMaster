@@ -30,9 +30,9 @@ function getCookieOptions(maxAge: number): CookieOptions {
   return {
     httpOnly: true, // Prevents JavaScript access (XSS protection)
     secure: isProduction, // Only send over HTTPS in production
-    sameSite: 'lax', // CSRF protection
+    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-domain in production
     maxAge, // Cookie expiration in milliseconds
-    path: '/api/v1/auth', // Limit cookie to auth endpoints
+    path: '/', // Must be '/' to work across domains
   };
 }
 
