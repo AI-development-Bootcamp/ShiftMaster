@@ -58,13 +58,13 @@ describe('ConfirmationDialog', () => {
     });
 
     it('should use default confirm text when not provided', () => {
-      const { confirmText, ...propsWithoutConfirmText } = defaultProps;
+      const { confirmText: _confirmText, ...propsWithoutConfirmText } = defaultProps;
       render(<ConfirmationDialog {...propsWithoutConfirmText} />);
       expect(screen.getByText('מחק את הפרויקט')).toBeInTheDocument();
     });
 
     it('should use default cancel text when not provided', () => {
-      const { cancelText, ...propsWithoutCancelText } = defaultProps;
+      const { cancelText: _cancelText, ...propsWithoutCancelText } = defaultProps;
       render(<ConfirmationDialog {...propsWithoutCancelText} />);
       expect(screen.getByText('מעדיף שלא למחוק')).toBeInTheDocument();
     });
