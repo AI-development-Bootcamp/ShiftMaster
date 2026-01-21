@@ -1,67 +1,78 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { BaseRepository } from './BaseRepository.js';
 import { IAdminTaskAssignmentRepository } from '../types/repositories.js';
-import { AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment } from '../types/entities.js';
+import {
+  AdminTaskAssignment,
+  NewAdminTaskAssignment,
+  UpdateAdminTaskAssignment,
+} from '../types/entities.js';
 import { logDbError } from '../utils/logger.js';
 
-export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssignment, NewAdminTaskAssignment, UpdateAdminTaskAssignment> implements IAdminTaskAssignmentRepository {
-    constructor(client: SupabaseClient) {
-        super('admin_task_assignments', 'admin_task_assignment_id', client);
+export class AdminTaskAssignmentRepository
+  extends BaseRepository<
+    AdminTaskAssignment,
+    NewAdminTaskAssignment,
+    UpdateAdminTaskAssignment
+  >
+  implements IAdminTaskAssignmentRepository
+{
+  constructor(client: SupabaseClient) {
+    super('admin_task_assignments', 'admin_task_assignment_id', client);
+  }
+
+  async findByUserId(userId: string): Promise<AdminTaskAssignment[]> {
+    const { data, error } = await this.dbConnection
+      .from(this.table)
+      .select('*')
+      .eq('user_id', userId)
+      .eq('active', true);
+
+    if (error) {
+      logDbError('AdminTaskAssignmentRepository.findByUserId', error);
+      throw error;
     }
 
-    async findByUserId(userId: string): Promise<AdminTaskAssignment[]> {
-        const { data, error } = await this.dbConnection
-            .from(this.table)
-            .select('*')
-            .eq('user_id', userId)
-            .eq('active', true);
+    return data as AdminTaskAssignment[];
+  }
 
-        if (error) {
-            logDbError('AdminTaskAssignmentRepository.findByUserId', error);
-            throw error;
-        }
+  async findByTaskId(taskId: string): Promise<AdminTaskAssignment[]> {
+    const { data, error } = await this.dbConnection
+      .from(this.table)
+      .select('*')
+      .eq('task_id', taskId)
+      .eq('active', true);
 
-        return data as AdminTaskAssignment[];
+    if (error) {
+      logDbError('AdminTaskAssignmentRepository.findByTaskId', error);
+      throw error;
     }
 
-    async findByTaskId(taskId: string): Promise<AdminTaskAssignment[]> {
-        const { data, error } = await this.dbConnection
-            .from(this.table)
-            .select('*')
-            .eq('task_id', taskId)
-            .eq('active', true);
+    return data as AdminTaskAssignment[];
+  }
 
-        if (error) {
-            logDbError('AdminTaskAssignmentRepository.findByTaskId', error);
-            throw error;
-        }
+  async findAllActive(): Promise<AdminTaskAssignment[]> {
+    const { data, error } = await this.dbConnection
+      .from(this.table)
+      .select('*')
+      .eq('active', true);
 
-        return data as AdminTaskAssignment[];
+    if (error) {
+      logDbError('AdminTaskAssignmentRepository.findAllActive', error);
+      throw error;
     }
 
-    async findAllActive(): Promise<AdminTaskAssignment[]> {
-        const { data, error } = await this.dbConnection
-            .from(this.table)
-            .select('*')
-            .eq('active', true);
+    return data as AdminTaskAssignment[];
+  }
 
-        if (error) {
-            logDbError('AdminTaskAssignmentRepository.findAllActive', error);
-            throw error;
-        }
+  async revoke(id: string): Promise<void> {
+    const { error } = await this.dbConnection
+      .from(this.table)
+      .update({ active: false, revoked_at: new Date().toISOString() })
+      .eq(this.primaryKey, id);
 
-        return data as AdminTaskAssignment[];
+    if (error) {
+      logDbError('AdminTaskAssignmentRepository.revoke', error);
+      throw error;
     }
-
-    async revoke(id: string): Promise<void> {
-        const { error } = await this.dbConnection
-            .from(this.table)
-            .update({ active: false, revoked_at: new Date().toISOString() })
-            .eq(this.primaryKey, id);
-
-        if (error) {
-            logDbError('AdminTaskAssignmentRepository.revoke', error);
-            throw error;
-        }
-    }
+  }
 }
