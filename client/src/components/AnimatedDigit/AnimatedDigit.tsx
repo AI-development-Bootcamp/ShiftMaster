@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { flushSync } from 'react-dom';
-import './AnimatedDigit.css';
+import '../../styles/AnimatedDigit.css';
 
 interface AnimatedDigitProps {
   value: number;

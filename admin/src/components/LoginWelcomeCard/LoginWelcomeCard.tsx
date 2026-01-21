@@ -5,9 +5,10 @@ import { MIN_PASSWORD_LENGTH, VALIDATION_MESSAGES } from '../../constants';
 import { EyeIcon, EyeOffIcon } from '../../constants/icons';
 import { useTranslation } from 'react-i18next';
 import '../../styles/LoginWelcomeCard.css';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { loginUser } from '../../store/slices/authSlice';
 
 interface LoginWelcomeCardProps {
-  onLogin: (email: string, password: string) => void | Promise<void>;
   error?: string | null;
 }
 
@@ -18,21 +19,24 @@ interface FormErrors {
   code?: string;
 }
 
-export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
+export function LoginWelcomeCard({ error }: LoginWelcomeCardProps) {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+  const { loading, error: authError } = useAppSelector((state) => state.auth);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
-  // Effect to sync external error to local state if needed, or just specific error render
-  // For simplicity, we can merge external error into general error rendering
-
   const [touched, setTouched] = useState<{ email: boolean; password: boolean }>({
     email: false,
     password: false,
   });
-  const [isLoading, setIsLoading] = useState(false);
+
+  // Use local loading state to sync with Redux loading if needed,
+  // but simpler to just use Redux loading state directly.
+  // const [isLoading, setIsLoading] = useState(false); 
 
   const validateEmail = (value: string): string | undefined => {
     if (!value.trim()) {
@@ -87,43 +91,20 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
       return;
     }
 
-    setIsLoading(true);
     setErrors({});
 
-    try {
-      const result = onLogin(email, password);
-      if (result instanceof Promise) {
-        await result;
-      }
-    } catch (localError: unknown) {
-      // Logic handled in parent, but this catch ensures we don't crash
-      setErrors({
-        general: VALIDATION_MESSAGES.auth.invalidCredentials,
-        code: getErrorCode(localError),
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    await dispatch(loginUser({ email, password, source: 'admin' }));
   };
 
-  const getErrorCode = (error: unknown): string | undefined => {
-    if (typeof error === 'object' && error !== null) {
-      const errObj = error as Record<string, unknown>;
-      if (typeof errObj.code === 'string') {
-        return errObj.code;
-      }
-      if (typeof errObj.status === 'string') {
-        return errObj.status;
-      }
-    }
-    return undefined;
-  };
-
-  const isSubmitDisabled = isLoading || !email || !password;
+  const isSubmitDisabled = loading || !email || !password;
 
   // Display external error if it exists and no local error overrides it
-  const displayGeneralError = errors.general || error;
-  const displayErrorCode = errors.code;
+  // Prefer component-passed error over Redux error if both exist? 
+  // Or combine? For now, we'll use either.
+  // We can map backend error codes to localized strings here or in dictionary.
+  // Assuming authError is a code like 'INVALID_CREDENTIALS'.
+  const displayGeneralError = errors.general || error || (authError ? t(`errors.${authError}`, authError) : null);
+  const displayErrorCode = errors.code || authError;
 
   return (
     <div className="login-card">
@@ -149,7 +130,7 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             onBlur={handleEmailBlur}
-            disabled={isLoading}
+            disabled={loading}
             autoComplete="email"
             dir="ltr"
           />
@@ -173,7 +154,7 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onBlur={handlePasswordBlur}
-              disabled={isLoading}
+              disabled={loading}
               autoComplete="current-password"
             />
             <button
@@ -209,7 +190,7 @@ export function LoginWelcomeCard({ onLogin, error }: LoginWelcomeCardProps) {
           className="login-card__button"
           disabled={isSubmitDisabled}
         >
-          {isLoading ? t('login.submittingButton') : t('login.submitButton')}
+          {loading ? t('login.submittingButton') : t('login.submitButton')}
         </button>
       </form>
     </div>

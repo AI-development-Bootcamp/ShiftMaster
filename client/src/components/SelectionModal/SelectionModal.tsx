@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import './SelectionModal.css';
+import '../../styles/SelectionModal.css';
 
 export type SelectionType = 'project' | 'task' | 'location';
 
