@@ -19,7 +19,6 @@ vi.mock('../../services/projectsService.js', () => ({
 
 // Import after mocking
 import * as projectsController from '../../controllers/projectsController.js';
-import { ProjectsService } from '../../services/projectsService.js';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -56,11 +55,8 @@ const mockUser = {
 };
 
 describe('ProjectsController', () => {
-  let mockService: ReturnType<typeof ProjectsService>;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    mockService = new ProjectsService();
   });
 
   describe('createProject', () => {
@@ -84,7 +80,7 @@ describe('ProjectsController', () => {
       };
       mockCreateProject.mockResolvedValue(mockProject);
 
-      await projectsController.createProject(req, res, undefined, mockService);
+      await projectsController.createProject(req as Request, res as Response);
 
       expect(mockCreateProject).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
@@ -104,7 +100,7 @@ describe('ProjectsController', () => {
       } as unknown as AuthenticatedRequest;
       const res = mockResponse();
 
-      await projectsController.createProject(req, res, undefined, mockService);
+      await projectsController.createProject(req as Request, res as Response);
 
       expect(mockCreateProject).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(400);
@@ -129,7 +125,7 @@ describe('ProjectsController', () => {
       };
       mockUpdateProject.mockResolvedValue(mockProject);
 
-      await projectsController.updateProject(req, res, undefined, mockService);
+      await projectsController.updateProject(req as Request, res as Response);
 
       expect(mockUpdateProject).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
@@ -152,9 +148,9 @@ describe('ProjectsController', () => {
       } as unknown as AuthenticatedRequest;
       const res = mockResponse();
 
-      mockDeleteProject.mockResolvedValue();
+      mockDeleteProject.mockResolvedValue(undefined);
 
-      await projectsController.deleteProject(req, res, undefined, mockService);
+      await projectsController.deleteProject(req as Request, res as Response);
 
       expect(mockDeleteProject).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
