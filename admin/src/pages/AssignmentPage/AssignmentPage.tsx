@@ -96,10 +96,15 @@ export function AssignmentPage() {
     }, [fetchData]);
 
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeForm} form:`, values);
-        // TODO: Implement create/edit API calls
-        showInfo(t('common.notImplemented'));
-        setActiveForm(null);
+        try {
+            console.log(`Submitted ${activeForm} form:`, values);
+            // TODO: Implement create/edit API calls
+            showInfo(t('common.notImplemented'));
+            setActiveForm(null);
+        } catch (formError) {
+            console.error('Form submission failed:', formError);
+            showError(t('common.error') || 'An error occurred');
+        }
     };
 
     const handleEditClient = (row: AssignmentTableRow) => {
@@ -145,11 +150,16 @@ export function AssignmentPage() {
     };
 
     const handleConfirmDelete = () => {
-        if (!deletingItem) return;
-        // TODO: Implement delete API calls
-        console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
-        showInfo(t('common.notImplemented'));
-        setDeletingItem(null);
+        try {
+            if (!deletingItem) return;
+            // TODO: Implement delete API calls
+            console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
+            showInfo(t('common.notImplemented'));
+            setDeletingItem(null);
+        } catch (deleteError) {
+            console.error('Delete failed:', deleteError);
+            showError(t('common.error') || 'An error occurred');
+        }
     };
 
     // --- Data Aggregation (Raw Rows) ---

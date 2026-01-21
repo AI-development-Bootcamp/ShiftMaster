@@ -9,7 +9,9 @@
         "search": "חיפוש",
         "searchPlaceholder": "חיפוש...",
         "selectRow": "בחר שורה",
-        "retry": "נסה שוב"
+        "retry": "נסה שוב",
+        "notImplemented": "פונקציונליות זו עדיין לא מומשה",
+        "error": "אירעה שגיאה"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
