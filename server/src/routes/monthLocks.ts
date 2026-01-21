@@ -12,7 +12,7 @@ const router = Router();
  * /api/v1/month-locks:
  *   get:
  *     summary: List month locks for a specific year
- *     description: Admin-only endpoint to retrieve all active month locks for a given year
+ *     description: Retrieve all active month locks for a given year. All authenticated users can view locks to check which months are locked before attempting to modify entries.
  *     tags: [Month Locks]
  *     security:
  *       - bearerAuth: []
@@ -88,12 +88,10 @@ const router = Router();
  *                       type: object
  *       401:
  *         description: Unauthorized - Missing or invalid token
- *       403:
- *         description: Forbidden - Admin access required
  *       500:
  *         description: Internal server error
  */
-router.get('/', isAuthenticated, isAdmin, listLocks);
+router.get('/', isAuthenticated, listLocks);
 
 /**
  * @swagger

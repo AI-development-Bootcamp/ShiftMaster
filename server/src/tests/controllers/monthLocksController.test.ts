@@ -147,6 +147,38 @@ describe('MonthLocksController', () => {
       });
     });
 
+    it('should allow regular users to view locks', async () => {
+      const mockLocks = [
+        {
+          lock_id: '123e4567-e89b-12d3-a456-426614174000',
+          year: 2026,
+          month: 1,
+          locked_at: '2026-02-05T09:00:00Z',
+          locked_by: 'admin-user-id',
+          unlocked_at: null,
+        },
+      ];
+
+      mockRequest.query = { year: '2026' };
+      (mockRequest as AuthenticatedRequest).user = {
+        userId: 'regular-user-id',
+        role: 'regular',
+        email: 'user@example.com',
+      };
+      mockGetLocksForYear.mockResolvedValue(mockLocks);
+
+      await listLocks(mockRequest as Request, mockResponse as Response);
+
+      expect(mockGetLocksForYear).toHaveBeenCalledWith(2026);
+      expect(statusMock).toHaveBeenCalledWith(200);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: true,
+        data: {
+          locks: mockLocks,
+        },
+      });
+    });
+
     it('should return 400 for missing year parameter', async () => {
       mockRequest.query = {};
 
