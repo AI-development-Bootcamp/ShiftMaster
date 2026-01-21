@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { isValidEmail } from '@abra-shift-master/shared';
 import { useAppDispatch, useAppSelector } from '../../store';
 import { loginUser } from '../../store/slices/authSlice';
-import './LoginPage.css';
+import '../../styles/LoginPage.css';
 
 // Assets
 import welcomeIllustration from '../../assets/images/welcome-illustration.svg';
@@ -19,7 +19,11 @@ interface FormErrors {
 function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { loading, error: authError, isAuthenticated } = useAppSelector((state) => state.auth);
+  const {
+    loading,
+    error: authError,
+    isAuthenticated,
+  } = useAppSelector((state) => state.auth);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -171,7 +175,15 @@ function LoginPage() {
           </div>
 
           {generalError && (
-            <div className="login-error-general" role="alert" style={{ color: 'red', marginBottom: '1rem', textAlign: 'center' }}>
+            <div
+              className="login-error-general"
+              role="alert"
+              style={{
+                color: 'red',
+                marginBottom: '1rem',
+                textAlign: 'center',
+              }}
+            >
               {generalError}
             </div>
           )}
