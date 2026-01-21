@@ -11,7 +11,8 @@
         "selectRow": "Select Row",
         "retry": "Retry",
         "notImplemented": "Not implemented yet",
-        "error": "Error occurred"
+        "error": "Error occurred",
+        "restore_failed": "Failed to restore item"
     },
     "desktopOnlyOverlay": {
         "title": "Desktop Only System",
@@ -53,6 +54,7 @@
         "success": {
             "assigned": "Employees assigned successfully"
         },
+        "showInactive": "Show inactive",
         "errors": {
             "loadFailed": "Failed to load data",
             "assignFailed": "Failed to assign employees"

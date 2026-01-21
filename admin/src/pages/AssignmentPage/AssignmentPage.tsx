@@ -279,9 +279,9 @@ export function AssignmentPage() {
             }
             showSuccess(t('common.success') || 'Restored successfully');
             fetchData();
-        } catch (error) {
-            console.error('Restore failed:', error);
-            showError('Failed to restore item');
+        } catch (restoreError) {
+            console.error('Restore failed:', restoreError);
+            showError({ message: t('common.restore_failed') || 'Failed to restore item', code: 'ASSIGNMENT_RESTORE_FAILED' });
         }
     };
 
@@ -460,7 +460,7 @@ export function AssignmentPage() {
                             onChange={(e) => setShowActiveOnly(!e.target.checked)}
                             style={{ cursor: 'pointer' }}
                         />
-                        <span>הצג לא פעילים</span>
+                        <span>{t('assignmentPage.showInactive')}</span>
                     </label>
 
                     <CreateDropdownMenu

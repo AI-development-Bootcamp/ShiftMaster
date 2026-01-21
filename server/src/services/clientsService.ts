@@ -1,7 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 import { ClientRepository } from '../db/repositories/ClientRepository.js';
 import { Client, NewClient, UpdateClient } from '../db/types/entities.js';
-import { ProjectsService } from './projectsService.js';
 import { Actor, AuthorizationError } from './usersService.js';
 
 export class ClientNotFoundError extends Error {
@@ -14,11 +13,11 @@ export class ClientNotFoundError extends Error {
 
 export class ClientsService {
     private clientRepo: ClientRepository;
-    private projectsService: ProjectsService;
+    private supabaseClient: SupabaseClient;
 
     constructor(client: SupabaseClient) {
         this.clientRepo = new ClientRepository(client);
-        this.projectsService = new ProjectsService(client);
+        this.supabaseClient = client;
     }
 
     async listClients(includeInactive = false): Promise<Client[]> {
@@ -51,9 +50,8 @@ export class ClientsService {
         return this.clientRepo.update(id, data);
     }
 
-    // Soft delete a client
-    // Note: Supabase JS client doesn't support client-side transactions.
-    // We wrap in try-catch and propagate errors with context.
+    // Soft delete a client (with transactional cascade to projects and tasks)
+    // Uses a Postgres RPC function for atomic operation
     async deleteClient(actor: Actor, id: string): Promise<void> {
         if (actor.role !== 'admin') {
             throw new AuthorizationError('Access denied: Only admins can delete clients');
@@ -64,14 +62,12 @@ export class ClientsService {
             throw new ClientNotFoundError(id);
         }
 
-        try {
-            // Cascade delete projects (and their tasks)
-            await this.projectsService.deleteProjectsByClientId(id);
+        // Use RPC function for atomic cascade delete
+        const { error } = await this.supabaseClient.rpc('delete_client_cascade', {
+            p_client_id: id
+        });
 
-            // Delete client
-            await this.clientRepo.delete(id);
-        } catch (error) {
-            // Log and rethrow with context for callers to handle
+        if (error) {
             console.error(`[ClientsService.deleteClient] Cascade delete failed for client ${id}:`, error);
             throw error;
         }

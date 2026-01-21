@@ -11,7 +11,8 @@
         "selectRow": "בחר שורה",
         "retry": "נסה שוב",
         "notImplemented": "פונקציונליות זו עדיין לא מומשה",
-        "error": "אירעה שגיאה"
+        "error": "אירעה שגיאה",
+        "restore_failed": "שחזור הפריט נכשל"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
@@ -53,6 +54,7 @@
         "success": {
             "assigned": "העובדים שויכו בהצלחה"
         },
+        "showInactive": "הצג לא פעילים",
         "errors": {
             "loadFailed": "טעינת הנתונים נכשלה",
             "assignFailed": "שיוך העובדים נכשל"

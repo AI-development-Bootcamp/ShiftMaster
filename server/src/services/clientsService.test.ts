@@ -1,12 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { ClientsService, ClientNotFoundError } from './clientsService';
 import { ClientRepository } from '../db/repositories/ClientRepository';
-import { ProjectsService } from './projectsService';
 import { SupabaseClient } from '@supabase/supabase-js';
 
 // Mock dependencies
 vi.mock('../db/repositories/ClientRepository');
-vi.mock('./projectsService');
 
 const _mockActor = {
     user_id: 'user-1',
@@ -27,9 +25,7 @@ describe('ClientsService', () => {
         findActive: ReturnType<typeof vi.fn>;
         delete: ReturnType<typeof vi.fn>;
     };
-    let mockProjectsService: {
-        deleteProjectsByClientId: ReturnType<typeof vi.fn>;
-    };
+    let mockRpc: ReturnType<typeof vi.fn>;
 
     beforeEach(() => {
         vi.clearAllMocks();
@@ -43,29 +39,28 @@ describe('ClientsService', () => {
             delete: vi.fn(),
         };
 
-        mockProjectsService = {
-            deleteProjectsByClientId: vi.fn(),
-        };
+        mockRpc = vi.fn();
 
         vi.mocked(ClientRepository).mockImplementation(() => mockClientRepo as unknown as ClientRepository);
-        vi.mocked(ProjectsService).mockImplementation(() => mockProjectsService as unknown as ProjectsService);
 
-        // Create service instance with mock Supabase client
-        const mockSupabaseClient = {} as SupabaseClient;
+        // Create service instance with mock Supabase client that has rpc method
+        const mockSupabaseClient = {
+            rpc: mockRpc,
+        } as unknown as SupabaseClient;
         service = new ClientsService(mockSupabaseClient);
     });
 
     describe('deleteClient', () => {
-        it('should cascade delete projects before deleting client', async () => {
+        it('should call RPC for transactional cascade delete', async () => {
             const clientId = 'client-123';
             mockClientRepo.findById.mockResolvedValue({ client_id: clientId, name: 'Test', active: true });
-            mockProjectsService.deleteProjectsByClientId.mockResolvedValue(undefined);
-            mockClientRepo.delete.mockResolvedValue(undefined);
+            mockRpc.mockResolvedValue({ data: null, error: null });
 
             await service.deleteClient({ role: 'admin' }, clientId);
 
-            expect(mockProjectsService.deleteProjectsByClientId).toHaveBeenCalledWith(clientId);
-            expect(mockClientRepo.delete).toHaveBeenCalledWith(clientId);
+            expect(mockRpc).toHaveBeenCalledWith('delete_client_cascade', {
+                p_client_id: clientId
+            });
         });
 
         it('should throw ClientNotFoundError if client does not exist', async () => {
@@ -73,19 +68,19 @@ describe('ClientsService', () => {
 
             await expect(service.deleteClient({ role: 'admin' }, 'nonexistent'))
                 .rejects.toThrow(ClientNotFoundError);
+
+            // RPC should not be called if client doesn't exist
+            expect(mockRpc).not.toHaveBeenCalled();
         });
 
-        it('should propagate cascade delete error', async () => {
+        it('should propagate RPC error on cascade delete failure', async () => {
             const clientId = 'client-123';
-            const cascadeError = new Error('Cascade failed');
+            const rpcError = { code: 'PGRST500', message: 'Cascade failed' };
             mockClientRepo.findById.mockResolvedValue({ client_id: clientId, name: 'Test', active: true });
-            mockProjectsService.deleteProjectsByClientId.mockRejectedValue(cascadeError);
+            mockRpc.mockResolvedValue({ data: null, error: rpcError });
 
             await expect(service.deleteClient({ role: 'admin' }, clientId))
-                .rejects.toThrow(cascadeError);
-
-            // Client delete should not have been called since cascade failed
-            expect(mockClientRepo.delete).not.toHaveBeenCalled();
+                .rejects.toEqual(rpcError);
         });
     });
 });
