@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { isValidEmail } from '@abra-shift-master/shared';
 import '../../styles/LoginPage.css';
 
@@ -15,6 +16,7 @@ interface FormErrors {
 
 function LoginPage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
@@ -25,16 +27,16 @@ function LoginPage() {
 
     // Validate email
     if (!trimmedEmail) {
-      newErrors.email = 'יש להזין אימייל';
+      newErrors.email = t('login.validation.emailRequired');
     } else if (!isValidEmail(trimmedEmail)) {
-      newErrors.email = 'פורמט אימייל לא תקין';
+      newErrors.email = t('login.validation.emailInvalid');
     }
 
     // Validate password (minimum 6 characters)
     if (!password) {
-      newErrors.password = 'יש להזין סיסמה';
+      newErrors.password = t('login.validation.passwordRequired');
     } else if (password.length < 6) {
-      newErrors.password = 'הסיסמה חייבת להכיל לפחות 6 תווים';
+      newErrors.password = t('login.validation.passwordMinLength');
     }
 
     setErrors(newErrors);
@@ -80,28 +82,28 @@ function LoginPage() {
         />
 
         {/* Welcome text */}
-        <h1 className="login-title">ברוכים הבאים!</h1>
+        <h1 className="login-title">{t('login.welcomeTitle')}</h1>
 
         {/* Description text */}
         <p className="login-description">
-          ברוכים הבאים למערכת דיווחי השעות שלנו 🥳
+          {t('login.description')}
           <br />
-          שנוצרה במיוחד עבורכם!
+          {t('login.descriptionLine2')}
           <br />
-          יש להתחבר באמצעות הזדהות למטה.
+          {t('login.descriptionLine3')}
         </p>
 
         {/* Login form */}
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
             <label htmlFor="email-input" className="visually-hidden">
-              אימייל
+              {t('login.emailLabel')}
             </label>
             <input
               id="email-input"
               type="email"
               className={`login-input ${errors.email ? 'input-error' : ''}`}
-              placeholder="אימייל"
+              placeholder={t('login.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               dir="rtl"
@@ -117,13 +119,13 @@ function LoginPage() {
           </div>
           <div className="login-input-group">
             <label htmlFor="password-input" className="visually-hidden">
-              סיסמה
+              {t('login.passwordLabel')}
             </label>
             <input
               id="password-input"
               type="password"
               className={`login-input ${errors.password ? 'input-error' : ''}`}
-              placeholder="סיסמה"
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               dir="rtl"
@@ -138,7 +140,7 @@ function LoginPage() {
             )}
           </div>
           <button type="submit" className="login-button">
-            התחברות
+            {t('login.submitButton')}
           </button>
         </form>
       </div>
