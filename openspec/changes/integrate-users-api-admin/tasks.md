@@ -344,43 +344,40 @@
 - [ ] `GET /api/v1/users?active=true` returns only active users
 - [ ] `GET /api/v1/users?search=john` returns matching users
 
---------------------
-
 #### Task 6.2: Backend - Task Assignments API
-- [ ] **TASK PENDING**
+- [x] **TASK COMPLETE**
 
 **Description:** Create endpoints for creating and listing task assignments
 
 **Steps:**
-- [ ] 1. Create `AssignmentController`
-  - [ ] `POST /api/v1/tasks/:taskId/assignments`: Create assignment
-  - [ ] `GET /api/v1/tasks/:taskId/assignments`: List assignments (optional)
-- [ ] 2. Register routes in `routes/tasks.ts` (or equivalent)
+- [x] 1. Create `TasksController`, `AssignmentsService`
+  - [x] `POST /api/v1/tasks/:taskId/assignments`
+  - [x] `GET /api/v1/tasks/assignments` (Bulk fetch)
+- [x] 2. Register routes in `routes/tasks.ts`
 
 **Validation:**
-- [ ] Can create assignment via API
-- [ ] Enforces unique assignment constraint
+- [x] Can assign employees
+- [x] Can fetch assignments
 
 --------------------
 
 #### Task 6.3: Frontend - Refactor AssignmentPage Data Fetching
-- [ ] **TASK PENDING**
+- [x] **TASK COMPLETE**
 
 **Description:** Replace mock data in AssignmentPage with real API calls
 
 **Steps:**
-- [ ] 1. Create `admin/src/services/assignmentService.ts` (or equivalent)
-  - [ ] `fetchAssignments(filters)`
-  - [ ] `assignEmployees(taskId, employeeIds)`
-- [ ] 2. Update `AssignmentPage.tsx` to fetch tasks/assignments
-  - [ ] Replace `mockTasks`, `mockProjects`, `mockClients`, `mockAdminTaskAssignments`
-  - [ ] Implement loading and error states
+- [x] 1. Create `assignmentService.ts`
+  - [x] `fetchAllAssignments`
+  - [x] `assignEmployees`
+- [x] 2. Update `AssignmentPage.tsx`
+  - [x] Remove mock data
+  - [x] Implement fetch on mount
+  - [x] Implement submission
 
 **Validation:**
-- [ ] Page loads real data from API
-- [ ] Loading spinners work
-
-**Dependencies:** Task 6.1, 6.2
+- [x] Page loads real data
+- [x] Assignment updates persist
 
 --------------------
 

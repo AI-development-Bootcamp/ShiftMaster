@@ -46,6 +46,13 @@
             "deleteClient": "מחק לקוח",
             "deleteProject": "מחק פרויקט",
             "deleteTask": "מחק משימה"
+        },
+        "success": {
+            "assigned": "העובדים שויכו בהצלחה"
+        },
+        "errors": {
+            "loadFailed": "טעינת הנתונים נכשלה",
+            "assignFailed": "שיוך העובדים נכשל"
         }
     },
     "employeesPage": {

@@ -39,6 +39,20 @@ export class AdminTaskAssignmentRepository extends BaseRepository<AdminTaskAssig
         return data as AdminTaskAssignment[];
     }
 
+    async findAllActive(): Promise<AdminTaskAssignment[]> {
+        const { data, error } = await this.dbConnection
+            .from(this.table)
+            .select('*')
+            .eq('active', true);
+
+        if (error) {
+            logDbError('AdminTaskAssignmentRepository.findAllActive', error);
+            throw error;
+        }
+
+        return data as AdminTaskAssignment[];
+    }
+
     async revoke(id: string): Promise<void> {
         const { error } = await this.dbConnection
             .from(this.table)
