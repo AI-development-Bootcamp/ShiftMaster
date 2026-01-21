@@ -28,6 +28,7 @@ function LogoutButton({ className = 'logout-btn' }: LogoutButtonProps) {
       className={className}
       onClick={handleLogout}
       aria-label="התנתק"
+      type="button"
     >
       <span className="logout-btn-icon">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
