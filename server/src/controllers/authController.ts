@@ -161,11 +161,14 @@ export async function refresh(req: Request, res: Response): Promise<void> {
     const { userId } = await validateRefreshSession(sessionId, refreshToken);
 
     // Rotate refresh token (invalidate old one, generate new one)
-    const { refreshToken: newRefreshToken } =
+    // Grace period prevents rapid rotation during concurrent requests
+    const { refreshToken: newRefreshToken, rotated } =
       await rotateRefreshToken(sessionId);
 
-    // Update cookies with new refresh token
-    setRefreshCookies(res, newRefreshToken, sessionId);
+    // Only update cookies if rotation occurred
+    if (rotated && newRefreshToken) {
+      setRefreshCookies(res, newRefreshToken, sessionId);
+    }
 
     // Get user data from database to include in new access token
     const { supabaseAdmin } = await import('../db/supabase.js');

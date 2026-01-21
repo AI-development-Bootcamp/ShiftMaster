@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
@@ -12,13 +13,23 @@ import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDr
 import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
 import { CONFIRM_VARIANTS } from '../../constants/ui';
 import { useTranslation } from 'react-i18next';
-import { UserRole } from '@abra-shift-master/shared';
+import { UserRole, User } from '@abra-shift-master/shared';
+// Import services and types
+import { assignmentService, Client, Project, Task } from '../../services/assignmentService';
+import { AdminTaskAssignment } from '@abra-shift-master/shared';
+import { useToast, ToastContainer } from '../../components/Toast';
 
-import { mockProjects, mockTasks } from '../../mocks/projects';
-import { mockClients } from '../../mocks/clients';
-import { mockUsers } from '../../mocks/users';
-import { mockAdminTaskAssignments } from '../../mocks/adminTaskAssignments';
 import '../../styles/AssignmentPage.css';
+
+// Stable error codes for traceable logging
+export const ERROR_CODES = {
+    ASSIGNMENT_LOAD_FAILED: 'ASSIGNMENT_LOAD_FAILED',
+    FORM_SUBMIT_FAILED: 'FORM_SUBMIT_FAILED',
+    DELETE_FAILED: 'DELETE_FAILED',
+    ASSIGNMENT_FAILED: 'ASSIGNMENT_FAILED',
+} as const;
+
+export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
 
 interface AssignmentTableRow {
     id: string;
@@ -33,12 +44,22 @@ interface AssignmentTableRow {
 
 export function AssignmentPage() {
     const { t } = useTranslation();
+    const { toasts, showError, showSuccess, showInfo, removeToast } = useToast();
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>([
         { key: 'client_name', direction: 'asc' },
         { key: 'project_name', direction: 'asc' }
     ]);
     const [editingAssignment, setEditingAssignment] = useState<AssignmentTableRow | null>(null);
+
+    // --- Data State ---
+    const [clients, setClients] = useState<Client[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [assignments, setAssignments] = useState<AdminTaskAssignment[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     // --- Edit/Create Form State ---
     const [activeForm, setActiveForm] = useState<'client' | 'project' | 'task' | 'createClient' | 'createProject' | 'createTask' | null>(null);
@@ -47,13 +68,59 @@ export function AssignmentPage() {
     // --- Delete Confirmation State ---
     const [deletingItem, setDeletingItem] = useState<{ type: 'client' | 'project' | 'task', id: string, name: string } | null>(null);
 
+    // --- Fetch Data ---
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const [
+                fetchedClients,
+                fetchedProjects,
+                fetchedTasks,
+                fetchedAssignments,
+                fetchedUsers
+            ] = await Promise.all([
+                assignmentService.fetchClients(),
+                assignmentService.fetchProjects(),
+                assignmentService.fetchTasks(),
+                assignmentService.fetchAllAssignments(),
+                assignmentService.fetchPotentialEmployees()
+            ]);
+
+            setClients(fetchedClients);
+            setProjects(fetchedProjects);
+            setTasks(fetchedTasks);
+            setAssignments(fetchedAssignments);
+            setUsers(fetchedUsers);
+        } catch (err) {
+            const code = ERROR_CODES.ASSIGNMENT_LOAD_FAILED;
+            console.error(`[${code}] Failed to fetch assignment data:`, err);
+            setError(t('assignmentPage.errors.loadFailed'));
+            showError({ message: t('assignmentPage.errors.loadFailed'), code });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [t, showError]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeForm} form:`, values);
-        setActiveForm(null);
+        try {
+            console.log(`Submitted ${activeForm} form:`, values);
+            // TODO: Implement create/edit API calls
+            showInfo(t('common.notImplemented'));
+            setActiveForm(null);
+        } catch (formError) {
+            const code = ERROR_CODES.FORM_SUBMIT_FAILED;
+            console.error(`[${code}] Form submission failed:`, formError);
+            showError({ message: t('common.error') || 'An error occurred', code });
+        }
     };
 
     const handleEditClient = (row: AssignmentTableRow) => {
-        const client = mockClients.find(c => c.client_id === row.client_id);
+        const client = clients.find(c => c.client_id === row.client_id);
         if (client) {
             setFormInitialValues({
                 clientName: client.name,
@@ -64,12 +131,12 @@ export function AssignmentPage() {
     };
 
     const handleEditProject = (row: AssignmentTableRow) => {
-        const project = mockProjects.find(p => p.project_id === row.project_id);
+        const project = projects.find(p => p.project_id === row.project_id);
         if (project) {
             setFormInitialValues({
                 projectName: project.name,
                 clientId: String(project.client_id),
-                projectDuration: { start: project.start_date || '', end: '' }, // End date missing in mock
+                projectDuration: { start: project.start_date || '', end: project.end_date || '' },
                 description: project.description || '',
             });
             setActiveForm('project');
@@ -77,13 +144,13 @@ export function AssignmentPage() {
     };
 
     const handleEditTask = (row: AssignmentTableRow) => {
-        const task = mockTasks.find(t => t.task_id === row.task_id);
+        const task = tasks.find(t => t.task_id === row.task_id);
         if (task) {
             setFormInitialValues({
                 taskTitle: task.name,
                 projectId: String(task.project_id),
-                assignedTo: '',
-                dueDate: '',
+                assignedTo: '', // Logic needed if we want to pre-fill single assignee
+                dueDate: task.end_date || '',
                 description: task.description || '',
             });
             setActiveForm('task');
@@ -95,25 +162,35 @@ export function AssignmentPage() {
     };
 
     const handleConfirmDelete = () => {
-        if (!deletingItem) return;
-        console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
-        setDeletingItem(null);
+        try {
+            if (!deletingItem) return;
+            // TODO: Implement delete API calls
+            console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
+            showInfo(t('common.notImplemented'));
+            setDeletingItem(null);
+        } catch (deleteError) {
+            const code = ERROR_CODES.DELETE_FAILED;
+            console.error(`[${code}] Delete failed:`, deleteError);
+            showError({ message: t('common.error') || 'An error occurred', code });
+        }
     };
 
     // --- Data Aggregation (Raw Rows) ---
     const rawRows = useMemo(() => {
-        return mockTasks.map(task => {
-            const project = mockProjects.find(p => p.project_id === task.project_id);
-            const client = project ? mockClients.find(c => c.client_id === project.client_id) : null;
+        if (!tasks) return [];
+        return tasks.map(task => {
+            const project = projects.find(p => p.project_id === task.project_id);
+            const client = project ? clients.find(c => c.client_id === project.client_id) : null;
 
             // Find active assignments for this task
-            const taskAssignments = mockAdminTaskAssignments.filter(
+            // Assignments from backend are AdminTaskAssignment[]
+            const taskAssignments = (assignments || []).filter(
                 a => a.task_id === task.task_id && a.active
             );
 
             // Map assignments to PersonChip
             const assignees: PersonChip[] = taskAssignments.map(assignment => {
-                const user = mockUsers.find(u => u.user_id === assignment.user_id);
+                const user = (users || []).find(u => u.user_id === assignment.user_id);
                 return {
                     id: String(assignment.user_id),
                     name: user ? user.full_name : t('common.unknownUser')
@@ -131,7 +208,7 @@ export function AssignmentPage() {
                 assignees
             };
         });
-    }, [t]);
+    }, [tasks, projects, clients, assignments, users, t]);
 
     // --- Search Logic (Reusable) ---
     const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
@@ -173,17 +250,27 @@ export function AssignmentPage() {
 
     // Data for the form: All potential available employees
     const potentialEmployees: EmployeeRow[] = useMemo(() => {
-        return mockUsers.map(user => ({
+        return (users || []).map(user => ({
             id: String(user.user_id),
             fullName: user.full_name,
             type: user.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee'),
             role: user.job_title || ''
         }));
-    }, [t]);
+    }, [users, t]);
 
     const handleAssignmentSubmit = async (selectedRows: EmployeeRow[]) => {
-        console.log('Updated assignments for task', editingAssignment?.task_name, ':', selectedRows);
-        setEditingAssignment(null);
+        if (!editingAssignment) return;
+        try {
+            const employeeIds = selectedRows.map(r => r.id);
+            await assignmentService.assignEmployees(editingAssignment.task_id, employeeIds);
+            showSuccess(t('assignmentPage.success.assigned'));
+            setEditingAssignment(null);
+            fetchData(); // Refresh data to show updates
+        } catch (assignError) {
+            const code = ERROR_CODES.ASSIGNMENT_FAILED;
+            console.error(`[${code}] Assignment failed:`, assignError);
+            showError({ message: t('assignmentPage.errors.assignFailed'), code });
+        }
     };
 
     // Columns definition
@@ -232,6 +319,10 @@ export function AssignmentPage() {
         { id: 'task', label: t('createMenu.options.addTask'), onSelect: () => { setFormInitialValues({}); setActiveForm('createTask'); } },
     ], [t]);
 
+    if (error && !data.length) {
+        return <div className="assignment-page-error">{error} <button onClick={fetchData}>{t('common.retry')}</button></div>;
+    }
+
     return (
         <div className="assignment-page">
             <div className="assignment-page-header">
@@ -269,7 +360,7 @@ export function AssignmentPage() {
                 onPageChange={setPage}
                 sort={sort}
                 onSortChange={setSort}
-                isLoading={false}
+                isLoading={isLoading}
                 rowActions={{
                     showEdit: true,
                     showDelete: true,
@@ -370,6 +461,8 @@ export function AssignmentPage() {
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setDeletingItem(null)}
             />
+
+            <ToastContainer toasts={toasts} onDismiss={removeToast} />
         </div>
     );
 }

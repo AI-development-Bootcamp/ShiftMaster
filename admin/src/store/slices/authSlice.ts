@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { tokenStore } from '@/auth/tokenStore';
+import { env } from '../../config/env';
 
 interface User {
   user_id: string;
@@ -13,6 +14,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  isRefreshing: boolean; // Track if refresh is in progress to prevent concurrent calls
 }
 
 const initialState: AuthState = {
@@ -20,6 +22,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  isRefreshing: false,
 };
 
 // Async thunk for login
@@ -29,7 +32,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: { code: string; message: string } }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+    const response = await fetch(`${env.apiUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +67,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      await fetch(`${env.apiUrl}/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Include cookies
       });
@@ -85,26 +88,24 @@ export const logoutUser = createAsyncThunk(
 );
 
 // Async thunk for initializing auth on app start (refresh flow)
-export const initializeAuth = createAsyncThunk(
+export const initializeAuth = createAsyncThunk<
+  { user: User | null },
+  void,
+  { rejectValue: { code: string; message: string }; state: { auth: AuthState } }
+>(
   'auth/initialize',
-  async (_, { rejectWithValue }) => {
+  async (_) => {
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/refresh`,
-        {
-          method: 'POST',
-          credentials: 'include', // Include cookies
-        }
-      );
+      const response = await fetch(`${env.apiUrl}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include', // Include cookies
+      });
 
       if (!response.ok) {
         // Refresh failed, user needs to login
         tokenStore.clearAccessToken();
         localStorage.removeItem('user');
-        return rejectWithValue({
-          message: 'Session expired',
-          code: 'SESSION_EXPIRED',
-        });
+        return { user: null };
       }
 
       const data = await response.json();
@@ -130,11 +131,17 @@ export const initializeAuth = createAsyncThunk(
     } catch (err) {
       tokenStore.clearAccessToken();
       localStorage.removeItem('user');
-      return rejectWithValue({
-        message: 'Failed to initialize auth',
-        code: 'INIT_ERROR',
-      });
+      // Resolve with null user instead of rejecting to avoid global error handlers on init
+      return { user: null };
     }
+  },
+  {
+    // Prevent concurrent refresh requests
+    condition: (_, { getState }) => {
+      const { auth } = getState();
+      // Don't start if already refreshing
+      return !auth.isRefreshing;
+    },
   }
 );
 
@@ -174,14 +181,22 @@ const authSlice = createSlice({
       // Initialize auth cases
       .addCase(initializeAuth.pending, (state) => {
         state.loading = true;
+        state.isRefreshing = true;
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
+        state.isRefreshing = false;
+        if (action.payload.user) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+        } else {
+          state.isAuthenticated = false;
+          state.user = null;
+        }
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;
+        state.isRefreshing = false;
         state.isAuthenticated = false;
         state.user = null;
       });
