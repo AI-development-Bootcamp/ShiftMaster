@@ -592,8 +592,8 @@ A: Yes, good practice. Add `revokeAllUserSessions(userId)` to authService.
 - [x] POST /api/v1/auth/logout clears cookies and revokes session
 - [x] Client and Admin frontends store access token in-memory only
 - [x] Client and Admin frontends call /refresh on app start
-- [ ] API client retries 401 with /refresh, prevents refresh storms
-- [ ] All tests pass (backend + frontend)
+- [x] API client retries 401 with /refresh, prevents refresh storms
+- [x] All tests pass (backend + frontend)
 - [ ] No tokens stored in localStorage or sessionStorage
 - [ ] README documents Docker Compose Redis setup
 - [ ] project.md documents new endpoints and schemas
