@@ -191,7 +191,7 @@ function LoginPage() {
           )}
 
           {/* Submit button */}
-          <button type="submit" className="login-button">
+          <button type="submit" className="login-button" disabled={loading}>
             {t('login.submitButton')}
           </button>
         </form>
