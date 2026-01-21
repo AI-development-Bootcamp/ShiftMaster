@@ -218,8 +218,6 @@ router.post('/refresh', refresh);
  *     responses:
  *       204:
  *         description: Logout successful (no content)
- *       500:
- *         description: Internal server error (but cookies still cleared)
  */
 router.post('/logout', logout);
 
