@@ -271,15 +271,15 @@ describe('User Validation Schemas', () => {
       }
     });
 
-    it('should fail when limit exceeds 100', () => {
+    it('should fail when limit exceeds 1000', () => {
       const invalidData = {
-        limit: '101',
+        limit: '1001',
       };
 
       const result = listUsersSchema.safeParse(invalidData);
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toContain('between 1 and 100');
+        expect(result.error.issues[0].message).toContain('between 1 and 1000');
       }
     });
 

@@ -14,6 +14,7 @@ interface AuthState {
   isAuthenticated: boolean;
   loading: boolean;
   error: string | null;
+  isRefreshing: boolean; // Track if refresh is in progress to prevent concurrent calls
 }
 
 const initialState: AuthState = {
@@ -21,6 +22,7 @@ const initialState: AuthState = {
   isAuthenticated: false,
   loading: false,
   error: null,
+  isRefreshing: false,
 };
 
 // Async thunk for login
@@ -89,18 +91,15 @@ export const logoutUser = createAsyncThunk(
 export const initializeAuth = createAsyncThunk<
   { user: User | null },
   void,
-  { rejectValue: { code: string; message: string } }
+  { rejectValue: { code: string; message: string }; state: { auth: AuthState } }
 >(
   'auth/initialize',
   async (_) => {
     try {
-      const response = await fetch(
-        `${env.apiUrl}/auth/refresh`,
-        {
-          method: 'POST',
-          credentials: 'include', // Include cookies
-        }
-      );
+      const response = await fetch(`${env.apiUrl}/auth/refresh`, {
+        method: 'POST',
+        credentials: 'include', // Include cookies
+      });
 
       if (!response.ok) {
         // Refresh failed, user needs to login
@@ -127,6 +126,14 @@ export const initializeAuth = createAsyncThunk<
       localStorage.removeItem('user');
       return { user: null };
     }
+  },
+  {
+    // Prevent concurrent refresh requests
+    condition: (_, { getState }) => {
+      const { auth } = getState();
+      // Don't start if already refreshing
+      return !auth.isRefreshing;
+    },
   }
 );
 
@@ -160,9 +167,11 @@ const authSlice = createSlice({
       // Initialize auth cases
       .addCase(initializeAuth.pending, (state) => {
         state.loading = true;
+        state.isRefreshing = true;
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
+        state.isRefreshing = false;
         if (action.payload.user) {
           state.isAuthenticated = true;
           state.user = action.payload.user;
@@ -173,6 +182,7 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;
+        state.isRefreshing = false;
         state.isAuthenticated = false;
         state.user = null;
       });

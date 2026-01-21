@@ -176,7 +176,8 @@ export class UsersService {
   async listUsers(
     actor: Actor,
     page: number = 1,
-    limit: number = 20
+    limit: number = 20,
+    filters?: { active?: boolean; search?: string }
   ): Promise<PaginatedUsersResponse> {
     // Enforce admin access
     if (actor.role !== 'admin') {
@@ -184,7 +185,11 @@ export class UsersService {
     }
 
     // Get paginated users from database
-    const { data, count } = await this.userRepo.findPaginated(page, limit);
+    const { data, count } = await this.userRepo.findPaginated(
+      page,
+      limit,
+      filters
+    );
 
     // Calculate total pages
     const totalPages = Math.ceil(count / limit);

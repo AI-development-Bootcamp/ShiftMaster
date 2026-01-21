@@ -24,4 +24,19 @@ export class TaskRepository extends BaseRepository<Task, NewTask, UpdateTask> im
 
         return data as Task[];
     }
+
+    async findActive(): Promise<Task[]> {
+        const { data, error } = await this.dbConnection
+            .from(this.table)
+            .select('*')
+            .eq('active', true)
+            .order('name');
+
+        if (error) {
+            logDbError('TaskRepository.findActive', error);
+            throw error;
+        }
+
+        return data as Task[];
+    }
 }

@@ -203,11 +203,19 @@ export function EmployeesManagementPage() {
         setDeletingUser(user);
     };
 
-    const handleConfirmDelete = () => {
+    const handleConfirmDelete = async () => {
         if (!deletingUser) return;
-        console.log('Delete Employee ID:', deletingUser.user_id);
-        // This will be implemented in Task 3.4
-        setDeletingUser(null);
+
+        try {
+            await apiClient.delete(`/users/${deletingUser.user_id}`);
+            showSuccess(t('messages.userDeleted', 'העובד נמחק בהצלחה'));
+            setDeletingUser(null);
+            // Refresh user list
+            await fetchUsers();
+        } catch (err) {
+            const errorMsg = getErrorMessage(err);
+            showError(errorMsg);
+        }
     };
 
     return (

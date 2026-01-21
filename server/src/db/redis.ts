@@ -106,6 +106,7 @@ export interface RefreshSession {
   userId: string;
   refreshTokenHash: string;
   createdAt: string;
+  lastRotatedAt?: string; // Track last token rotation to prevent rapid rotation
   userAgent?: string;
   ipAddress?: string;
 }

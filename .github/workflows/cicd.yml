@@ -1,4 +1,4 @@
-name:  CI/CD
+name: CI/CD
 
 on:
   push:
@@ -10,7 +10,7 @@ jobs:
     name: Server - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
-    environment: production
+    environment: stage
 
     steps:
       - name: Checkout code
@@ -44,7 +44,7 @@ jobs:
           echo "🚀 Deploying server to Render..."
           if [ -n "$RENDER_DEPLOY_URL_SERVER" ]; then
             curl -X POST "$RENDER_DEPLOY_URL_SERVER" \
-              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed" && exit 1)
+              -f -s -o /dev/null && echo "✅ Render deployment triggered successfully" || (echo "⚠️  Render API call failed :(" && exit 1)
           else
             echo "⚠️  Render deploy URL not configured - deployment skipped"
           fi
@@ -55,7 +55,7 @@ jobs:
     name: Client - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
-    environment: production
+    environment: stage
 
     steps:
       - name: Checkout code
@@ -100,7 +100,7 @@ jobs:
     name: Admin - Test, Lint & Deploy
     runs-on: ubuntu-latest
     needs: shared
-    environment: production
+    environment: stage
 
     steps:
       - name: Checkout code

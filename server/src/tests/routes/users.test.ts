@@ -262,7 +262,10 @@ describe('Users Routes', () => {
         .set('Authorization', `Bearer ${VALID_ADMIN_TOKEN}`);
 
       expect(response.status).toBe(200);
-      expect(serviceListUsers).toHaveBeenCalledWith({ role: 'admin' }, 2, 10);
+      expect(serviceListUsers).toHaveBeenCalledWith({ role: 'admin' }, 2, 10, {
+        active: undefined,
+        search: undefined,
+      });
     });
 
     it('should return 401 when not authenticated', async () => {

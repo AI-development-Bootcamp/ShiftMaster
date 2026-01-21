@@ -50,7 +50,17 @@ function App() {
 
   useEffect(() => {
     // Initialize auth on app startup (check for refresh token)
-    dispatch(initializeAuth());
+    dispatch(initializeAuth())
+      .unwrap()
+      .catch((error) => {
+        // Ignore ConditionError - it's expected when preventing concurrent refresh calls
+        if (error?.name === 'ConditionError') {
+          return;
+        }
+        const errorCode =
+          (error as { code?: string })?.code ?? 'AUTH_INIT_FAILED';
+        console.error('Auth init error:', { code: errorCode, error });
+      });
   }, [dispatch]);
 
   return (
