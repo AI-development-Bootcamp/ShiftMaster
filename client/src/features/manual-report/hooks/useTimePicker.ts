@@ -90,19 +90,19 @@ export function useTimePicker({
       ref: React.RefObject<HTMLDivElement>,
       items: TimePickerItem[]
     ) => {
-      e.preventDefault();
-      if (!ref.current) return;
+      // ✅ Don't call preventDefault() on wheel — can be passive and cause the warning
+      e.stopPropagation();
 
-      const currentScroll = ref.current.scrollTop;
+      const el = ref.current;
+      if (!el) return;
+
+      const currentScroll = el.scrollTop;
       const currentIndex = Math.round(currentScroll / TIME_PICKER_ITEM_HEIGHT);
 
       const direction = e.deltaY > 0 ? 1 : -1;
-      const newIndex = Math.max(
-        0,
-        Math.min(currentIndex + direction, items.length - 1)
-      );
+      const newIndex = Math.max(0, Math.min(currentIndex + direction, items.length - 1));
 
-      ref.current.scrollTop = newIndex * TIME_PICKER_ITEM_HEIGHT;
+      el.scrollTop = newIndex * TIME_PICKER_ITEM_HEIGHT;
     },
     []
   );

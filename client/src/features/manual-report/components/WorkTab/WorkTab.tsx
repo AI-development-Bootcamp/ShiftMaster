@@ -36,12 +36,12 @@ function WorkTab({
   >(null);
   const [entryTime, setEntryTime] = useState<TimeValue>({
     hours: 9,
-    minutes: 41,
+    minutes: 0,
     period: 'AM',
   });
   const [exitTime, setExitTime] = useState<TimeValue>({
-    hours: 9,
-    minutes: 4,
+    hours: 10,
+    minutes: 0,
     period: 'AM',
   });
   const [selectionModal, setSelectionModal] = useState<{
