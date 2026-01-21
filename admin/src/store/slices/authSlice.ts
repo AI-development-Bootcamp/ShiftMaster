@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { tokenStore } from '@/auth/tokenStore';
+import { env } from '../../config/env';
 
 interface User {
   user_id: string;
@@ -29,7 +30,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: { code: string; message: string } }
 >('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_URL}/auth/login`, {
+    const response = await fetch(`${env.apiUrl}/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -64,7 +65,7 @@ export const logoutUser = createAsyncThunk(
   'auth/logout',
   async (_, { rejectWithValue }) => {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/auth/logout`, {
+      await fetch(`${env.apiUrl}/auth/logout`, {
         method: 'POST',
         credentials: 'include', // Include cookies
       });
@@ -85,58 +86,51 @@ export const logoutUser = createAsyncThunk(
 );
 
 // Async thunk for initializing auth on app start (refresh flow)
-export const initializeAuth = createAsyncThunk(
-  'auth/initialize',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/auth/refresh`,
-        {
-          method: 'POST',
-          credentials: 'include', // Include cookies
-        }
-      );
+export const initializeAuth = createAsyncThunk<
+  { user: User | null },
+  void,
+  { rejectValue: { code: string; message: string } }
+>('auth/initialize', async (_) => {
+  try {
+    const response = await fetch(`${env.apiUrl}/auth/refresh`, {
+      method: 'POST',
+      credentials: 'include', // Include cookies
+    });
 
-      if (!response.ok) {
-        // Refresh failed, user needs to login
-        tokenStore.clearAccessToken();
-        localStorage.removeItem('user');
-        return rejectWithValue({
-          message: 'Session expired',
-          code: 'SESSION_EXPIRED',
-        });
-      }
-
-      const data = await response.json();
-
-      if (!data.data?.accessToken) {
-        throw new Error('Invalid refresh response');
-      }
-
-      // Store new access token in memory
-      tokenStore.setAccessToken(data.data.accessToken);
-
-      // Get user from localStorage
-      const userStr = localStorage.getItem('user');
-      if (!userStr) {
-        throw new Error('User data not found');
-      }
-
-      const user = JSON.parse(userStr);
-      if (!user?.user_id || !user?.email || !user?.role) {
-        throw new Error('Invalid user data');
-      }
-      return { user };
-    } catch (err) {
+    if (!response.ok) {
+      // Refresh failed, user needs to login
       tokenStore.clearAccessToken();
       localStorage.removeItem('user');
-      return rejectWithValue({
-        message: 'Failed to initialize auth',
-        code: 'INIT_ERROR',
-      });
+      return { user: null };
     }
+
+    const data = await response.json();
+
+    if (!data.data?.accessToken) {
+      throw new Error('Invalid refresh response');
+    }
+
+    // Store new access token in memory
+    tokenStore.setAccessToken(data.data.accessToken);
+
+    // Get user from localStorage
+    const userStr = localStorage.getItem('user');
+    if (!userStr) {
+      throw new Error('User data not found');
+    }
+
+    const user = JSON.parse(userStr);
+    if (!user?.user_id || !user?.email || !user?.role) {
+      throw new Error('Invalid user data');
+    }
+    return { user };
+  } catch (err) {
+    tokenStore.clearAccessToken();
+    localStorage.removeItem('user');
+    // Resolve with null user instead of rejecting to avoid global error handlers on init
+    return { user: null };
   }
-);
+});
 
 const authSlice = createSlice({
   name: 'auth',
@@ -177,8 +171,13 @@ const authSlice = createSlice({
       })
       .addCase(initializeAuth.fulfilled, (state, action) => {
         state.loading = false;
-        state.isAuthenticated = true;
-        state.user = action.payload.user;
+        if (action.payload.user) {
+          state.isAuthenticated = true;
+          state.user = action.payload.user;
+        } else {
+          state.isAuthenticated = false;
+          state.user = null;
+        }
       })
       .addCase(initializeAuth.rejected, (state) => {
         state.loading = false;

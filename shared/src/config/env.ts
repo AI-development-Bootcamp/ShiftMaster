@@ -4,30 +4,18 @@
  */
 
 // Detect environment-specific API URL
-// - In Vite/browser: use import.meta.env.VITE_API_URL
+// - In Vite/browser: use import.meta.env.VITE_API_URL (statically analyzed by Vite)
 // - In Node: use process.env.API_URL
 // - Fallback: hardcoded default
-function getApiUrl(): string {
-  // Check if running in Vite/browser environment
-  // Safely access import.meta.env without type errors
-  try {
-    const meta = import.meta as unknown as { env?: { VITE_API_URL?: string } };
-    if (meta.env?.VITE_API_URL) {
-      return meta.env.VITE_API_URL;
-    }
-  } catch {
-    // import.meta might not exist in Node environments
-  }
 
-  // Check if running in Node environment
-  if (typeof process !== 'undefined' && process.env?.API_URL) {
-    return process.env.API_URL;
-  }
+// For Vite environments - direct property access for static analysis
+// Vite will replace import.meta.env.VITE_API_URL at build time
+const viteApiUrl = import.meta.env.VITE_API_URL;
 
-  // Default fallback
-  return 'http://localhost:3000/api/v1';
-}
+// For Node environments
+const nodeApiUrl = (typeof process !== 'undefined' && process.env?.API_URL) || undefined;
 
+// Export with fallback priority
 export const env = {
-  apiUrl: getApiUrl(),
+  apiUrl: viteApiUrl || nodeApiUrl || 'http://localhost:3000/api/v1',
 };
