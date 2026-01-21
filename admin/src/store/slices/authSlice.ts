@@ -158,6 +158,12 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.error = null;
       })
+      .addCase(logoutUser.rejected, (state) => {
+        // Even on failure, tokens are cleared locally, so reset state
+        state.user = null;
+        state.isAuthenticated = false;
+        state.error = null;
+      })
       // Initialize auth cases
       .addCase(initializeAuth.pending, (state) => {
         state.loading = true;
