@@ -116,13 +116,15 @@ export const listUsersSchema = z
     page: z
       .union([z.string(), z.number()])
       .transform((val) => Number(val))
-      .refine((val) => !isNaN(val) && val >= 1, 'Page must be at least 1')
+      .refine((val) => !isNaN(val), { message: 'Page must be a positive integer' })
+      .refine((val) => val >= 1, { message: 'Page must be at least 1' })
       .optional()
       .default('1'),
     limit: z
       .union([z.string(), z.number()])
       .transform((val) => Number(val))
-      .refine((val) => !isNaN(val) && val >= 1 && val <= 100, 'Limit must be between 1 and 100')
+      .refine((val) => !isNaN(val), { message: 'Limit must be a positive integer' })
+      .refine((val) => val >= 1 && val <= 100, { message: 'Limit must be between 1 and 100' })
       .optional()
       .default('20'),
     active: z

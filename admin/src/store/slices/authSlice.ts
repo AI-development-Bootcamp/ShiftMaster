@@ -92,7 +92,7 @@ export const initializeAuth = createAsyncThunk<
   { rejectValue: { code: string; message: string } }
 >(
   'auth/initialize',
-  async (_, { rejectWithValue }) => {
+  async (_) => {
     try {
       const response = await fetch(
         `${env.apiUrl}/auth/refresh`,
