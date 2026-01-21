@@ -1,5 +1,5 @@
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
@@ -13,7 +13,7 @@ import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDr
 import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
 import { CONFIRM_VARIANTS } from '../../constants/ui';
 import { useTranslation } from 'react-i18next';
-import { UserRole } from '@abra-shift-master/shared';
+import { UserRole, User } from '@abra-shift-master/shared';
 // Import services and types
 import { assignmentService, Client, Project, Task } from '../../services/assignmentService';
 import { AdminTaskAssignment } from '@abra-shift-master/shared';
@@ -47,7 +47,7 @@ export function AssignmentPage() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [tasks, setTasks] = useState<Task[]>([]);
     const [assignments, setAssignments] = useState<AdminTaskAssignment[]>([]);
-    const [users, setUsers] = useState<any[]>([]); // Using any for now if User type import is tricky, but strictly should be User[]
+    const [users, setUsers] = useState<User[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -59,7 +59,7 @@ export function AssignmentPage() {
     const [deletingItem, setDeletingItem] = useState<{ type: 'client' | 'project' | 'task', id: string, name: string } | null>(null);
 
     // --- Fetch Data ---
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         setIsLoading(true);
         setError(null);
         try {
@@ -89,11 +89,11 @@ export function AssignmentPage() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [t, showError]);
 
     useEffect(() => {
         fetchData();
-    }, [t]);
+    }, [fetchData]);
 
     const handleFormSubmit = async (values: FormValues) => {
         console.log(`Submitted ${activeForm} form:`, values);

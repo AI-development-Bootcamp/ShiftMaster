@@ -1,8 +1,8 @@
 
 import { apiClient } from '../api';
-import { AdminTaskAssignment } from '@abra-shift-master/shared';
+import { AdminTaskAssignment, User } from '@abra-shift-master/shared';
 
-// Define types locally if not in shared yet, or use any for now until shared is updated
+// Define types locally if not in shared yet
 // Ideally these should be in shared package.
 export interface Client {
     client_id: string;
@@ -63,10 +63,10 @@ export const assignmentService = {
 
     // Re-export fetchUsers from here or just use the one in EmployeesPage?
     // Better to keep it consistent. Since we need "potential employees", we can add a helper here or reuse apiClient directly.
-    fetchPotentialEmployees: async () => {
+    fetchPotentialEmployees: async (): Promise<User[]> => {
         // Fetch active users for assignment
         // ApiClient.get() unwraps the API envelope, returning { users, pagination }
-        const response = await apiClient.get<{ users: any[], pagination: any }>('/users', { params: { active: true, limit: 1000 } });
+        const response = await apiClient.get<{ users: User[], pagination: { total: number; page: number; limit: number; totalPages: number } }>('/users', { params: { active: true, limit: 1000 } });
         return response.users || [];
     }
 };

@@ -51,7 +51,7 @@ vi.mock('../../services/assignmentsService.js', () => {
 // Import after mocking
 import {
     listTasks,
-    getAssignments,
+    getAssignments as _getAssignments,
     getAllAssignments,
     assignEmployees,
 } from '../../controllers/tasksController.js';
@@ -76,7 +76,7 @@ const assignmentsServiceModule = await vi.importMock<
     typeof import('../../services/assignmentsService.js')
 >('../../services/assignmentsService.js');
 const {
-    mockGetAssignmentsByTaskId,
+    mockGetAssignmentsByTaskId: _mockGetAssignmentsByTaskId,
     mockGetAllActiveAssignments,
     mockAssignEmployees
 } = (

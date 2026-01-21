@@ -247,6 +247,11 @@ describe('UsersService', () => {
     });
 
     it('should pass filters to repository', async () => {
+      mockUserRepo.findPaginated.mockResolvedValue({
+        data: [],
+        count: 0,
+      });
+
       const actor = { role: 'admin' as const };
       const filters = { active: true, search: 'test' };
 
