@@ -49,7 +49,7 @@ export default defineConfig(({ command }) => {
       },
     },
     optimizeDeps: {
-      include: ['@abra-shift-master/shared'],
+      exclude: ['@abra-shift-master/shared'],
     },
   };
 });
