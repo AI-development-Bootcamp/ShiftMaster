@@ -21,16 +21,16 @@
 
 ## Phase 2: Backend Services
 
-4. **Extend ClientsService** - Add `createClient`, `updateClient`, `deleteClient`
+4. [x] **Extend ClientsService** - Add `createClient`, `updateClient`, `deleteClient`
    - Validate admin role
    - On delete: cascade soft-delete to projects via ProjectsService
 
-5. **Extend ProjectsService** - Add `createProject`, `updateProject`, `deleteProject`
+5. [x] **Extend ProjectsService** - Add `createProject`, `updateProject`, `deleteProject`
    - Validate admin role, validate client_id and manager_user_id exist
    - Default time_format_type to 'sum'
    - On delete: cascade soft-delete to tasks via TasksService
 
-6. **Extend TasksService** - Add `createTask`, `updateTask`, `deleteTask`
+6. [x] **Extend TasksService** - Add `createTask`, `updateTask`, `deleteTask`
    - Validate admin role, validate project_id exists
 
 ---
