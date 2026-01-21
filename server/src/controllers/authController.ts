@@ -115,16 +115,12 @@ export async function login(req: Request, res: Response): Promise<void> {
     }
 
     // Check error names directly as classes might be imported from modified file
-    if (err.name === 'UserNotFoundError') {
-      return errorResponse(404, 'User not found', 'USER_NOT_FOUND');
-    }
-
-    if (err.name === 'AccountInactiveError') {
-      return errorResponse(401, 'Account is inactive', 'ACCOUNT_INACTIVE');
-    }
-
-    if (err.name === 'InvalidPasswordError') {
-      return errorResponse(401, 'Invalid password', 'INVALID_PASSWORD'); // Or keep INVALID_CREDENTIALS if strict security preferred
+    if (
+      err.name === 'UserNotFoundError' ||
+      err.name === 'AccountInactiveError' ||
+      err.name === 'InvalidPasswordError'
+    ) {
+      return errorResponse(401, 'Invalid credentials', 'INVALID_CREDENTIALS');
     }
 
     // Handle unexpected errors
