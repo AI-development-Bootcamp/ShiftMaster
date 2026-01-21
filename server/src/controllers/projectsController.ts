@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { supabaseAdmin } from '../db/supabase.js';
 import { ProjectsService } from '../services/projectsService.js';
 
-export async function listProjects(req: Request, res: Response): Promise<void> {
+export async function listProjects(_req: Request, res: Response): Promise<void> {
     try {
         const projectsService = new ProjectsService(supabaseAdmin);
         const projects = await projectsService.listProjects();
