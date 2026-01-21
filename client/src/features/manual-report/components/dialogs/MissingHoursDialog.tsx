@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { WarningTriangleIcon } from '../icons';
 import { MissingHoursDialogProps } from '../../types/manualReport';
 
@@ -7,6 +8,8 @@ function MissingHoursDialog({
   onComplete,
   onDontShowAgain,
 }: MissingHoursDialogProps) {
+  const { t } = useTranslation();
+
   if (!isOpen) return null;
 
   return (
@@ -18,23 +21,25 @@ function MissingHoursDialog({
         <div className="confirmation-icon-wrapper">
           <WarningTriangleIcon />
         </div>
-        <p className="confirmation-main-message">יום העבודה שלך טרם הושלם.</p>
+        <p className="confirmation-main-message">
+          {t('dialogs.missingHours.title')}
+        </p>
         <p className="confirmation-sub-message">
-          חסרות {Math.max(0, missingHours)} שעות דיווח כדי למלוא את היום.
+          {t('dialogs.missingHours.message', { hours: Math.max(0, missingHours) })}
         </p>
         <button
           type="button"
           className="confirmation-link-btn"
           onClick={onDontShowAgain}
         >
-          אל תציג לנו זאת
+          {t('dialogs.missingHours.dontShowAgain')}
         </button>
         <button
           type="button"
           className="confirmation-primary-btn"
           onClick={onComplete}
         >
-          תן לי להשלים את השעות
+          {t('dialogs.missingHours.completeHours')}
         </button>
       </div>
     </div>

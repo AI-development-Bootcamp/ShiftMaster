@@ -12,8 +12,19 @@ vi.mock('../../db/supabase.js', () => ({
     from: vi.fn(),
   },
 }));
-vi.mock('../../services/authService.js');
+vi.mock('../../services/authService.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/authService.js')>();
+  return {
+    ...actual,
+    authenticateUser: vi.fn(),
+    createRefreshSession: vi.fn(),
+  };
+});
 vi.mock('../../utils/jwt.js');
+vi.mock('../../utils/cookies.js', () => ({
+  setRefreshCookies: vi.fn(),
+  clearRefreshCookies: vi.fn(),
+}));
 
 import authRouter from '../../routes/auth.js';
 import * as authService from '../../services/authService.js';
@@ -39,20 +50,27 @@ describe('POST /auth/login', () => {
     };
 
     const mockToken = 'mock.jwt.token';
+    const mockRefreshToken = 'mock.refresh.token';
+    const mockSessionId = 'mock-session-id';
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: mockSessionId,
+      refreshToken: mockRefreshToken,
+    });
 
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'SecurePassword123!',
+      source: 'client',
     });
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       success: true,
       data: {
-        token: mockToken,
+        accessToken: mockToken,
         user: {
           user_id: '550e8400-e29b-41d4-a716-446655440000',
           full_name: 'John Doe',
@@ -63,9 +81,22 @@ describe('POST /auth/login', () => {
     });
   });
 
+  it('should return 400 for missing source', async () => {
+    const response = await request(app).post('/auth/login').send({
+      email: 'john@example.com',
+      password: 'password123',
+    });
+
+    expect(response.status).toBe(400);
+    expect(response.body.success).toBe(false);
+    expect(response.body.error.code).toBe('VALIDATION_ERROR');
+    expect(response.body.error.details).toHaveProperty('source');
+  });
+
   it('should return 400 for missing email', async () => {
     const response = await request(app).post('/auth/login').send({
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -78,6 +109,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'not-an-email',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -89,6 +121,7 @@ describe('POST /auth/login', () => {
   it('should return 400 for missing password', async () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
+      source: 'client',
     });
 
     expect(response.status).toBe(400);
@@ -105,6 +138,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'WrongPassword',
+      source: 'client',
     });
 
     expect(response.status).toBe(401);
@@ -120,7 +154,7 @@ describe('POST /auth/login', () => {
   it('should return 500 for server errors', async () => {
     const consoleErrorSpy = vi
       .spyOn(console, 'error')
-      .mockImplementation(() => {});
+      .mockImplementation(() => { });
 
     vi.spyOn(authService, 'authenticateUser').mockRejectedValue(
       new Error('Database connection failed')
@@ -129,6 +163,7 @@ describe('POST /auth/login', () => {
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.status).toBe(500);
@@ -154,10 +189,15 @@ describe('POST /auth/login', () => {
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: 'mock-session-id',
+      refreshToken: 'mock-refresh-token',
+    });
 
     const response = await request(app).post('/auth/login').send({
       email: 'john@example.com',
       password: 'password123',
+      source: 'client',
     });
 
     expect(response.headers['content-type']).toMatch(/application\/json/);
@@ -174,6 +214,10 @@ describe('POST /auth/login', () => {
 
     vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
     vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+    vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+      sessionId: 'mock-session-id',
+      refreshToken: 'mock-refresh-token',
+    });
 
     const response = await request(app)
       .post('/auth/login')
@@ -182,6 +226,7 @@ describe('POST /auth/login', () => {
         JSON.stringify({
           email: 'john@example.com',
           password: 'password123',
+          source: 'client',
         })
       );
 
