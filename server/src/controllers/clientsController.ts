@@ -117,6 +117,18 @@ export async function updateClient(req: Request, res: Response): Promise<void> {
             return;
         }
 
+        // Reject empty update payloads
+        if (Object.keys(validation.data).length === 0) {
+            res.status(400).json({
+                success: false,
+                error: {
+                    message: 'No fields provided for update',
+                    code: 'VALIDATION_ERROR',
+                },
+            });
+            return;
+        }
+
         const actor: Actor = { role: req.user!.role };
         const clientsService = new ClientsService(supabaseAdmin);
 
