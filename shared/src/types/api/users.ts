@@ -56,14 +56,7 @@ export interface DeleteUserResponse {
 }
 
 // Error codes
-export const UserApiErrorCode = {
-  EMAIL_EXISTS: 'EMAIL_EXISTS',
-  DUPLICATE_EMAIL: 'DUPLICATE_EMAIL',
-  USER_NOT_FOUND: 'USER_NOT_FOUND',
-  VALIDATION_ERROR: 'VALIDATION_ERROR',
-  FORBIDDEN: 'FORBIDDEN',
-  UNAUTHORIZED: 'UNAUTHORIZED',
-  INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
-} as const;
+// Error codes - moved to enums.ts
+import { UserApiErrorCode } from '../enums';
 
-export type UserApiErrorCodeType = typeof UserApiErrorCode[keyof typeof UserApiErrorCode];
+export type UserApiErrorCodeType = UserApiErrorCode;
