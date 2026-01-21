@@ -20,7 +20,11 @@ export class ClientsService {
         this.supabaseClient = client;
     }
 
-    async listClients(includeInactive = false): Promise<Client[]> {
+    async listClients(actor: Actor, includeInactive = false): Promise<Client[]> {
+        if (actor.role !== 'admin') {
+            throw new AuthorizationError('Access denied: Only admins can list clients');
+        }
+
         if (includeInactive) {
             return this.clientRepo.findAll();
         }

@@ -7,14 +7,27 @@ import { createClientSchema, updateClientSchema, getClientSchema } from '../vali
 export async function listClients(req: Request, res: Response): Promise<void> {
     try {
         const includeInactive = req.query.active === 'false';
+        const actor: Actor = { role: req.user!.role };
         const clientsService = new ClientsService(supabaseAdmin);
-        const clients = await clientsService.listClients(includeInactive);
+        const clients = await clientsService.listClients(actor, includeInactive);
         res.status(200).json({
             success: true,
             data: clients,
         });
     } catch (error) {
         console.error('List clients error:', error);
+
+        if (error instanceof AuthorizationError) {
+            res.status(403).json({
+                success: false,
+                error: {
+                    message: error.message,
+                    code: error.code,
+                },
+            });
+            return;
+        }
+
         res.status(500).json({
             success: false,
             error: {

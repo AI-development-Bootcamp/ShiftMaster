@@ -1,27 +1,27 @@
--- Migration: Create transactional cascade delete function for clients
--- This function deletes a client and cascades soft-deletes to all related
--- projects and tasks atomically within a single transaction.
+-- Migration: Pin search_path for delete_client_cascade function
+-- This prevents object shadowing attacks in SECURITY DEFINER functions.
 
 CREATE OR REPLACE FUNCTION delete_client_cascade(p_client_id UUID)
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = pg_catalog, public
 AS $$
 BEGIN
     -- Soft delete all tasks belonging to projects of this client
-    UPDATE tasks
+    UPDATE public.tasks
     SET active = false
     WHERE project_id IN (
-        SELECT project_id FROM projects WHERE client_id = p_client_id
+        SELECT project_id FROM public.projects WHERE client_id = p_client_id
     );
 
     -- Soft delete all projects belonging to this client
-    UPDATE projects
+    UPDATE public.projects
     SET active = false
     WHERE client_id = p_client_id;
 
     -- Soft delete the client itself
-    UPDATE clients
+    UPDATE public.clients
     SET active = false
     WHERE client_id = p_client_id;
 END;
