@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import DailyEntryCard, {
   DailyEntry,
 } from '../../components/DailyEntryCard/DailyEntryCard';
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
+import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
 
@@ -42,7 +42,6 @@ const isFutureMonth = (month: number, year: number): boolean => {
 };
 
 function HomePage() {
-  const navigate = useNavigate();
   const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
   const [currentYear, setCurrentYear] = useState(2025);
   const [prevMonthIndex, setPrevMonthIndex] = useState(10);
@@ -144,30 +143,12 @@ function HomePage() {
     }
   };
 
-  const handleLogout = () => {
-    navigate('/login');
-  };
-
   return (
     <div className="home-page">
       {/* Header */}
       <header className="home-header">
         <div className="header-left">
-          <button
-            className="logout-btn"
-            onClick={handleLogout}
-            aria-label="התנתק"
-          >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M13 14L17 10M17 10L13 6M17 10H7M7 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H7"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          <LogoutButton />
           <h1 className="home-title">דיווח שעות</h1>
         </div>
         <div className="month-nav">
