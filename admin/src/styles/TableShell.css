@@ -1,0 +1,469 @@
+/* TableShell.css */
+
+/* === Container === */
+.table-shell-container {
+    /* Flex-based sizing to fill parent container width */
+    width: 100%;
+    /* Height according to spec */
+    height: 80.185vh;
+
+    /* Flex column for header/body/footer stacking */
+    display: flex;
+    flex-direction: column;
+
+    /* RTL enforcement */
+    direction: rtl;
+
+    /* Visual styling */
+    background-color: var(--color-bg-primary, #ffffff);
+    border-radius: var(--radius-lg, 8px);
+    box-shadow: var(--shadow-md, 0 4px 6px -1px rgba(0, 0, 0, 0.1));
+
+    /* Remove scroll from container, move to wrapper */
+    overflow: hidden;
+}
+
+/* .table-shell-container--empty rules removed as not currently needed */
+
+/* === Content Wrapper === */
+.table-shell__content-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    position: relative;
+    /* Custom scrollbar styling could go here */
+}
+
+/* === Table Element === */
+.table-shell {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+/* === Header === */
+.table-shell__header {
+    background-color: var(--color-nav-bg, #141e3e);
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table-shell__header-cell {
+    /* Height: 0.75 × RowHeight (approx 36px if row is 48px) */
+    padding: 8px 16px;
+    text-align: right;
+    font-weight: 600;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-nav-text-active, #ffffff);
+    white-space: nowrap;
+    user-select: none;
+    transition: background-color var(--transition-fast, 150ms);
+}
+
+.table-shell__header-cell:not(:last-child) {
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.table-shell__header-cell--sortable {
+    cursor: pointer;
+}
+
+.table-shell__header-cell--sortable:hover {
+    background-color: var(--color-nav-hover, rgba(255, 255, 255, 0.08));
+}
+
+.table-shell__sort-indicator {
+    margin-right: 6px;
+    font-size: var(--font-size-xs, 0.75rem);
+    display: inline-block;
+}
+
+/* === Body === */
+.table-shell__body {
+    flex: 1;
+}
+
+.table-shell__row {
+    border-bottom: 1px solid var(--color-border, #e5e7eb);
+    transition: background-color var(--transition-fast, 150ms);
+}
+
+.table-shell__row:last-child {
+    border-bottom: none;
+}
+
+.table-shell__row:hover {
+    background-color: var(--color-bg-secondary, #f9fafb);
+}
+
+.table-shell__cell {
+    padding: 8px 16px;
+    vertical-align: middle;
+    color: var(--color-text-primary, #111827);
+    font-size: var(--font-size-sm, 0.875rem);
+    overflow: hidden;
+    /* Changed from hidden to visible/clip might be needed but dropdown needs to show */
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    position: relative;
+    /* Enable absolute positioning for children (e.g. empty state bg) */
+}
+
+/* Allow overflow for actions cell so dropdowns can appear */
+.table-shell__cell:has(.table-shell__actions) {
+    overflow: visible;
+}
+
+
+/* === Empty State === */
+.table-shell__empty-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-bg-primary, #ffffff);
+}
+
+.table-shell__empty-image {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    opacity: 0.9;
+}
+
+/* === Loading State === */
+.table-shell__skeleton {
+    height: 20px;
+    width: 100%;
+    background: linear-gradient(90deg,
+            var(--color-bg-secondary, #e5e7eb) 25%,
+            var(--color-border, #d1d5db) 50%,
+            var(--color-bg-secondary, #e5e7eb) 75%);
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm, 4px);
+    animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* === Footer === */
+.table-shell__footer {
+    /* Fixed at bottom of flex container */
+    /* margin-top: auto; - Not needed if previous element is flex: 1 */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    border-top: 1px solid var(--color-border, #e5e7eb);
+    gap: 8px;
+    background-color: var(--color-bg-primary, #ffffff);
+    z-index: 10;
+    /* Reduced height optimization */
+    min-height: 48px;
+}
+
+.table-shell__footer-btn {
+    padding: 6px 12px;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 6px);
+    background-color: var(--color-bg-primary, #ffffff);
+    color: var(--color-text-primary, #111827);
+    font-size: var(--font-size-sm, 0.875rem);
+    cursor: pointer;
+    transition: all var(--transition-fast, 150ms);
+}
+
+.table-shell__footer-btn:hover:not(:disabled) {
+    background-color: var(--color-bg-secondary, #f9fafb);
+    border-color: var(--color-border-dark, #d1d5db);
+}
+
+.table-shell__footer-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.table-shell__footer-btn--active {
+    background-color: var(--color-primary, #0052D6);
+    color: var(--color-text-on-primary, #ffffff);
+    border-color: var(--color-primary, #0052D6);
+}
+
+.table-shell__page-info {
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-text-secondary, #6b7280);
+    margin: 0 8px;
+}
+
+/* === Cell Types === */
+.table-shell__cell--actions {
+    text-align: center;
+}
+
+/* Selection cell styling */
+.table-shell__cell--selection {
+    width: 48px;
+    min-width: 48px;
+    text-align: center;
+}
+
+.table-shell__header-cell--selection {
+    width: 48px;
+    min-width: 48px;
+}
+
+.table-shell__selection-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-shell__selection-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-primary, #0052D6);
+}
+
+.table-shell__row--selected {
+    background-color: var(--color-primary-light, #e0eaff);
+}
+
+.table-shell__row--selected:hover {
+    background-color: var(--color-primary-light, #d0e0ff);
+}
+
+/* Radio cell styling */
+.table-shell__radio-group {
+    display: flex;
+    gap: 16px;
+    flex-direction: row;
+    justify-content: flex-start;
+    /* flex-start = right side in RTL */
+}
+
+.table-shell__radio-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: var(--font-size-sm, 0.875rem);
+}
+
+.table-shell__radio-input {
+    cursor: pointer;
+}
+
+/* Boolean cell styling */
+.table-shell__checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+/* Tags cell styling */
+.table-shell__cell--tags {
+    overflow: visible;
+    /* Allow tooltip to spill out */
+}
+
+.table-shell__tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    /* Allow wrapping to next line */
+    overflow: visible;
+    /* Allow tooltip to spill out */
+    position: relative;
+    height: auto;
+    /* Allow height to grow */
+    min-height: 100%;
+    align-items: center;
+}
+
+.table-shell__tag {
+    padding: 2px 8px;
+    background-color: #e5e7eb;
+    /* Gray-200 */
+    color: var(--color-text-primary, #111827);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--font-size-xs, 0.75rem);
+    white-space: nowrap;
+    font-weight: 500;
+}
+
+.table-shell__tag--overflow {
+    background-color: #e5e7eb;
+    /* Gray-200 */
+    color: var(--color-text-primary, #111827);
+    position: relative;
+    /* Anchor for tooltip */
+    cursor: default;
+    overflow: visible;
+    /* Allow tooltip to show outside */
+}
+
+/* Tooltip (Speech Bubble) */
+.table-shell__tooltip {
+    visibility: hidden;
+    background-color: #000000;
+    color: #ffffff;
+    text-align: center;
+    border-radius: 4px;
+    padding: 6px 12px;
+    position: absolute;
+    z-index: 1000;
+    /* Ensure on top */
+    bottom: 125%;
+    /* Position above */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: normal;
+    /* Allow text wrapping if names are long */
+    min-width: 120px;
+    max-width: 200px;
+    font-size: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+
+    /* Fade in effect */
+    opacity: 0;
+    transition: opacity 0.2s, visibility 0.2s;
+}
+
+/* Arrow for Speech Bubble */
+.table-shell__tooltip::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    /* At bottom of tooltip */
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: #000000 transparent transparent transparent;
+}
+
+/* Show tooltip on hover over the overflow tag */
+.table-shell__tag--overflow:hover .table-shell__tooltip {
+    visibility: visible;
+    opacity: 1;
+}
+
+.table-shell__tags--empty {
+    /* Absolute positioning to fill the cell completely */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: #ff0000;
+    opacity: 0.3;
+}
+
+/* Actions cell styling */
+.table-shell__actions {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    /* Consistent spacing */
+}
+
+.table-shell__action-btn {
+    padding: 4px 8px;
+    margin: 0 2px;
+    border: none;
+    border-radius: var(--radius-sm, 4px);
+    background-color: transparent;
+    cursor: pointer;
+    transition: all var(--transition-fast, 150ms);
+    /* Default Edit Button (generic class) */
+    color: #3b82f6;
+    /* Light Blue */
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.table-shell__action-btn:hover {
+    background-color: #dbeafe;
+    /* Lighter Blue background */
+    color: #2563eb;
+    /* Slightly darker blue text on hover */
+}
+
+/* Delete button specific */
+.table-shell__action-btn--delete {
+    color: #ef4444;
+    /* Red */
+}
+
+.table-shell__action-btn--delete:hover {
+    background-color: #fee2e2;
+    /* Lighter Red background */
+    color: #dc2626;
+    /* Darker red text on hover */
+}
+
+/* --- Action Dropdown Styles --- */
+.table-shell__action-dropdown-container {
+    position: relative;
+    display: inline-block;
+}
+
+.table-shell__action-dropdown-menu {
+    /* Position is handled by inline styles (fixed) when using Portal */
+    /* position: absolute; - REMOVED */
+    /* top: 100%; - REMOVED */
+    /* left: 50%; - REMOVED */
+    /* transform: translateX(-50%); - REMOVED (handled inline) */
+    /* margin-top: 4px; - REMOVED */
+
+    background-color: #ffffff;
+    border: 1px solid var(--color-border, #e5e7eb);
+    border-radius: var(--radius-md, 6px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    /* z-index: 1001; - REMOVED (handled inline) */
+    min-width: 140px;
+    overflow: hidden;
+    padding: 4px 0;
+}
+
+.table-shell__action-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 8px 12px;
+    text-align: right;
+    /* RTL friendly */
+    background: none;
+    border: none;
+    font-size: var(--font-size-sm, 0.875rem);
+    color: var(--color-text-primary, #111827);
+    cursor: pointer;
+    transition: background-color var(--transition-fast, 150ms);
+}
+
+.table-shell__action-dropdown-item:hover {
+    background-color: var(--color-bg-secondary, #f9fafb);
+}
+
+.table-shell__action-dropdown-item--danger {
+    color: #ef4444;
+}
+
+.table-shell__action-dropdown-item--danger:hover {
+    background-color: #fee2e2;
+}

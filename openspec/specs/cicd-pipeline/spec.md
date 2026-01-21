@@ -1,3 +1,9 @@
+## Purpose
+
+Automate quality checks, testing, and deployment for the AbraShiftMaster monorepo across all branches and environments.
+
+## Requirements
+
 ### Requirement: Staging CI Workflow
 The system SHALL run automated quality checks on code pushed to the main branch or pull requests targeting main.
 

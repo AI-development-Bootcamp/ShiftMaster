@@ -2,7 +2,7 @@
 
 ## Purpose
 
-AbraShiftMaster is a shift management application for Abra Bootcamp. It provides a mobile-first client interface for employees and a web-based admin interface for managers.
+AbraShiftMaster is a shift management application for Abra Bootcamp. It provides a mobile-first client interface for employees and a web-based admin interface for managers
 
 ## Tech Stack
 
@@ -222,7 +222,7 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 - `VITE_API_URL` - Backend API URL for frontends
 - `JWT_SECRET` - Secret key for JWT signing
-- `DATABASE_URL` - Supabase PostgreSQL connection string
+- `SUPABASE_URL` - Supabase PostgreSQL connection string
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
 
@@ -313,6 +313,7 @@ Employees and administrators.
 | email         | TEXT        | Required, Unique |
 | password_hash | TEXT        | Required         |
 | role          | user_role   | Required         |
+| job_title     | TEXT        |                  |
 | active        | BOOLEAN     | Soft delete flag |
 | created_at    | TIMESTAMPTZ |                  |
 

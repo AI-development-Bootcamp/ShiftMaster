@@ -1,0 +1,6 @@
+/* This CSS file has been moved to a feature-based structure */
+/* Old path: client/src/components/ManualReportModal/ManualReportModal.css */
+/* New path: client/src/features/manual-report/styles/manualReportModal.css */
+/* This file re-imports the new CSS to maintain backward compatibility */
+
+@import url('../../features/manual-report/styles/manualReportModal.css');

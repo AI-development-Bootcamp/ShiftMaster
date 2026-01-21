@@ -1,7 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { isValidEmail } from '@abra-shift-master/shared';
-import './LoginPage.css';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { loginUser } from '../../store/slices/authSlice';
+import '../../styles/LoginPage.css';
 
 // Assets
 import welcomeIllustration from '../../assets/images/welcome-illustration.svg';
@@ -11,13 +14,28 @@ import abraLogo from '../../assets/images/abra-logo.svg';
 interface FormErrors {
   email?: string;
   password?: string;
+  general?: string;
 }
 
 function LoginPage() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const {
+    loading,
+    error: authError,
+    isAuthenticated,
+  } = useAppSelector((state) => state.auth);
+
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<FormErrors>({});
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/home');
+    }
+  }, [isAuthenticated, navigate]);
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -25,16 +43,16 @@ function LoginPage() {
 
     // Validate email
     if (!trimmedEmail) {
-      newErrors.email = 'יש להזין אימייל';
+      newErrors.email = t('login.validation.emailRequired');
     } else if (!isValidEmail(trimmedEmail)) {
-      newErrors.email = 'פורמט אימייל לא תקין';
+      newErrors.email = t('login.validation.emailInvalid');
     }
 
     // Validate password (minimum 6 characters)
     if (!password) {
-      newErrors.password = 'יש להזין סיסמה';
+      newErrors.password = t('login.validation.passwordRequired');
     } else if (password.length < 6) {
-      newErrors.password = 'הסיסמה חייבת להכיל לפחות 6 תווים';
+      newErrors.password = t('login.validation.passwordMinLength');
     }
 
     setErrors(newErrors);
@@ -48,14 +66,33 @@ function LoginPage() {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // No authentication logic - just navigate to home
-      navigate('/home');
+      const trimmedEmail = email.trim();
+      await dispatch(loginUser({ email: trimmedEmail, password, source: 'client' }));
     }
   };
+
+  // Map auth errors to Hebrew messages or use generic
+  const getErrorMessage = () => {
+    if (errors.general) return errors.general;
+    if (!authError) return null;
+
+    switch (authError) {
+      case 'INVALID_CREDENTIALS':
+        return 'אימייל או סיסמה שגויים';
+      case 'ACCESS_DENIED':
+        return 'אין לך הרשאה להתחבר לאפליקציה זו';
+      case 'NETWORK_ERROR':
+        return 'שגיאת תקשורת, אנא נסה שנית';
+      default:
+        return 'אירעה שגיאה בהתחברות';
+    }
+  };
+
+  const generalError = getErrorMessage();
 
   return (
     <div className="login-page">
@@ -70,11 +107,7 @@ function LoginPage() {
       {/* Login card */}
       <div className="login-card">
         {/* Abra Logo */}
-        <img
-          src={abraLogo}
-          alt="Abra Logo"
-          className="login-logo"
-        />
+        <img src={abraLogo} alt="Abra Logo" className="login-logo" />
 
         {/* Welcome illustration */}
         <img
@@ -84,30 +117,33 @@ function LoginPage() {
         />
 
         {/* Welcome text */}
-        <h1 className="login-title">ברוכים הבאים!</h1>
+        <h1 className="login-title">{t('login.welcomeTitle')}</h1>
 
         {/* Description text */}
         <p className="login-description">
-          ברוכים הבאים למערכת דיווחי השעות שלנו 🥳
+          {t('login.description')}
           <br />
-          שנוצרה במיוחד עבורכם!
+          {t('login.descriptionLine2')}
           <br />
-          יש להתחבר באמצעות הזדהות למטה.
+          {t('login.descriptionLine3')}
         </p>
 
         {/* Login form */}
         <form className="login-form" onSubmit={handleSubmit} noValidate>
           <div className="login-input-group">
-            <label htmlFor="email-input" className="visually-hidden">אימייל</label>
+            <label htmlFor="email-input" className="visually-hidden">
+              {t('login.emailLabel')}
+            </label>
             <input
               id="email-input"
               type="email"
               className={`login-input ${errors.email ? 'input-error' : ''}`}
-              placeholder="אימייל"
+              placeholder={t('login.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               dir="rtl"
               autoComplete="email"
+              disabled={loading}
               aria-invalid={!!errors.email}
               aria-describedby={errors.email ? 'email-error' : undefined}
             />
@@ -118,16 +154,19 @@ function LoginPage() {
             )}
           </div>
           <div className="login-input-group">
-            <label htmlFor="password-input" className="visually-hidden">סיסמה</label>
+            <label htmlFor="password-input" className="visually-hidden">
+              {t('login.passwordLabel')}
+            </label>
             <input
               id="password-input"
               type="password"
               className={`login-input ${errors.password ? 'input-error' : ''}`}
-              placeholder="סיסמה"
+              placeholder={t('login.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               dir="rtl"
               autoComplete="current-password"
+              disabled={loading}
               aria-invalid={!!errors.password}
               aria-describedby={errors.password ? 'password-error' : undefined}
             />
@@ -137,8 +176,24 @@ function LoginPage() {
               </p>
             )}
           </div>
-          <button type="submit" className="login-button">
-            התחברות
+
+          {generalError && (
+            <div
+              className="login-error-general"
+              role="alert"
+              style={{
+                color: 'red',
+                marginBottom: '1rem',
+                textAlign: 'center',
+              }}
+            >
+              {generalError}
+            </div>
+          )}
+
+          {/* Submit button */}
+          <button type="submit" className="login-button" disabled={loading}>
+            {t('login.submitButton')}
           </button>
         </form>
       </div>

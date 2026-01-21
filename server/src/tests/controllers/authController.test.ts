@@ -11,8 +11,19 @@ vi.mock('../../db/supabase.js', () => ({
     from: vi.fn(),
   },
 }));
-vi.mock('../../services/authService.js');
+vi.mock('../../services/authService.js', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../../services/authService.js')>();
+  return {
+    ...actual,
+    authenticateUser: vi.fn(),
+    createRefreshSession: vi.fn(),
+  };
+});
 vi.mock('../../utils/jwt.js');
+vi.mock('../../utils/cookies.js', () => ({
+  setRefreshCookies: vi.fn(),
+  clearRefreshCookies: vi.fn(),
+}));
 
 // Import after mocking
 import { login } from '../../controllers/authController.js';
@@ -43,9 +54,9 @@ describe('AuthController', () => {
   });
 
   describe('login', () => {
-    it('should successfully login with valid credentials', async () => {
+    it('should successfully login with valid credentials (client source)', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -53,14 +64,23 @@ describe('AuthController', () => {
       };
 
       const mockToken = 'mock.jwt.token';
+      const mockRefreshToken = 'mock.refresh.token';
+      const mockSessionId = 'mock-session-id';
 
       mockRequest.body = {
         email: 'john@example.com',
         password: 'SecurePassword123!',
+        source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: mockSessionId,
+        refreshToken: mockRefreshToken,
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -72,7 +92,7 @@ describe('AuthController', () => {
 
       // Verify generateToken was called with correct payload
       expect(jwtUtil.generateToken).toHaveBeenCalledWith({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'john@example.com',
         role: 'regular',
       });
@@ -82,9 +102,9 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
         data: {
-          token: mockToken,
+          accessToken: mockToken,
           user: {
-            user_id: 1,
+            user_id: '550e8400-e29b-41d4-a716-446655440000',
             full_name: 'John Doe',
             email: 'john@example.com',
             role: 'regular',
@@ -93,9 +113,9 @@ describe('AuthController', () => {
       });
     });
 
-    it('should successfully login admin user', async () => {
+    it('should successfully login admin user (admin source)', async () => {
       const mockAdmin = {
-        user_id: 2,
+        user_id: '550e8400-e29b-41d4-a716-446655440001',
         full_name: 'Admin User',
         email: 'admin@example.com',
         role: 'admin' as const,
@@ -103,14 +123,23 @@ describe('AuthController', () => {
       };
 
       const mockToken = 'admin.jwt.token';
+      const mockRefreshToken = 'mock.refresh.token';
+      const mockSessionId = 'mock-session-id';
 
       mockRequest.body = {
         email: 'admin@example.com',
         password: 'AdminPassword123!',
+        source: 'admin',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockAdmin);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue(mockToken);
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: mockSessionId,
+        refreshToken: mockRefreshToken,
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -118,9 +147,9 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: true,
         data: {
-          token: mockToken,
+          accessToken: mockToken,
           user: {
-            user_id: 2,
+            user_id: '550e8400-e29b-41d4-a716-446655440001',
             full_name: 'Admin User',
             email: 'admin@example.com',
             role: 'admin',
@@ -129,9 +158,87 @@ describe('AuthController', () => {
       });
     });
 
+    it('should forbid regular user login from admin source', async () => {
+      const mockUser = {
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
+        full_name: 'John Doe',
+        email: 'john@example.com',
+        role: 'regular' as const,
+        active: true,
+      };
+
+      mockRequest.body = {
+        email: 'john@example.com',
+        password: 'SecurePassword123!',
+        source: 'admin',
+      };
+
+      vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(403);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Access denied: Regular users cannot access Admin application',
+          code: 'ACCESS_DENIED',
+        },
+      });
+
+      // Token should NOT be generated
+      expect(jwtUtil.generateToken).not.toHaveBeenCalled();
+    });
+
+    it('should return 400 for missing source', async () => {
+      mockRequest.body = {
+        email: 'john@example.com',
+        password: 'password123',
+      };
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Validation error',
+          code: 'VALIDATION_ERROR',
+          details: expect.objectContaining({
+            source: expect.arrayContaining(['Source is required']),
+          }),
+        },
+      });
+    });
+
+    it('should return 400 for invalid source', async () => {
+      mockRequest.body = {
+        email: 'john@example.com',
+        password: 'password123',
+        source: 'unknown',
+      };
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(400);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Validation error',
+          code: 'VALIDATION_ERROR',
+          details: expect.objectContaining({
+            source: expect.arrayContaining([
+              "Invalid enum value. Expected 'admin' | 'client', received 'unknown'",
+            ]),
+          }),
+        },
+      });
+    });
+
     it('should return 400 for missing email', async () => {
       mockRequest.body = {
         password: 'password123',
+        source: 'client',
       };
 
       await login(mockRequest as Request, mockResponse as Response);
@@ -155,6 +262,7 @@ describe('AuthController', () => {
       mockRequest.body = {
         email: 'not-an-email',
         password: 'password123',
+        source: 'client',
       };
 
       await login(mockRequest as Request, mockResponse as Response);
@@ -179,6 +287,7 @@ describe('AuthController', () => {
     it('should return 400 for missing password', async () => {
       mockRequest.body = {
         email: 'john@example.com',
+        source: 'client',
       };
 
       await login(mockRequest as Request, mockResponse as Response);
@@ -202,6 +311,7 @@ describe('AuthController', () => {
       mockRequest.body = {
         email: 'john@example.com',
         password: '',
+        source: 'client',
       };
 
       await login(mockRequest as Request, mockResponse as Response);
@@ -221,7 +331,7 @@ describe('AuthController', () => {
       });
     });
 
-    it('should return 400 for both missing email and password', async () => {
+    it('should return 400 for missing email, password and source', async () => {
       mockRequest.body = {};
 
       await login(mockRequest as Request, mockResponse as Response);
@@ -235,20 +345,65 @@ describe('AuthController', () => {
           details: expect.objectContaining({
             email: expect.any(Array),
             password: expect.any(Array),
+            source: expect.any(Array),
           }),
         },
       });
     });
 
-    it('should return 401 for invalid credentials', async () => {
+    it('should return 404 for user not found', async () => {
+      mockRequest.body = {
+        email: 'nonexistent@example.com',
+        password: 'password123',
+        source: 'client',
+      };
+
+      const error = new authService.UserNotFoundError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS',
+        },
+      });
+    });
+
+    it('should return 401 for inactive account', async () => {
+      mockRequest.body = {
+        email: 'inactive@example.com',
+        password: 'password123',
+        source: 'client',
+      };
+
+      const error = new authService.AccountInactiveError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
+
+      await login(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(401);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS',
+        },
+      });
+    });
+
+    it('should return 401 for invalid password', async () => {
       mockRequest.body = {
         email: 'john@example.com',
         password: 'WrongPassword',
+        source: 'client',
       };
 
-      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(
-        new authService.AuthenticationError('Invalid credentials')
-      );
+      const error = new authService.InvalidPasswordError();
+      vi.spyOn(authService, 'authenticateUser').mockRejectedValue(error);
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -266,11 +421,12 @@ describe('AuthController', () => {
       mockRequest.body = {
         email: 'john@example.com',
         password: 'password123',
+        source: 'client',
       };
 
       const consoleErrorSpy = vi
         .spyOn(console, 'error')
-        .mockImplementation(() => {});
+        .mockImplementation(() => { });
 
       vi.spyOn(authService, 'authenticateUser').mockRejectedValue(
         new Error('Database connection failed')
@@ -293,7 +449,7 @@ describe('AuthController', () => {
 
     it('should not include password in response', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -303,10 +459,17 @@ describe('AuthController', () => {
       mockRequest.body = {
         email: 'john@example.com',
         password: 'SecurePassword123!',
+        source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: 'mock-session-id',
+        refreshToken: 'mock-refresh-token',
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -317,7 +480,7 @@ describe('AuthController', () => {
 
     it('should not include active flag in response', async () => {
       const mockUser = {
-        user_id: 1,
+        user_id: '550e8400-e29b-41d4-a716-446655440000',
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular' as const,
@@ -327,10 +490,17 @@ describe('AuthController', () => {
       mockRequest.body = {
         email: 'john@example.com',
         password: 'SecurePassword123!',
+        source: 'client',
       };
+      mockRequest.headers = { 'user-agent': 'test-agent' };
+      mockRequest.ip = '127.0.0.1';
 
       vi.spyOn(authService, 'authenticateUser').mockResolvedValue(mockUser);
       vi.spyOn(jwtUtil, 'generateToken').mockReturnValue('token');
+      vi.spyOn(authService, 'createRefreshSession').mockResolvedValue({
+        sessionId: 'mock-session-id',
+        refreshToken: 'mock-refresh-token',
+      });
 
       await login(mockRequest as Request, mockResponse as Response);
 
@@ -339,3 +509,4 @@ describe('AuthController', () => {
     });
   });
 });
+

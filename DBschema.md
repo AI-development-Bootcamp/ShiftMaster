@@ -20,11 +20,12 @@ Employees and admins.
 
 | Field         | Type        | Key / FK | Restrictions    |
 | ------------- | ----------- | -------- | --------------- |
-| user_id       | BIGINT      | PK       |                 |
+| user_id       | UUID        | PK       |                 |
 | full_name     | TEXT        |          | required        |
 | email         | TEXT        | UNIQUE   | required        |
 | password_hash | TEXT        |          | required        |
 | role          | user_role   |          | admin / regular |
+| job_title     | TEXT        |          |                 |
 | active        | BOOLEAN     |          | soft delete     |
 | created_at    | TIMESTAMPTZ |          |                 |
 
@@ -59,7 +60,7 @@ Employees and admins.
 | ---------------- | ------------------------ | ---------------------- | ------------------------------ |
 | project_id       | BIGINT                   | PK                     |                                |
 | client_id        | BIGINT                   | FK → clients.client_id | required                       |
-| manager_user_id  | BIGINT                   | FK → users.user_id     | required                       |
+| manager_user_id  | UUID                     | FK → users.user_id     | required                       |
 | name             | TEXT                     |                        | required                       |
 | description      | TEXT                     |                        | optional                       |
 | start_date       | DATE                     |                        | required                       |
@@ -106,9 +107,9 @@ Prevents duplicate assignment of the same user to the same task.
 | Field                    | Type        | Key / FK           | Restrictions  |
 | ------------------------ | ----------- | ------------------ | ------------- |
 | admin_task_assignment_id | BIGINT      | PK                 |               |
-| user_id                  | BIGINT      | FK → users.user_id | required      |
+| user_id                  | UUID        | FK → users.user_id | required      |
 | task_id                  | BIGINT      | FK → tasks.task_id | required      |
-| assigned_by              | BIGINT      | FK → users.user_id | must be admin |
+| assigned_by              | UUID        | FK → users.user_id | must be admin |
 | assigned_at              | TIMESTAMPTZ |                    |               |
 | active                   | BOOLEAN     |                    | default true  |
 | revoked_at               | TIMESTAMPTZ |                    | optional      |
@@ -133,7 +134,7 @@ Prevents duplicate assignment of the same user to the same task.
 | Field            | Type         | Key / FK           | Restrictions                        |
 | ---------------- | ------------ | ------------------ | ----------------------------------- |
 | entry_id         | BIGINT       | PK                 |                                     |
-| user_id          | BIGINT       | FK → users.user_id | required                            |
+| user_id          | UUID         | FK → users.user_id | required                            |
 | entry_kind       | entry_kind   |                    | work / absence                      |
 | work_date        | DATE         |                    | required (single day only)          |
 | start_time       | TIME         |                    | optional                            |
@@ -143,7 +144,7 @@ Prevents duplicate assignment of the same user to the same task.
 | attachment_path  | TEXT         |                    | optional                            |
 | created_at       | TIMESTAMPTZ  |                    |                                     |
 | updated_at       | TIMESTAMPTZ  |                    |                                     |
-| last_modified_by | BIGINT       | FK → users.user_id | optional                            |
+| last_modified_by | UUID         | FK → users.user_id | optional                            |
 | last_modified_at | TIMESTAMPTZ  |                    |                                     |
 
 **Important absence behavior**
@@ -160,7 +161,6 @@ Prevents duplicate assignment of the same user to the same task.
 
 **Restrictions**
 
-- One entry per user per day (recommended unique constraint: user_id + work_date)
 - If month is locked → entry is read-only
 
 ---
@@ -203,7 +203,7 @@ Prevents duplicate assignment of the same user to the same task.
 | year        | INT         |                    | required      |
 | month       | INT         |                    | 1–12          |
 | locked_at   | TIMESTAMPTZ |                    |               |
-| locked_by   | BIGINT      | FK → users.user_id | must be admin |
+| locked_by   | UUID        | FK → users.user_id | must be admin |
 | unlocked_at | TIMESTAMPTZ |                    | optional      |
 
 **Relations**

@@ -1,0 +1,33 @@
+.entries-management-page {
+    padding: 2rem;
+    height: 100%;
+    overflow: hidden;
+    /* Prevent page scroll, let table scroll */
+    display: flex;
+    flex-direction: column;
+}
+
+.entries-management-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    /* Fixed and identical spacing */
+    padding-top: 1rem;
+    gap: 16px;
+}
+
+
+
+.month-lock-button-container {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+}
+
+
+
+.entries-management-page p {
+    color: #666;
+}

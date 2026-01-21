@@ -64,7 +64,7 @@ describe('Protected Routes Integration Tests', () => {
   describe('GET /protected - isAuthenticated middleware', () => {
     it('should allow access with valid JWT token', async () => {
       const token = generateToken({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'john@example.com',
         role: 'regular',
       });
@@ -77,7 +77,7 @@ describe('Protected Routes Integration Tests', () => {
       expect(response.body.success).toBe(true);
       expect(response.body.data.message).toBe('This is a protected resource');
       expect(response.body.data.user).toBeDefined();
-      expect(response.body.data.user.userId).toBe(1);
+      expect(response.body.data.user.userId).toBe('550e8400-e29b-41d4-a716-446655440000');
       expect(response.body.data.user.email).toBe('john@example.com');
       expect(response.body.data.user.role).toBe('regular');
     });
@@ -113,7 +113,7 @@ describe('Protected Routes Integration Tests', () => {
     it('should deny access with expired token', async () => {
       const expiredToken = generateToken(
         {
-          userId: 1,
+          userId: '550e8400-e29b-41d4-a716-446655440000',
           email: 'john@example.com',
           role: 'regular',
         },
@@ -134,7 +134,7 @@ describe('Protected Routes Integration Tests', () => {
 
     it('should allow access for admin users', async () => {
       const adminToken = generateToken({
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       });
@@ -152,7 +152,7 @@ describe('Protected Routes Integration Tests', () => {
   describe('GET /admin-only - isAdmin middleware', () => {
     it('should allow access for admin users', async () => {
       const adminToken = generateToken({
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       });
@@ -168,7 +168,7 @@ describe('Protected Routes Integration Tests', () => {
 
     it('should deny access for regular users', async () => {
       const regularToken = generateToken({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'john@example.com',
         role: 'regular',
       });
@@ -213,7 +213,7 @@ describe('Protected Routes Integration Tests', () => {
 
     it('should allow access for authenticated admin', async () => {
       const adminToken = generateToken({
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       });
@@ -232,7 +232,7 @@ describe('Protected Routes Integration Tests', () => {
   describe('Middleware chaining', () => {
     it('should properly chain isAuthenticated and isAdmin for admin user', async () => {
       const adminToken = generateToken({
-        userId: 2,
+        userId: '550e8400-e29b-41d4-a716-446655440001',
         email: 'admin@example.com',
         role: 'admin',
       });
@@ -247,7 +247,7 @@ describe('Protected Routes Integration Tests', () => {
 
     it('should properly reject regular user at isAdmin middleware', async () => {
       const regularToken = generateToken({
-        userId: 1,
+        userId: '550e8400-e29b-41d4-a716-446655440000',
         email: 'user@example.com',
         role: 'regular',
       });

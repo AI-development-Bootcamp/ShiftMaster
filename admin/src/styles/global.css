@@ -1,32 +1,50 @@
 /* Global styles with RTL support for Hebrew */
 
 :root {
-  /* Colors */
-  --color-primary: #2563eb;
-  --color-primary-dark: #1e40af;
-  --color-secondary: #10b981;
-  --color-error: #ef4444;
-  --color-warning: #f59e0b;
-  --color-success: #10b981;
+  /* ===== Theme Colors ===== */
 
-  --color-text-primary: #1f2937;
+  /* Primary - Buttons & Interactive Elements */
+  --color-primary: #0052D6;
+  --color-primary-hover: #0c69ff;
+
+  /* Status Colors */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+
+  /* ===== Text Colors ===== */
+  --color-text-primary: #141e3e;
   --color-text-secondary: #6b7280;
   --color-text-light: #9ca3af;
+  --color-text-on-dark: #ffffff;
+  --color-text-on-primary: #ffffff;
 
+  /* ===== Background Colors ===== */
   --color-bg-primary: #ffffff;
-  --color-bg-secondary: #f9fafb;
-  --color-bg-tertiary: #f3f4f6;
+  --color-bg-secondary: #F2F2F7;
+  --color-bg-dark: #000000;
 
+  /* ===== Navigation Sidebar Colors ===== */
+  --color-nav-bg: #141e3e;
+  --color-nav-text: #a0aec0;
+  --color-nav-text-active: #ffffff;
+  --color-nav-hover: rgba(255, 255, 255, 0.08);
+  --color-nav-active-indicator: #ed764c;
+
+  /* ===== Border Colors ===== */
   --color-border: #e5e7eb;
   --color-border-dark: #d1d5db;
+  --color-border-focus: #0052D6;
 
   /* Spacing */
+  --spacing-xxs: 0.1;
   --spacing-xs: 0.25rem;
   --spacing-sm: 0.5rem;
   --spacing-md: 1rem;
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
   --spacing-2xl: 3rem;
+  --sidebar-width: clamp(200px, 16.667vw, 280px);
 
   /* Typography */
   --font-family:
@@ -117,15 +135,19 @@ body {
 .text-xs {
   font-size: var(--font-size-xs);
 }
+
 .text-sm {
   font-size: var(--font-size-sm);
 }
+
 .text-base {
   font-size: var(--font-size-base);
 }
+
 .text-lg {
   font-size: var(--font-size-lg);
 }
+
 .text-xl {
   font-size: var(--font-size-xl);
 }
@@ -141,4 +163,73 @@ body {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border-width: 0;
+}
+
+/* Hide Everything on Small Screens */
+@media screen and (max-width: 1023px) {
+  #root {
+    display: none !important;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    background-color: #f3f4f6 !important;
+    /* Match overlay bg */
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
+/* Standardized Admin Action Button (Primary Page Actions) */
+.admin-action-btn {
+  height: 40px;
+  min-width: 140px;
+  padding: 0 16px;
+  background-color: var(--color-primary, #0052D6);
+  color: var(--color-text-on-primary, #ffffff);
+  border: none;
+  border-radius: var(--radius-md, 6px);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.admin-action-btn:hover {
+  background-color: var(--color-primary-hover, #0c69ff);
+  /* Or use a specific darker shade if defined, falling back to hover var */
+}
+
+
+.admin-action-btn:focus-visible,
+.admin-action-btn:focus {
+  outline: 2px solid var(--color-primary, #0052D6);
+  outline-offset: 2px;
+}
+
+/* Standardized Page Header Title Block */
+.page-header-title-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-header-title-group h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-text-primary, #111827);
+}
+
+.page-header-title-group p {
+  margin: 0;
+  color: var(--color-text-secondary, #6b7280);
+  font-size: 1rem;
 }

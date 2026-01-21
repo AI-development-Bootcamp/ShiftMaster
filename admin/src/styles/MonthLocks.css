@@ -1,0 +1,245 @@
+/* Month Lock Overlay - רקע שקוף לסגירה */
+.month-lock-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 999;
+}
+
+/* Month Lock Dropdown - החלון הקומפקטי */
+.month-lock-dropdown {
+  position: fixed;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  width: 420px;
+  max-height: calc(100vh - 120px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  direction: rtl;
+}
+
+/* Dropdown Header */
+.month-lock-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.month-lock-dropdown-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.month-lock-dropdown-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.month-lock-dropdown-close:hover {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+
+.month-lock-dropdown-close:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Dropdown Body */
+.month-lock-dropdown-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Year Navigator */
+.year-navigator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.year-display {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  min-width: 60px;
+  text-align: center;
+}
+
+.year-nav-button {
+  background-color: #f3f4f6;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: #374151;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.year-nav-button:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.year-nav-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Month Grid */
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  direction: rtl;
+}
+
+/* Month Tile */
+.month-tile {
+  padding: 10px;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.month-tile-name {
+  display: block;
+}
+
+/* Unlocked state - Gray */
+.month-tile--unlocked {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.month-tile--unlocked:hover {
+  background-color: #d1d5db;
+  border-color: #9ca3af;
+}
+
+/* Locked state - Red */
+.month-tile--locked {
+  background-color: #ef4444;
+  color: white;
+}
+
+.month-tile--locked:hover {
+  background-color: #dc2626;
+  border-color: #b91c1c;
+}
+
+/* Focus states */
+.month-tile:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Skeleton loading state */
+.month-tile--skeleton {
+  background: linear-gradient(90deg,
+      #f3f4f6 25%,
+      #e5e7eb 50%,
+      #f3f4f6 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  cursor: default;
+  pointer-events: none;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Footer and Save Button */
+.month-lock-dropdown-footer {
+  padding: 16px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+}
+
+.month-lock-save-button {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 32px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  min-width: 120px;
+}
+
+.month-lock-save-button:hover {
+  background-color: #2563eb;
+}
+
+.month-lock-save-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .month-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .month-lock-dropdown {
+    width: 320px;
+  }
+
+  .month-lock-dropdown-body {
+    padding: 12px;
+  }
+  
+  .month-lock-dropdown-footer {
+    padding: 12px;
+  }
+}

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login } from '../controllers/authController.js';
+import { login, refresh, logout } from '../controllers/authController.js';
 
 const router = Router();
 
@@ -10,6 +10,7 @@ const router = Router();
  *     summary: User login
  *     description: Authenticate user with email and password, returns JWT token and user data
  *     tags: [Authentication]
+ *     security: []
  *     requestBody:
  *       required: true
  *       content:
@@ -19,6 +20,7 @@ const router = Router();
  *             required:
  *               - email
  *               - password
+ *               - source
  *             properties:
  *               email:
  *                 type: string
@@ -30,6 +32,11 @@ const router = Router();
  *                 format: password
  *                 description: User's password
  *                 example: SecurePassword123!
+ *               source:
+ *                 type: string
+ *                 enum: [admin, client]
+ *                 description: Application source of the login request
+ *                 example: admin
  *     responses:
  *       200:
  *         description: Login successful
@@ -52,8 +59,9 @@ const router = Router();
  *                       type: object
  *                       properties:
  *                         user_id:
- *                           type: integer
- *                           example: 1
+ *                           type: string
+ *                           format: uuid
+ *                           example: "550e8400-e29b-41d4-a716-446655440000"
  *                         full_name:
  *                           type: string
  *                           example: John Doe
@@ -65,7 +73,7 @@ const router = Router();
  *                           enum: [admin, regular]
  *                           example: regular
  *       400:
- *         description: Validation error
+ *         description: Validation error (e.g., missing source or invalid format)
  *         content:
  *           application/json:
  *             schema:
@@ -79,7 +87,7 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Validation error
+ *                       example: "Validation error"
  *                     code:
  *                       type: string
  *                       example: VALIDATION_ERROR
@@ -88,7 +96,7 @@ const router = Router();
  *                       description: Field-level validation errors
  *                       example:
  *                         email: ["Invalid email format"]
- *                         password: ["Password is required"]
+ *                         source: ["Source is required"]
  *       401:
  *         description: Invalid credentials
  *         content:
@@ -104,10 +112,29 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Invalid credentials
+ *                       example: "Invalid credentials"
  *                     code:
  *                       type: string
  *                       example: INVALID_CREDENTIALS
+ *       403:
+ *         description: Access denied (e.g., regular user trying to login to admin app)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Access denied: Regular users cannot access Admin application"
+ *                     code:
+ *                       type: string
+ *                       example: ACCESS_DENIED
  *       500:
  *         description: Internal server error
  *         content:
@@ -123,11 +150,75 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: Internal server error
+ *                       example: "Internal server error"
  *                     code:
  *                       type: string
  *                       example: INTERNAL_SERVER_ERROR
  */
 router.post('/login', login);
+
+/**
+ * @swagger
+ * /api/v1/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Validates refresh token from HttpOnly cookie, rotates it, and returns new access token
+ *     tags: [Authentication]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                       description: New JWT access token
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       401:
+ *         description: Refresh token missing, expired, or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Refresh token missing"
+ *                     code:
+ *                       type: string
+ *                       example: REFRESH_TOKEN_MISSING
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/refresh', refresh);
+
+/**
+ * @swagger
+ * /api/v1/auth/logout:
+ *   post:
+ *     summary: User logout
+ *     description: Revokes refresh session and clears cookies
+ *     tags: [Authentication]
+ *     security: []
+ *     responses:
+ *       204:
+ *         description: Logout successful (no content)
+ */
+router.post('/logout', logout);
 
 export default router;

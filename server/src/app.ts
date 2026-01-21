@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import cookieParser from 'cookie-parser';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import apiRouter from './routes/index.js';
 import { env } from './config/env.js';
@@ -35,6 +36,9 @@ app.use(
 // Body parsing middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Cookie parsing middleware (for refresh tokens)
+app.use(cookieParser());
 
 // Logging middleware
 if (process.env.NODE_ENV !== 'test') {
@@ -73,6 +77,14 @@ export const swaggerInitPromise = Promise.all([
   });
 
 // API Routes - All routes are automatically prefixed with /api/v1
+app.get('/', (_, res, next) => {
+  try {
+    res.status(200).send('OK');
+  } catch (err) {
+    console.error('Error in root route handler:', err);
+    next(err);
+  }
+});
 app.use('/api/v1', apiRouter);
 
 // 404 handler
