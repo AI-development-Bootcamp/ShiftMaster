@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { login } from '../controllers/authController.js';
+import { login, refresh, logout } from '../controllers/authController.js';
 
 const router = Router();
 
@@ -156,5 +156,71 @@ const router = Router();
  *                       example: INTERNAL_SERVER_ERROR
  */
 router.post('/login', login);
+
+/**
+ * @swagger
+ * /api/v1/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     description: Validates refresh token from HttpOnly cookie, rotates it, and returns new access token
+ *     tags: [Authentication]
+ *     security: []
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                       description: New JWT access token
+ *                       example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *       401:
+ *         description: Refresh token missing, expired, or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: false
+ *                 error:
+ *                   type: object
+ *                   properties:
+ *                     message:
+ *                       type: string
+ *                       example: "Refresh token missing"
+ *                     code:
+ *                       type: string
+ *                       example: REFRESH_TOKEN_MISSING
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/refresh', refresh);
+
+/**
+ * @swagger
+ * /api/v1/auth/logout:
+ *   post:
+ *     summary: User logout
+ *     description: Revokes refresh session and clears cookies
+ *     tags: [Authentication]
+ *     security: []
+ *     responses:
+ *       204:
+ *         description: Logout successful (no content)
+ *       500:
+ *         description: Internal server error (but cookies still cleared)
+ */
+router.post('/logout', logout);
 
 export default router;
