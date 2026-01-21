@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import DailyEntryCard, {
   DailyEntry,
@@ -153,7 +154,7 @@ function HomePage() {
       <header className="home-header">
         <div className="header-left">
           <LogoutButton />
-          <h1 className="home-title">דיווח שעות</h1>
+          <h1 className="home-title">{t('home.title')}</h1>
         </div>
         <div className="month-nav">
           <button

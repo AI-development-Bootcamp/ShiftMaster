@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../store';
 import { logoutUser } from '../../store/slices/authSlice';
 import '../../styles/LogoutButton.css';
+import { useTranslation } from 'react-i18next';
 
 interface LogoutButtonProps {
   className?: string;
@@ -10,6 +11,7 @@ interface LogoutButtonProps {
 function LogoutButton({ className = 'logout-btn' }: LogoutButtonProps) {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const handleLogout = async () => {
     try {
@@ -25,23 +27,19 @@ function LogoutButton({ className = 'logout-btn' }: LogoutButtonProps) {
 
   return (
     <button
-      className={className}
+      className="logout-btn"
       onClick={handleLogout}
-      aria-label="התנתק"
-      type="button"
+      aria-label={t('home.logout')}
     >
-      <span className="logout-btn-icon">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-          <path
-            d="M13 14L17 10M17 10L13 6M17 10H7M7 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H7"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-      <span className="logout-btn-text">התנתקות</span>
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+        <path
+          d="M13 14L17 10M17 10L13 6M17 10H7M7 3H5C3.89543 3 3 3.89543 3 5V15C3 16.1046 3.89543 17 5 17H7"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
     </button>
   );
 }
