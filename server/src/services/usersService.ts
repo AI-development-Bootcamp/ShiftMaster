@@ -50,8 +50,8 @@ export class DuplicateEmailError extends Error {
  */
 export class UserNotFoundError extends Error {
   code = 'USER_NOT_FOUND';
-  constructor(userId: string) {
-    super(`User with ID ${userId} not found`);
+  constructor() {
+    super(`User not found`);
     this.name = 'UserNotFoundError';
   }
 }
@@ -211,7 +211,7 @@ export class UsersService {
     const user = await this.userRepo.findById(userId);
 
     if (!user) {
-      throw new UserNotFoundError(userId);
+      throw new UserNotFoundError();
     }
 
     return sanitizeUser(user);
@@ -245,7 +245,7 @@ export class UsersService {
     // Verify user exists
     const existingUser = await this.userRepo.findById(userId);
     if (!existingUser) {
-      throw new UserNotFoundError(userId);
+      throw new UserNotFoundError();
     }
 
     // If updating email, check uniqueness
@@ -305,7 +305,7 @@ export class UsersService {
     // Verify user exists
     const existingUser = await this.userRepo.findById(userId);
     if (!existingUser) {
-      throw new UserNotFoundError(userId);
+      throw new UserNotFoundError();
     }
 
     // Soft delete

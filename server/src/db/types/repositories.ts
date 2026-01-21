@@ -33,6 +33,13 @@ export interface IClientRepository extends IBaseRepository<Client, NewClient, Up
 export interface IProjectRepository extends IBaseRepository<Project, NewProject, UpdateProject> {
     findByClientId(clientId: string): Promise<Project[]>;
     findActive(): Promise<Project[]>;
+    findPaginated(
+        page: number,
+        limit: number,
+        search?: string,
+        sort?: 'asc' | 'desc',
+        includeInactive?: boolean
+    ): Promise<{ data: Project[]; count: number }>;
 }
 
 export interface ITaskRepository extends IBaseRepository<Task, NewTask, UpdateTask> {

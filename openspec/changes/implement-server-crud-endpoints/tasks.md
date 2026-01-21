@@ -1,0 +1,27 @@
+# Tasks
+
+- [ ] Implement `Projects` CRUD <!-- id: 1 -->
+    - [ ] **Repository Layer** <!-- id: 2 -->
+        - [x] Update `IProjectRepository` interface in `db/types/repositories.ts` to include `findPaginated` with search/sort <!-- id: 3 -->
+        - [x] Implement `findPaginated` in `db/repositories/ProjectRepository.ts` <!-- id: 4 -->
+    - [x] **Service Layer** <!-- id: 5 -->
+        - [x] Create `services/projectsService.ts` <!-- id: 6 -->
+        - [x] Implement `createProject` with duplicate name check <!-- id: 7 -->
+        - [x] Implement `listProjects` with pagination/filtering logic <!-- id: 8 -->
+        - [x] Implement `getProjectById` <!-- id: 9 -->
+        - [x] Implement `updateProject` <!-- id: 10 -->
+        - [x] Implement `deleteProject` (soft delete) <!-- id: 11 -->
+        - [ ] **Validation Logic** <!-- id: 24 -->
+        - [x] Validate `client_id` exists in `createProject` <!-- id: 25 -->
+             - [x] Validate `manager_user_id` exists in `createProject` <!-- id: 26 -->
+    - [x] **Validation & Swagger** <!-- id: 12 -->
+        - [x] Create `validations/projectValidation.ts` with Zod schemas <!-- id: 13 -->
+        - [x] update `utils/swagger.ts` with Project schema <!-- id: 14 -->
+    - [x] **Controller & Routes** <!-- id: 15 -->
+        - [x] Create `controllers/projectsController.ts` <!-- id: 16 -->
+        - [x] Create `routes/projects.ts` with auth middleware <!-- id: 17 -->
+        - [x] Register route in `routes/index.ts` <!-- id: 18 -->
+    - [ ] **Testing** <!-- id: 19 -->
+        - [x] Create `tests/services/projectsService.test.ts` (Unit) <!-- id: 20 -->
+        - [x] Create `tests/controllers/projectsController.test.ts` (Unit) <!-- id: 21 -->
+        - [x] Create `tests/routes/projects.test.ts` (Integration) <!-- id: 22 -->
