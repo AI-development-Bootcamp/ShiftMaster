@@ -37,12 +37,22 @@
 
 ## Phase 3: Backend Controllers & Routes
 
-7. **Extend clientsController** - Add handlers for POST, PATCH, DELETE
-8. **Extend projectsController** - Add handlers for POST, PATCH, DELETE
-9. **Extend tasksController** - Add handlers for POST, PATCH, DELETE
+7. [x] **Extend clientsController** - Add handlers for POST, PATCH, DELETE
+   - Use ClientsService
+   - Return 201 for create, 200 for update/delete
+   - Handle 403, 404, 400 errors
 
-10. **Update route files** to register new endpoints:
-    - `POST /clients`, `PATCH /clients/:id`, `DELETE /clients/:id`
+8. [x] **Extend projectsController** - Add handlers for POST, PATCH, DELETE
+   - Use ProjectsService
+   - Handle errors
+
+9. [x] **Extend tasksController** - Add handlers for POST, PATCH, DELETE
+   - Use TasksService
+   - Handle errors
+
+10. [x] **Update route files** (`clients.ts`, `projects.ts`, `tasks.ts`)
+    - Register new POST, PATCH, DELETE endpoints
+    - Ensure `isAuthenticated` and `isAdmin` middleware is applied`, `DELETE /clients/:id`
     - `POST /projects`, `PATCH /projects/:id`, `DELETE /projects/:id`
     - `POST /tasks`, `PATCH /tasks/:id`, `DELETE /tasks/:id`
 
