@@ -4,7 +4,7 @@
  */
 
 import { Response } from 'express';
-// import { env } from '../config/env.js';
+import { env } from '../config/env.js';
 
 /**
  * Cookie configuration options
@@ -15,7 +15,6 @@ interface CookieOptions {
   sameSite: 'strict' | 'lax' | 'none';
   maxAge: number;
   path: string;
-  domain?: string;
 }
 
 /**
@@ -26,21 +25,15 @@ interface CookieOptions {
  * @returns {CookieOptions} Cookie configuration
  */
 function getCookieOptions(maxAge: number): CookieOptions {
-  // const isProduction = env.nodeEnv === 'production';
+  const isProduction = env.nodeEnv === 'production';
 
-  const options: CookieOptions = {
+  return {
     httpOnly: true, // Prevents JavaScript access (XSS protection)
-    secure: true, // Only send over HTTPS in production
-    sameSite: 'none', // 'none' required for cross-domain in production
+    secure: isProduction, // Only send over HTTPS in production
+    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-domain in production
     maxAge, // Cookie expiration in milliseconds
     path: '/', // Must be '/' to work across domains
   };
-
-  // In development, don't set domain so cookies work across localhost ports
-  // In production, don't set domain to use the default (current domain)
-  // This allows cookies to be shared between frontend and backend on different ports
-
-  return options;
 }
 
 /**
