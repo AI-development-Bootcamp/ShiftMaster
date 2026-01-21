@@ -408,7 +408,19 @@ export function AssignmentPage() {
 
             {activeForm === 'project' && (
                 <FormShell
-                    {...editProjectForm}
+                    {...JSON.parse(JSON.stringify(editProjectForm))} // Deep clone to avoid mutating original
+                    fields={editProjectForm.fields.map(field => {
+                        if (field.id === 'clientId') {
+                            return {
+                                ...field,
+                                options: clients
+                                    .filter(c => c.active)
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map(c => ({ value: c.client_id, label: c.name }))
+                            };
+                        }
+                        return field;
+                    })}
                     initialValues={formInitialValues}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
