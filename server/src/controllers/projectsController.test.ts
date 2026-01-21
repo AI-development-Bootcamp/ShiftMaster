@@ -4,6 +4,8 @@ import * as projectsController from './projectsController';
 import { AuthenticatedRequest } from '../types/express';
 import { ProjectsService } from '../services/projectsService.js';
 
+vi.mock('../services/projectsService.js');
+
 const createMockService = () => ({
     listProjects: vi.fn(),
     createProject: vi.fn(),
@@ -11,8 +13,10 @@ const createMockService = () => ({
     deleteProject: vi.fn(),
 } as unknown as ProjectsService);
 
+import { Response } from 'express';
+
 const mockResponse = () => {
-    const res: any = {};
+    const res = {} as unknown as Response;
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
     return res;
@@ -33,6 +37,7 @@ describe('ProjectsController', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockService = createMockService();
+        vi.mocked(ProjectsService).mockImplementation(() => mockService);
     });
 
     describe('createProject', () => {
@@ -53,7 +58,7 @@ describe('ProjectsController', () => {
 
             await projectsController.createProject(req, res, undefined, mockService);
 
-            expect(mockService.createProject).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), req.body);
+            expect(mockService.createProject).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), { ...req.body, time_format_type: 'sum' });
             expect(res.status).toHaveBeenCalledWith(201);
             expect(res.json).toHaveBeenCalledWith({ success: true, data: mockProject });
         });
@@ -106,7 +111,7 @@ describe('ProjectsController', () => {
 
             expect(mockService.deleteProject).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ success: true, message: expect.any(String) });
+            expect(res.json).toHaveBeenCalledWith({ success: true, data: { message: expect.any(String) } });
         });
     });
 });

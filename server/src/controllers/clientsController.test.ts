@@ -4,6 +4,9 @@ import * as clientsController from './clientsController';
 import { AuthenticatedRequest } from '../types/express';
 import { ClientsService } from '../services/clientsService.js';
 
+// Mock the service module
+vi.mock('../services/clientsService.js');
+
 // We just mock the TYPE to satisfy TS, or simpler: use 'any' or partial mock
 // But we can just create a plain object that matches the interface
 const createMockService = () => ({
@@ -13,8 +16,10 @@ const createMockService = () => ({
     deleteClient: vi.fn(),
 } as unknown as ClientsService);
 
+import { Response } from 'express';
+
 const mockResponse = () => {
-    const res: any = {};
+    const res = {} as unknown as Response;
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
     return res;
@@ -35,6 +40,7 @@ describe('ClientsController', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockService = createMockService();
+        vi.mocked(ClientsService).mockImplementation(() => mockService);
     });
 
     describe('createClient', () => {
@@ -105,7 +111,7 @@ describe('ClientsController', () => {
 
             expect(mockService.deleteClient).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ success: true, message: expect.any(String) });
+            expect(res.json).toHaveBeenCalledWith({ success: true, data: { message: expect.any(String) } });
         });
     });
 });

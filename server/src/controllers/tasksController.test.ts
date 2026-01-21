@@ -4,6 +4,8 @@ import * as tasksController from './tasksController';
 import { AuthenticatedRequest } from '../types/express';
 import { TasksService } from '../services/tasksService.js';
 
+vi.mock('../services/tasksService.js');
+
 const createMockService = () => ({
     fetchTasks: vi.fn(),
     createTask: vi.fn(),
@@ -15,8 +17,10 @@ const createMockService = () => ({
     listTasks: vi.fn(),
 } as unknown as TasksService);
 
+import { Response } from 'express';
+
 const mockResponse = () => {
-    const res: any = {};
+    const res = {} as unknown as Response;
     res.status = vi.fn().mockReturnValue(res);
     res.json = vi.fn().mockReturnValue(res);
     return res;
@@ -37,6 +41,7 @@ describe('TasksController', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         mockService = createMockService();
+        vi.mocked(TasksService).mockImplementation(() => mockService);
     });
 
     describe('createTask', () => {
@@ -105,7 +110,7 @@ describe('TasksController', () => {
 
             expect(mockService.deleteTask).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
             expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith({ success: true, message: expect.any(String) });
+            expect(res.json).toHaveBeenCalledWith({ success: true, data: { message: expect.any(String) } });
         });
     });
 });

@@ -171,7 +171,9 @@ describe('TasksController', () => {
             expect(statusMock).toHaveBeenCalledWith(200);
             expect(jsonMock).toHaveBeenCalledWith({
                 success: true,
-                message: 'Assignments updated successfully'
+                data: {
+                    message: 'Assignments updated successfully'
+                }
             });
         });
 

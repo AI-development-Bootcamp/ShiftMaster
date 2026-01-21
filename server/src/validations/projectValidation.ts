@@ -7,7 +7,7 @@ export const createProjectSchema = z.object({
     description: z.string().optional(),
     start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid start date format (YYYY-MM-DD)'),
     end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid end date format (YYYY-MM-DD)').optional(),
-    time_format_type: z.enum(['sum', 'start_end']).default('sum').optional(),
+    time_format_type: z.enum(['sum', 'start_end']).default('sum'),
 });
 
 export const updateProjectSchema = z.object({
