@@ -2,7 +2,7 @@
 
 ## Progress Tracker
 
-**Overall Progress:** 5/12 tasks completed
+**Overall Progress:** 5/14 tasks completed
 
 ### Phase Status
 - [x] **Phase 1:** Foundation (Toast Notifications) - 1/1 tasks
@@ -323,6 +323,91 @@
 
 ---
 
+### Phase 6: Task Employee Assignment Integration
+
+#### Task 6.1: Backend - Users API Filtering
+- [ ] **TASK PENDING**
+
+**Description:** Update Users API to support filtering by active status and text search
+
+**Steps:**
+- [ ] 1. Update `UserRepository`
+  - [ ] Add `active` and `search` params to `findPaginated`
+  - [ ] Implement query filters (eq for active, ilike for search)
+- [ ] 2. Update `UsersService`
+  - [ ] Pass filters from `listUsers` to repository
+- [ ] 3. Update `UsersController`
+  - [ ] Extract `active` and `search` query params
+  - [ ] Update validation schema
+
+**Validation:**
+- [ ] `GET /api/v1/users?active=true` returns only active users
+- [ ] `GET /api/v1/users?search=john` returns matching users
+
+--------------------
+
+#### Task 6.2: Backend - Task Assignments API
+- [ ] **TASK PENDING**
+
+**Description:** Create endpoints for creating and listing task assignments
+
+**Steps:**
+- [ ] 1. Create `AssignmentController`
+  - [ ] `POST /api/v1/tasks/:taskId/assignments`: Create assignment
+  - [ ] `GET /api/v1/tasks/:taskId/assignments`: List assignments (optional)
+- [ ] 2. Register routes in `routes/tasks.ts` (or equivalent)
+
+**Validation:**
+- [ ] Can create assignment via API
+- [ ] Enforces unique assignment constraint
+
+--------------------
+
+#### Task 6.3: Frontend - Refactor AssignmentPage Data Fetching
+- [ ] **TASK PENDING**
+
+**Description:** Replace mock data in AssignmentPage with real API calls
+
+**Steps:**
+- [ ] 1. Create `admin/src/services/assignmentService.ts` (or equivalent)
+  - [ ] `fetchAssignments(filters)`
+  - [ ] `assignEmployees(taskId, employeeIds)`
+- [ ] 2. Update `AssignmentPage.tsx` to fetch tasks/assignments
+  - [ ] Replace `mockTasks`, `mockProjects`, `mockClients`, `mockAdminTaskAssignments`
+  - [ ] Implement loading and error states
+
+**Validation:**
+- [ ] Page loads real data from API
+- [ ] Loading spinners work
+
+**Dependencies:** Task 6.1, 6.2
+
+--------------------
+
+#### Task 6.4: Frontend - TaskEmployeeAssignmentForm Integration
+- [ ] **TASK PENDING**
+
+**Description:** Wire up the assignment form to fetch employees and submit assignments
+
+**Steps:**
+- [ ] 1. Fetch "Potential Employees" from API
+  - [ ] Use `fetchUsers` with `active=true` filter
+  - [ ] Handle server-side pagination if user count is large
+- [ ] 2. Wire `onSubmit` in `AssignmentPage`
+  - [ ] Call `apiClient.post('/api/v1/tasks/:id/assignments', ...)`
+  - [ ] Handle success/error toasts
+- [ ] 3. Handle "Active Assignments" pre-selection
+  - [ ] Ensure `initialSelectedIds` reflects current server state
+
+**Validation:**
+- [ ] Form shows real "active" employees
+- [ ] Submitting updates the backend
+- [ ] Success/Error feedback works
+
+**Dependencies:** Task 6.3
+
+---
+
 #### Task 5.2: Testing
 - [ ] **TASK COMPLETE**
 
@@ -379,6 +464,7 @@
 4. Task 3.2, 3.3, 3.4 (in any order) - CRUD operations
 5. Task 4.1, 4.2, 4.3 (in any order) - UX polish
 6. Task 5.1, 5.2 (final) - cleanup and testing
+7. Phase 6 (Task Assignment) - can differ to after Phase 5 or parallel to Phase 3/4
 
 ## Estimated Effort
 
@@ -387,8 +473,9 @@
 - **Phase 3:** ~4-5 hours (Core integration)
 - **Phase 4:** ~2-3 hours (UX enhancements)
 - **Phase 5:** ~2 hours (Cleanup and testing)
+- **Phase 6:** ~3-4 hours (Assignment integration)
 
-**Total:** ~11-14 hours (for experienced developer)
+**Total:** ~14-18 hours (for experienced developer)
 
 ## Testing Strategy
 
