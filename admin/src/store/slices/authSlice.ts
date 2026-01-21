@@ -109,6 +109,10 @@ export const initializeAuth = createAsyncThunk(
 
       const data = await response.json();
 
+      if (!data.data?.accessToken) {
+        throw new Error('Invalid refresh response');
+      }
+
       // Store new access token in memory
       tokenStore.setAccessToken(data.data.accessToken);
 
@@ -119,6 +123,9 @@ export const initializeAuth = createAsyncThunk(
       }
 
       const user = JSON.parse(userStr);
+      if (!user?.user_id || !user?.email || !user?.role) {
+        throw new Error('Invalid user data');
+      }
       return { user };
     } catch (err) {
       tokenStore.clearAccessToken();
