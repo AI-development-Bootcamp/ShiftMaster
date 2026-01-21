@@ -1,0 +1,152 @@
+{
+  "common": {
+    "appName": "Shift Master",
+    "close": "סגור",
+    "save": "שמירה",
+    "cancel": "ביטול",
+    "delete": "מחק",
+    "edit": "עריכה",
+    "add": "הוסף",
+    "or": "או",
+    "loading": "טוען...",
+    "comingSoon": "תכונה זו תהיה זמינה בקרוב"
+  },
+  "login": {
+    "welcomeTitle": "ברוכים הבאים!",
+    "description": "ברוכים הבאים למערכת דיווחי השעות שלנו 🥳",
+    "descriptionLine2": "שנוצרה במיוחד עבורכם!",
+    "descriptionLine3": "יש להתחבר באמצעות הזדהות למטה.",
+    "emailLabel": "אימייל",
+    "emailPlaceholder": "אימייל",
+    "passwordLabel": "סיסמה",
+    "passwordPlaceholder": "סיסמה",
+    "submitButton": "התחברות",
+    "validation": {
+      "emailRequired": "יש להזין אימייל",
+      "emailInvalid": "פורמט אימייל לא תקין",
+      "passwordRequired": "יש להזין סיסמה",
+      "passwordMinLength": "הסיסמה חייבת להכיל לפחות 6 תווים"
+    }
+  },
+  "home": {
+    "title": "דיווח שעות",
+    "logout": "התנתק",
+    "loadingReports": "טוען דיווחים...",
+    "navigation": {
+      "nextMonth": "החודש הבא",
+      "previousMonth": "החודש הקודם"
+    },
+    "emptyState": {
+      "futureMonth": {
+        "title": "לא הגעת לחודש הזה 😌",
+        "subtitle": "תן לזמן לעשות את שלו - ואז תוכל לדווח גם כאן."
+      },
+      "noReports": {
+        "title": "עוד לא דווח כלום החודש 😅",
+        "subtitleLine1": "זה הזמן להכניס את השעות הראשונות",
+        "subtitleLine2": "הזנה אחת ואתה בעניינים."
+      }
+    },
+    "actions": {
+      "manualReport": "דיווח ידני",
+      "startTimer": "הפעלת שעון"
+    }
+  },
+  "navigation": {
+    "home": "עמוד הבית",
+    "reports": "דיווחים"
+  },
+  "manualReport": {
+    "title": "דיווח ידני",
+    "closeAriaLabel": "סגור",
+    "tabs": {
+      "work": "דיווח עבודה",
+      "absence": "דיווח היעדרות"
+    },
+    "save": "שמירה"
+  },
+  "workTab": {
+    "dailyQuota": "תקן יומי 9 שעות",
+    "entryTime": "כניסה",
+    "exitTime": "יציאה",
+    "projectsSection": {
+      "title": "דיווח פרוייקטים",
+      "addProject": "הוספת פרויקט"
+    },
+    "projectCard": {
+      "selectProject": "בחר פרויקט",
+      "selectTask": "בחר משימה",
+      "selectLocation": "בחר מיקום",
+      "startTime": "שעת התחלה",
+      "endTime": "שעת סיום",
+      "detailsPlaceholder": "הוספת פירוט...",
+      "deleteProject": "מחיקת פרויקט"
+    }
+  },
+  "absenceTab": {
+    "or": "או",
+    "multiDayLabel": "לדווח על היעדרות יותר מיום אחד",
+    "selectAbsenceType": "בחר סוג היעדרות",
+    "fileUpload": {
+      "title": "צירוף קבצים ומסמכים",
+      "clickToUpload": "לחץ כאן להעלאת הקובץ",
+      "supportedTypes": "סוג הקבצים הנתמכים : JPG / PNG / PDF",
+      "uploadAriaLabel": "העלאת קובץ",
+      "removeAriaLabel": "הסר קובץ",
+      "errors": {
+        "fileTooLarge": "הקובץ גדול מדי. גודל מקסימלי: 10MB",
+        "unsupportedType": "סוג קובץ לא נתמך. אנא העלה JPG, PNG או PDF"
+      }
+    }
+  },
+  "absenceTypes": {
+    "vacationHalf": "חופשה - חצי יום",
+    "vacationFull": "חופשה - יום מלא",
+    "sick": "מחלה",
+    "reserves": "מילואים"
+  },
+  "locations": {
+    "office": "משרד",
+    "client": "אצל הלקוח",
+    "home": "בית"
+  },
+  "statusBadge": {
+    "missing": "חסר",
+    "hours": "ש'",
+    "sick": "מחלה",
+    "weekend": "סופ\"ש",
+    "halfVacation": "חצי חופש"
+  },
+  "dialogs": {
+    "confirmation": {
+      "defaultTitle": "מחק את הפרויקט",
+      "defaultCancelLabel": "מעדיף שלא למחוק"
+    },
+    "missingHours": {
+      "title": "יום העבודה שלך טרם הושלם.",
+      "message": "חסרות {{hours}} שעות דיווח כדי למלוא את היום.",
+      "dontShowAgain": "צא בכל זאת",
+      "completeHours": "תן לי להשלים את השעות"
+    }
+  },
+  "dailyEntryCard": {
+    "addReport": "הוספת דיווח"
+  },
+  "timeEntryItem": {
+    "edit": "עריכה"
+  },
+  "monthNames": {
+    "january": "ינואר",
+    "february": "פברואר",
+    "march": "מרץ",
+    "april": "אפריל",
+    "may": "מאי",
+    "june": "יוני",
+    "july": "יולי",
+    "august": "אוגוסט",
+    "september": "ספטמבר",
+    "october": "אוקטובר",
+    "november": "נובמבר",
+    "december": "דצמבר"
+  }
+}
