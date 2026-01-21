@@ -70,7 +70,8 @@ function LoginPage() {
     e.preventDefault();
 
     if (validateForm()) {
-      await dispatch(loginUser({ email, password, source: 'client' }));
+      const trimmedEmail = email.trim();
+      await dispatch(loginUser({ email: trimmedEmail, password, source: 'client' }));
     }
   };
 
