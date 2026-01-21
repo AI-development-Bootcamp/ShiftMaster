@@ -1,7 +1,8 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { TimeValue } from '../../types/manualReport';
 import { formatDateDisplay } from '../../utils/date';
 import { DAILY_QUOTA_HOURS } from '../../constants/time';
+import { timeToMinutes } from '../../utils/time';
 import { useTimePicker, useProjectEntries } from '../../hooks';
 import { TimeEntryRow, ProjectEntriesSection } from './components';
 import { InfoCircleIcon } from '../icons';
@@ -15,6 +16,11 @@ interface WorkTabProps {
   projectGroups: SelectionGroup[];
   taskGroups: SelectionGroup[];
   locationGroups: SelectionGroup[];
+  onRequestDeleteProject: (
+    projectId: string,
+    actualDeleteFn: (projectId: string) => void
+  ) => void;
+  onUpdateTotalHours: (hours: number) => void;
 }
 
 function WorkTab({
@@ -22,6 +28,8 @@ function WorkTab({
   projectGroups,
   taskGroups,
   locationGroups,
+  onRequestDeleteProject,
+  onUpdateTotalHours,
 }: WorkTabProps) {
   const [editingField, setEditingField] = useState<
     'entry' | 'exit' | string | null
@@ -62,6 +70,40 @@ function WorkTab({
     updateProjectTime,
     deleteProject,
   } = useProjectEntries();
+
+  // Calculate total hours whenever times change
+  useEffect(() => {
+    try {
+      const entryMinutes = timeToMinutes(entryTime);
+      const exitMinutes = timeToMinutes(exitTime);
+      const mainHours = (exitMinutes - entryMinutes) / 60;
+
+      // Calculate project hours
+      let projectHours = 0;
+      projectEntries.forEach((project) => {
+        try {
+          const startMinutes = timeToMinutes(project.startTime);
+          const endMinutes = timeToMinutes(project.endTime);
+          const duration = (endMinutes - startMinutes) / 60;
+          if (duration > 0) {
+            projectHours += duration;
+          }
+        } catch {
+          // Skip invalid project times
+        }
+      });
+
+      const totalHours = Math.max(mainHours, projectHours);
+      onUpdateTotalHours(totalHours);
+    } catch {
+      // If times are invalid, set to 0
+      onUpdateTotalHours(0);
+    }
+  }, [entryTime, exitTime, projectEntries, onUpdateTotalHours]);
+
+  const handleDeleteProject = (projectId: string) => {
+    onRequestDeleteProject(projectId, deleteProject);
+  };
 
   const getCurrentTime = (): TimeValue => {
     if (editingField === 'entry') return entryTime;
@@ -196,7 +238,7 @@ function WorkTab({
         onOpenSelection={handleOpenSelection}
         onTimeClick={handleTimeClick}
         onDescriptionChange={updateProjectDescription}
-        onDeleteProject={deleteProject}
+        onDeleteProject={handleDeleteProject}
         getRefs={getRefs}
         onScroll={handleScroll}
         onWheel={handleWheel}

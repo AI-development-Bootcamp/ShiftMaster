@@ -63,7 +63,9 @@
       "work": "דיווח עבודה",
       "absence": "דיווח היעדרות"
     },
-    "save": "שמירה"
+    "save": "שמירה",
+    "progressTextRight": "{{hours}} מתוך {{quota}} שעות",
+    "progressTextLeft": "חסרות {{remaining}} שעות לדיווח"
   },
   "workTab": {
     "dailyQuota": "תקן יומי 9 שעות",
@@ -119,8 +121,12 @@
   },
   "dialogs": {
     "confirmation": {
-      "defaultTitle": "מחק את הפרויקט",
-      "defaultCancelLabel": "מעדיף שלא למחוק"
+      "deleteProject": {
+        "title": "למחוק את הפרויקט?",
+        "message": "הפעולה הזאת תמחק את כל הנתונים שהוזנו בפרויקט.",
+        "confirm": "מחק את הפרויקט",
+        "cancel": "מעדיף שלא למחוק"
+      }
     },
     "missingHours": {
       "title": "יום העבודה שלך טרם הושלם.",
