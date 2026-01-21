@@ -125,3 +125,5 @@ export interface MonthLock {
   locked_by: string; // UUID - admin user
   unlocked_at?: string;
 }
+
+export { UserRole };
