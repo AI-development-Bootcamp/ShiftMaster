@@ -13,6 +13,7 @@ export async function listClients(req: Request, res: Response): Promise<void> {
         res.status(200).json({
             success: true,
             data: clients,
+            error: null,
         });
     } catch (error) {
         console.error('List clients error:', error);
@@ -20,6 +21,7 @@ export async function listClients(req: Request, res: Response): Promise<void> {
         if (error instanceof AuthorizationError) {
             res.status(403).json({
                 success: false,
+                data: null,
                 error: {
                     message: error.message,
                     code: error.code,
@@ -30,6 +32,7 @@ export async function listClients(req: Request, res: Response): Promise<void> {
 
         res.status(500).json({
             success: false,
+            data: null,
             error: {
                 message: 'Internal server error',
                 code: 'INTERNAL_SERVER_ERROR',
