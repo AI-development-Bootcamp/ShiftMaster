@@ -10,10 +10,11 @@
 
 // For Vite environments - direct property access for static analysis
 // Vite will replace import.meta.env.VITE_API_URL at build time
-const viteApiUrl = import.meta.env.VITE_API_URL;
-
+const viteApiUrl =
+  typeof import.meta !== 'undefined' && import.meta.env?.VITE_API_URL;
 // For Node environments
-const nodeApiUrl = (typeof process !== 'undefined' && process.env?.API_URL) || undefined;
+const nodeApiUrl =
+  (typeof process !== 'undefined' && process.env?.API_URL) || undefined;
 
 // Export with fallback priority
 export const env = {
