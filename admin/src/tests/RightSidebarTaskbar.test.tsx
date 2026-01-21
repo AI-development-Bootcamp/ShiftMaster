@@ -1,10 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import { configureStore } from '@reduxjs/toolkit';
 import '@testing-library/jest-dom/vitest';
 import { User, UserRole } from '@abra-shift-master/shared';
 import { RightSidebarTaskbar } from '../components/RightSidebarTaskbar/RightSidebarTaskbar';
 import type { NavItemConfig } from '../components/RightSidebarTaskbar/RightSidebarTaskbar';
+import authReducer from '../store/slices/authSlice';
 
 const mockNavItems: NavItemConfig[] = [
   { id: 'dashboard', label: 'לוח בקרה', path: '/' },
@@ -22,17 +25,37 @@ const mockUser: User = {
   created_at: '2024-01-01T08:00:00Z',
 };
 
+const createMockStore = () => {
+  return configureStore({
+    reducer: {
+      auth: authReducer,
+    },
+    preloadedState: {
+      auth: {
+        user: null,
+        isAuthenticated: false,
+        loading: false,
+        error: null,
+      },
+    },
+  });
+};
+
 const renderWithRouter = (ui: React.ReactElement, initialEntries = ['/']) => {
+  const store = createMockStore();
+
   return render(
-    <MemoryRouter
-      initialEntries={initialEntries}
-      future={{
-        v7_startTransition: true,
-        v7_relativeSplatPath: true,
-      }}
-    >
-      {ui}
-    </MemoryRouter>
+    <Provider store={store}>
+      <MemoryRouter
+        initialEntries={initialEntries}
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true,
+        }}
+      >
+        {ui}
+      </MemoryRouter>
+    </Provider>
   );
 };
 
