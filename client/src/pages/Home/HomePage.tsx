@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import DailyEntryCard, {
   DailyEntry,
 } from '../../components/DailyEntryCard/DailyEntryCard';
@@ -7,23 +8,6 @@ import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
-
-// Mock data for testing
-
-const HEBREW_MONTHS = [
-  'ינואר',
-  'פברואר',
-  'מרץ',
-  'אפריל',
-  'מאי',
-  'יוני',
-  'יולי',
-  'אוגוסט',
-  'ספטמבר',
-  'אוקטובר',
-  'נובמבר',
-  'דצמבר',
-];
 // Function to load entries for a specific month/year
 // TODO: Replace with actual API call to backend
 const loadEntriesForMonth = (_month: number, _year: number): DailyEntry[] => {
@@ -43,6 +27,7 @@ const isFutureMonth = (month: number, year: number): boolean => {
 
 function HomePage() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
   const [currentYear, setCurrentYear] = useState(2025);
   const [prevMonthIndex, setPrevMonthIndex] = useState(10);
@@ -56,6 +41,25 @@ function HomePage() {
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
+
+  // Helper function to get month name from translation
+  const getMonthName = (monthIndex: number): string => {
+    const monthKeys = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+    return t(`monthNames.${monthKeys[monthIndex]}`);
+  };
 
   // Load entries when month/year changes
   useEffect(() => {
@@ -156,7 +160,7 @@ function HomePage() {
           <button
             className="logout-btn"
             onClick={handleLogout}
-            aria-label="התנתק"
+            aria-label={t('home.logout')}
           >
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <path
@@ -168,14 +172,14 @@ function HomePage() {
               />
             </svg>
           </button>
-          <h1 className="home-title">דיווח שעות</h1>
+          <h1 className="home-title">{t('home.title')}</h1>
         </div>
         <div className="month-nav">
           <button
             type="button"
             className="month-nav-btn"
             onClick={handleNextMonth}
-            aria-label="החודש הבא"
+            aria-label={t('home.navigation.nextMonth')}
           >
             <span className="chevron-left">‹</span>
           </button>
@@ -189,7 +193,7 @@ function HomePage() {
                     : 'month-hidden'
               }`}
             >
-              {HEBREW_MONTHS[prevMonthIndex]} {prevYear}
+              {getMonthName(prevMonthIndex)} {prevYear}
             </span>
             <span
               className={`month-label ${
@@ -200,14 +204,14 @@ function HomePage() {
                     : ''
               }`}
             >
-              {HEBREW_MONTHS[currentMonthIndex]} {currentYear}
+              {getMonthName(currentMonthIndex)} {currentYear}
             </span>
           </div>
           <button
             type="button"
             className="month-nav-btn"
             onClick={handlePrevMonth}
-            aria-label="החודש הקודם"
+            aria-label={t('home.navigation.previousMonth')}
           >
             <span className="chevron-right">›</span>
           </button>
@@ -220,7 +224,7 @@ function HomePage() {
           {isLoadingEntries ? (
             <div className="loading-state">
               <div className="spinner"></div>
-              <p className="loading-text">טוען דיווחים...</p>
+              <p className="loading-text">{t('home.loadingReports')}</p>
             </div>
           ) : entries.length > 0 ? (
             entries.map((entry) => (
@@ -242,20 +246,22 @@ function HomePage() {
                 <div className="empty-state-content">
                   {isFutureMonth(currentMonthIndex, currentYear) ? (
                     <>
-                      <p className="empty-state-title">לא הגעת לחודש הזה 😌</p>
+                      <p className="empty-state-title">
+                        {t('home.emptyState.futureMonth.title')}
+                      </p>
                       <p className="empty-state-subtitle">
-                        תן לזמן לעשות את שלו - ואז תוכל לדווח גם כאן.
+                        {t('home.emptyState.futureMonth.subtitle')}
                       </p>
                     </>
                   ) : (
                     <>
                       <p className="empty-state-title">
-                        עוד לא דווח כלום החודש 😅
+                        {t('home.emptyState.noReports.title')}
                       </p>
                       <p className="empty-state-subtitle">
-                        זה הזמן להכניס את השעות הראשונות
+                        {t('home.emptyState.noReports.subtitleLine1')}
                         <br />
-                        הזנה אחת ואתה בעניינים.
+                        {t('home.emptyState.noReports.subtitleLine2')}
                       </p>
                     </>
                   )}
@@ -273,7 +279,7 @@ function HomePage() {
             className="nav-btn add-btn"
             onClick={() => setIsManualReportModalOpen(true)}
           >
-            <span className="nav-label">דיווח ידני</span>
+            <span className="nav-label">{t('home.actions.manualReport')}</span>
             <span className="nav-icon-wrapper">
               <span className="icon-outer-ring"></span>
               <span className="icon-inner-circle">
@@ -341,7 +347,7 @@ function HomePage() {
             {isTimerRunning ? (
               <TimerDisplay totalSeconds={elapsedSeconds} />
             ) : (
-              <span className="nav-label">הפעלת שעון</span>
+              <span className="nav-label">{t('home.actions.startTimer')}</span>
             )}
           </button>
         </div>
