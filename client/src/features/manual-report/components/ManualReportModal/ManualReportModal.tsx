@@ -152,13 +152,13 @@ function ManualReportModal({
               <div className="progress-text-container">
                 <p className="progress-text progress-text-right">
                   {t('manualReport.progressTextRight', {
-                    hours: totalHours.toFixed(1),
+                    hours: Math.round(totalHours),
                     quota: DAILY_QUOTA_HOURS,
                   })}
                 </p>
                 <p className="progress-text progress-text-left">
                   {t('manualReport.progressTextLeft', {
-                    remaining: Math.max(0, DAILY_QUOTA_HOURS - totalHours).toFixed(1),
+                    remaining: Math.max(0, Math.round(DAILY_QUOTA_HOURS - totalHours)),
                   })}
                 </p>
               </div>
