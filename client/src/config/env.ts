@@ -25,5 +25,7 @@ if (!isTest && !isDevelopment) {
 }
 
 export const env = {
-  apiUrl: apiUrl || (isDevelopment ? 'http://localhost:3000/api/v1' : ''),
+  // In development, use relative URL to leverage Vite proxy (same-origin for cookies)
+  // In production, use absolute URL from environment variable
+  apiUrl: apiUrl || (isDevelopment ? '/api/v1' : ''),
 };
