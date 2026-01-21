@@ -1,11 +1,10 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState } from '../../components/TableShell/types';
-import { Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
+import { Client, Project, ProjectTimeFormatType } from '@abra-shift-master/shared';
 import { mockProjects } from '../../mocks/projects';
-import { mockClients } from '../../mocks/clients';
 import { mockCurrentUser } from '../../mocks/users';
 import { MonthLockButton, MonthLockModal } from '../../components/MonthLocks';
 import { FormShell, FormValues } from '../../components/FormShell';
@@ -14,6 +13,7 @@ import { createProjectForm } from '../../components/forms/createProject';
 import { createTaskForm } from '../../components/forms/createTask';
 import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDropdownMenu';
 import { useTranslation } from 'react-i18next';
+import { fetchClients, createClient } from '../../api/clientsApi';
 import '../../styles/EntriesManagementPage.css';
 
 export function EntriesManagementPage() {
@@ -26,16 +26,53 @@ export function EntriesManagementPage() {
     const [isMonthLockModalOpen, setIsMonthLockModalOpen] = useState(false);
     const buttonRef = useRef<HTMLButtonElement>(null);
 
+    // --- Client Data State (from API) ---
+    const [clients, setClients] = useState<Client[]>([]);
+    const [clientsLoading, setClientsLoading] = useState(true);
+    const [clientsError, setClientsError] = useState<string | null>(null);
+
     // --- Create Form State ---
     const [activeForm, setActiveForm] = useState<'createClient' | 'createProject' | 'createTask' | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // --- Fetch Clients from API ---
+    const loadClients = useCallback(async () => {
+        try {
+            setClientsLoading(true);
+            setClientsError(null);
+            const response = await fetchClients({ include_inactive: false });
+            setClients(response.clients);
+        } catch (error) {
+            console.error('Failed to fetch clients:', error);
+            setClientsError(t('errors.failedToLoadClients'));
+        } finally {
+            setClientsLoading(false);
+        }
+    }, [t]);
+
+    useEffect(() => {
+        loadClients();
+    }, [loadClients]);
 
     const handleFormSubmit = async (values: FormValues) => {
         try {
-            console.log(`Submitted ${activeForm} form:`, values);
+            setIsSubmitting(true);
+
+            if (activeForm === 'createClient') {
+                await createClient({
+                    name: values.clientName as string,
+                    contact_info: values.contactDetails as string || undefined,
+                });
+                await loadClients(); // Refresh client list
+            } else {
+                console.log(`Submitted ${activeForm} form:`, values);
+            }
+
             setActiveForm(null);
         } catch (error) {
             console.error('Form submission failed:', error);
-            // Ideally trigger a notification here
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -90,7 +127,7 @@ export function EntriesManagementPage() {
             disableSortClearing: true,
             width: '30%',
             accessor: (row) => {
-                const client = mockClients.find(c => c.client_id === row.client_id);
+                const client = clients.find(c => c.client_id === row.client_id);
                 return client ? client.name : t('common.unknown');
             }
         },
@@ -129,8 +166,8 @@ export function EntriesManagementPage() {
 
                     // Special handling for client name sorting
                     if (sortItem.key === 'client_name') {
-                        valA = mockClients.find(c => c.client_id === a.client_id)?.name || '';
-                        valB = mockClients.find(c => c.client_id === b.client_id)?.name || '';
+                        valA = clients.find(c => c.client_id === a.client_id)?.name || '';
+                        valB = clients.find(c => c.client_id === b.client_id)?.name || '';
                     } else {
                         valA = String(a[sortItem.key as keyof Project] || '');
                         valB = String(b[sortItem.key as keyof Project] || '');
@@ -151,7 +188,7 @@ export function EntriesManagementPage() {
         const paginatedData = processedData.slice(startIndex, startIndex + pageSize);
 
         return { data: paginatedData, totalItems, totalPages };
-    }, [page, sort, filteredData]);
+    }, [page, sort, filteredData, clients]);
 
     return (
         <div className="entries-management-page">
@@ -188,6 +225,26 @@ export function EntriesManagementPage() {
                 </div>
             </div>
 
+            {clientsError && (
+                <div style={{
+                    backgroundColor: '#FEE2E2',
+                    color: '#DC2626',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    marginBottom: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                }}>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    {clientsError}
+                </div>
+            )}
+
             <TableShell
                 tableId="projects-table"
                 data={data}
@@ -203,7 +260,7 @@ export function EntriesManagementPage() {
                 sort={sort}
                 onSortChange={setSort}
                 onRadioChange={handleRadioChange}
-                isLoading={false}
+                isLoading={clientsLoading}
             />
 
             {/* Create Forms */}
@@ -213,15 +270,29 @@ export function EntriesManagementPage() {
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
+                    isSubmitting={isSubmitting}
                 />
             )}
 
             {activeForm === 'createProject' && (
                 <FormShell
-                    {...createProjectForm}
+                    {...JSON.parse(JSON.stringify(createProjectForm))} // Deep clone to avoid mutating original
+                    fields={createProjectForm.fields.map(field => {
+                        if (field.id === 'clientId') {
+                            return {
+                                ...field,
+                                options: clients
+                                    .filter(c => c.active)
+                                    .sort((a, b) => a.name.localeCompare(b.name))
+                                    .map(c => ({ value: c.client_id, label: c.name }))
+                            };
+                        }
+                        return field;
+                    })}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
+                    isSubmitting={isSubmitting}
                 />
             )}
 
@@ -231,6 +302,7 @@ export function EntriesManagementPage() {
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
+                    isSubmitting={isSubmitting}
                 />
             )}
         </div>
