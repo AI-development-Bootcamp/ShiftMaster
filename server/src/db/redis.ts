@@ -94,6 +94,13 @@ export async function disconnectRedis(): Promise<void> {
 
 /**
  * Refresh token session data stored in Redis
+ *
+ * Redis Data Structure:
+ * - Session data: `refresh:{sessionId}` → JSON string of RefreshSession
+ * - User sessions: `user_sessions:{userId}` → Set of session IDs
+ *
+ * This allows O(M) revocation where M is the user's session count,
+ * instead of O(N) where N is all sessions in Redis.
  */
 export interface RefreshSession {
   userId: string;
@@ -105,6 +112,7 @@ export interface RefreshSession {
 
 /**
  * Store a refresh token session in Redis
+ * Also adds the session ID to the user's session set for efficient revocation
  *
  * @param {string} sessionId - UUID for the session
  * @param {RefreshSession} sessionData - Session data to store
@@ -117,10 +125,23 @@ export async function setRefreshSession(
   ttlSeconds: number = 30 * 24 * 60 * 60 // 30 days
 ): Promise<void> {
   const client = getRedisClient();
-  const key = `refresh:${sessionId}`;
+  const sessionKey = `refresh:${sessionId}`;
+  const userSessionsKey = `user_sessions:${sessionData.userId}`;
   const value = JSON.stringify(sessionData);
 
-  await client.setex(key, ttlSeconds, value);
+  // Use pipeline for atomic operations
+  const pipeline = client.pipeline();
+
+  // Store the session data
+  pipeline.setex(sessionKey, ttlSeconds, value);
+
+  // Add session ID to user's session set
+  pipeline.sadd(userSessionsKey, sessionId);
+
+  // Set expiry on user's session set (slightly longer than session TTL)
+  pipeline.expire(userSessionsKey, ttlSeconds + 86400); // +1 day buffer
+
+  await pipeline.exec();
 }
 
 /**
@@ -150,6 +171,7 @@ export async function getRefreshSession(
 
 /**
  * Delete a refresh token session from Redis
+ * Also removes the session ID from the user's session set
  * Used for logout and session revocation
  *
  * @param {string} sessionId - UUID for the session
@@ -159,10 +181,30 @@ export async function deleteRefreshSession(
   sessionId: string
 ): Promise<boolean> {
   const client = getRedisClient();
-  const key = `refresh:${sessionId}`;
+  const sessionKey = `refresh:${sessionId}`;
 
-  const result = await client.del(key);
-  return result === 1;
+  // Get session data to find userId before deleting
+  const session = await getRefreshSession(sessionId);
+
+  if (!session) {
+    return false;
+  }
+
+  const userSessionsKey = `user_sessions:${session.userId}`;
+
+  // Use pipeline for atomic operations
+  const pipeline = client.pipeline();
+
+  // Delete the session data
+  pipeline.del(sessionKey);
+
+  // Remove session ID from user's session set
+  pipeline.srem(userSessionsKey, sessionId);
+
+  const results = await pipeline.exec();
+
+  // First command is DEL, check if it deleted something
+  return results?.[0]?.[1] === 1;
 }
 
 /**
@@ -207,6 +249,7 @@ export async function updateRefreshSession(
 
 /**
  * Delete all refresh token sessions for a specific user
+ * Uses per-user session set for O(M) performance where M is the user's session count
  * Useful for password changes or account security events
  *
  * @param {string} userId - User ID to revoke all sessions for
@@ -214,27 +257,70 @@ export async function updateRefreshSession(
  */
 export async function revokeAllUserSessions(userId: string): Promise<number> {
   const client = getRedisClient();
+  const userSessionsKey = `user_sessions:${userId}`;
 
-  // Find all refresh session keys
-  const keys = await client.keys('refresh:*');
+  // Get all session IDs for this user from the set
+  const sessionIds = await client.smembers(userSessionsKey);
+
+  if (sessionIds.length === 0) {
+    return 0;
+  }
 
   let deletedCount = 0;
-  for (const key of keys) {
-    const value = await client.get(key);
-    if (value) {
-      try {
-        const session = JSON.parse(value) as RefreshSession;
-        if (session.userId === userId) {
-          await client.del(key);
-          deletedCount++;
-        }
-      } catch (error) {
-        console.error('Failed to parse session during revocation:', error);
-      }
+
+  // Delete all sessions for this user
+  const pipeline = client.pipeline();
+
+  for (const sessionId of sessionIds) {
+    const sessionKey = `refresh:${sessionId}`;
+    pipeline.del(sessionKey);
+  }
+
+  // Delete the user's session set
+  pipeline.del(userSessionsKey);
+
+  const results = await pipeline.exec();
+
+  if (!results) {
+    return 0;
+  }
+
+  // Count successful deletions (excluding the final set deletion)
+  for (let i = 0; i < sessionIds.length; i++) {
+    if (results[i]?.[1] === 1) {
+      deletedCount++;
     }
   }
 
   return deletedCount;
+}
+
+/**
+ * Get the count of active sessions for a specific user
+ * Useful for monitoring and debugging
+ *
+ * @param {string} userId - User ID to count sessions for
+ * @returns {Promise<number>} Number of active sessions
+ */
+export async function getUserSessionCount(userId: string): Promise<number> {
+  const client = getRedisClient();
+  const userSessionsKey = `user_sessions:${userId}`;
+
+  return await client.scard(userSessionsKey);
+}
+
+/**
+ * Get all session IDs for a specific user
+ * Useful for admin interfaces or debugging
+ *
+ * @param {string} userId - User ID to get sessions for
+ * @returns {Promise<string[]>} Array of session IDs
+ */
+export async function getUserSessionIds(userId: string): Promise<string[]> {
+  const client = getRedisClient();
+  const userSessionsKey = `user_sessions:${userId}`;
+
+  return await client.smembers(userSessionsKey);
 }
 
 // Initialize Redis client on module load

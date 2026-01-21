@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from 'react-router-dom';
 import './styles/reset.css';
 import './styles/global.css';
 import './styles/App.css';
@@ -42,7 +48,13 @@ function AppContent() {
 
   useEffect(() => {
     // Initialize auth on app startup (check for refresh token)
-    dispatch(initializeAuth());
+    dispatch(initializeAuth())
+      .unwrap()
+      .catch((error) => {
+        const errorCode =
+          (error as { code?: string })?.code ?? 'AUTH_INIT_FAILED';
+        console.error('Auth init error:', { code: errorCode, error });
+      });
   }, [dispatch]);
 
   const isLoginPage = location.pathname === '/';
@@ -51,7 +63,10 @@ function AppContent() {
   return (
     <div className="app" dir="rtl">
       {!isLoginPage && isAuthenticated && (
-        <RightSidebarTaskbar navItems={navigationItems} user={mockCurrentUser} />
+        <RightSidebarTaskbar
+          navItems={navigationItems}
+          user={mockCurrentUser}
+        />
       )}
       <main className={!isLoginPage ? 'main-content' : 'login-content'}>
         <Routes>

@@ -1,7 +1,7 @@
 /**
  * In-memory token store for access tokens
- * Tokens are stored in memory to prevent XSS attacks
- * Lost on page reload, triggering refresh flow automatically
+ * Tokens are stored in memory to reduce persistence exposure.
+ * Cleared on page reload, triggering the refresh flow automatically.
  */
 
 let accessToken: string | null = null;
