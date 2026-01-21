@@ -243,8 +243,8 @@ export function AssignmentPage() {
             showSuccess(t('assignmentPage.success.assigned'));
             setEditingAssignment(null);
             fetchData(); // Refresh data to show updates
-        } catch (error) {
-            console.error('Assignment failed:', error);
+        } catch (assignError) {
+            console.error('Assignment failed:', assignError);
             showError(t('assignmentPage.errors.assignFailed'));
         }
     };
@@ -296,7 +296,7 @@ export function AssignmentPage() {
     ], [t]);
 
     if (error && !data.length) {
-        return <div className="assignment-page-error">{error} <button onClick={fetchData}>Retry</button></div>;
+        return <div className="assignment-page-error">{error} <button onClick={fetchData}>{t('common.retry')}</button></div>;
     }
 
     return (

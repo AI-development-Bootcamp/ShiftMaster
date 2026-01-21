@@ -8,7 +8,8 @@
         "hide": "הסתר",
         "search": "חיפוש",
         "searchPlaceholder": "חיפוש...",
-        "selectRow": "בחר שורה"
+        "selectRow": "בחר שורה",
+        "retry": "נסה שוב"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
