@@ -51,7 +51,7 @@
     "preview:client": "npm run preview -w client",
     "preview:admin": "npm run preview -w admin",
     "redis:start": "docker compose up -d redis",
-    "redis:stop": "docker compose down",
+    "redis:stop": "docker compose stop redis",
     "redis:logs": "docker compose logs -f redis"
   },
   "devDependencies": {
