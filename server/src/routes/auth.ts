@@ -131,7 +131,7 @@ const router = Router();
  *                   properties:
  *                     message:
  *                       type: string
- *                       example: "Access denied: Admin privileges required"
+ *                       example: "Access denied: Regular users cannot access Admin application"
  *                     code:
  *                       type: string
  *                       example: ACCESS_DENIED
