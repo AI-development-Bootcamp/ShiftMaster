@@ -84,7 +84,6 @@ import {
   getAllAssignments,
   assignEmployees,
 } from '../../controllers/tasksController.js';
-import { TasksService } from '../../services/tasksService.js';
 
 // Get mocks
 const tasksServiceModule = await vi.importMock<
@@ -120,7 +119,6 @@ describe('TasksController', () => {
   let mockResponse: Partial<Response>;
   let jsonMock: ReturnType<typeof vi.fn>;
   let statusMock: ReturnType<typeof vi.fn>;
-  let mockService: ReturnType<typeof TasksService>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -144,8 +142,6 @@ describe('TasksController', () => {
       role: 'admin',
       email: 'admin@example.com',
     };
-
-    mockService = new TasksService();
   });
 
   describe('listTasks', () => {
@@ -183,7 +179,7 @@ describe('TasksController', () => {
       const mockTask = { task_id: 'task-1', ...req.body, active: true };
       mockCreateTask.mockResolvedValue(mockTask);
 
-      await createTask(req as Request, res, undefined, mockService);
+      await createTask(req as Request, res);
 
       expect(mockCreateTask).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), req.body);
       expect(statusMock).toHaveBeenCalledWith(201);
@@ -201,7 +197,7 @@ describe('TasksController', () => {
       } as unknown as AuthenticatedRequest;
       const res = mockResponse as Response;
 
-      await createTask(req as Request, res, undefined, mockService);
+      await createTask(req as Request, res);
 
       expect(mockCreateTask).not.toHaveBeenCalled();
       expect(statusMock).toHaveBeenCalledWith(400);
@@ -224,7 +220,7 @@ describe('TasksController', () => {
       const mockTask = { task_id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', name: 'Updated Task', project_id: 'p1', active: true };
       mockUpdateTask.mockResolvedValue(mockTask);
 
-      await updateTask(req as Request, res, undefined, mockService);
+      await updateTask(req as Request, res);
 
       expect(mockUpdateTask).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', req.body);
       expect(statusMock).toHaveBeenCalledWith(200);
@@ -246,7 +242,7 @@ describe('TasksController', () => {
 
       mockDeleteTask.mockResolvedValue(undefined);
 
-      await deleteTask(req as Request, res, undefined, mockService);
+      await deleteTask(req as Request, res);
 
       expect(mockDeleteTask).toHaveBeenCalledWith(expect.objectContaining({ role: 'admin' }), 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11');
       expect(statusMock).toHaveBeenCalledWith(200);

@@ -19,7 +19,6 @@ vi.mock('../../services/clientsService.js', () => ({
 
 // Import after mocking
 import * as clientsController from '../../controllers/clientsController.js';
-import { ClientsService } from '../../services/clientsService.js';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -56,11 +55,8 @@ const mockUser = {
 };
 
 describe('ClientsController', () => {
-  let mockService: ReturnType<typeof ClientsService>;
-
   beforeEach(() => {
     vi.clearAllMocks();
-    mockService = new ClientsService();
   });
 
   describe('createClient', () => {
@@ -74,8 +70,7 @@ describe('ClientsController', () => {
       const mockClient = { client_id: 'client-1', ...req.body, active: true };
       mockCreateClient.mockResolvedValue(mockClient);
 
-      // Pass mockService as injection
-      await clientsController.createClient(req, res, undefined, mockService);
+      await clientsController.createClient(req as Request, res as Response);
 
       expect(mockCreateClient).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
@@ -95,8 +90,7 @@ describe('ClientsController', () => {
       } as unknown as AuthenticatedRequest;
       const res = mockResponse();
 
-      // Service not injected because function shouldn't reach creation
-      await clientsController.createClient(req, res, undefined, mockService);
+      await clientsController.createClient(req as Request, res as Response);
 
       expect(mockCreateClient).not.toHaveBeenCalled();
       expect(res.status).toHaveBeenCalledWith(400);
@@ -119,7 +113,7 @@ describe('ClientsController', () => {
       };
       mockUpdateClient.mockResolvedValue(mockClient);
 
-      await clientsController.updateClient(req, res, undefined, mockService);
+      await clientsController.updateClient(req as Request, res as Response);
 
       expect(mockUpdateClient).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
@@ -144,7 +138,7 @@ describe('ClientsController', () => {
 
       mockDeleteClient.mockResolvedValue(undefined);
 
-      await clientsController.deleteClient(req, res, undefined, mockService);
+      await clientsController.deleteClient(req as Request, res as Response);
 
       expect(mockDeleteClient).toHaveBeenCalledWith(
         expect.objectContaining({ role: 'admin' }),
