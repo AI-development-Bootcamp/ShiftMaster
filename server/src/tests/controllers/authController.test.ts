@@ -363,12 +363,12 @@ describe('AuthController', () => {
 
       await login(mockRequest as Request, mockResponse as Response);
 
-      expect(statusMock).toHaveBeenCalledWith(404);
+      expect(statusMock).toHaveBeenCalledWith(401);
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: {
-          message: 'User not found',
-          code: 'USER_NOT_FOUND',
+          message: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS',
         },
       });
     });
@@ -389,8 +389,8 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: {
-          message: 'Account is inactive',
-          code: 'ACCOUNT_INACTIVE',
+          message: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS',
         },
       });
     });
@@ -411,8 +411,8 @@ describe('AuthController', () => {
       expect(jsonMock).toHaveBeenCalledWith({
         success: false,
         error: {
-          message: 'Invalid password',
-          code: 'INVALID_PASSWORD',
+          message: 'Invalid credentials',
+          code: 'INVALID_CREDENTIALS',
         },
       });
     });

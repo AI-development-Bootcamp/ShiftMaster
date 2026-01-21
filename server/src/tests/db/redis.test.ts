@@ -2,7 +2,15 @@
  * Tests for Redis session management
  */
 
-import { describe, it, expect, beforeEach, afterAll } from 'vitest';
+import { describe, it, expect, beforeEach, afterAll, vi } from 'vitest';
+import RedisMock from 'ioredis-mock';
+
+// Mock ioredis before importing db/redis.js
+vi.mock('ioredis', () => ({
+  Redis: RedisMock,
+  default: RedisMock,
+}));
+
 import {
   setRefreshSession,
   getRefreshSession,
