@@ -36,7 +36,7 @@ function ManualReportModal({
   const locationGroups: SelectionGroup[] = [
     {
       title: 'מיקום',
-      items: ['משרד', 'עבודה מהבית', 'אצל לקוח', 'בחוץ'],
+      items: ['משרד', 'בית', 'בית לקוח'],
     },
   ];
 
