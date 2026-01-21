@@ -49,7 +49,10 @@
     "start": "npm run start -w server",
     "start:server": "npm run start -w server",
     "preview:client": "npm run preview -w client",
-    "preview:admin": "npm run preview -w admin"
+    "preview:admin": "npm run preview -w admin",
+    "redis:start": "docker compose up -d redis",
+    "redis:stop": "docker compose stop redis",
+    "redis:logs": "docker compose logs -f redis"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^6.21.0",

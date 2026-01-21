@@ -17,8 +17,10 @@
   "dependencies": {
     "@abra-shift-master/shared": "*",
     "@reduxjs/toolkit": "^2.0.1",
+    "i18next": "^25.7.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^16.5.3",
     "react-redux": "^9.0.4",
     "react-router-dom": "^6.21.3"
   },
