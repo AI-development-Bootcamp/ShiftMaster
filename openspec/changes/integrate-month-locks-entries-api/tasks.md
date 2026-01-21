@@ -2,11 +2,11 @@
 
 ## 1. Backend - Month Locks Service
 
-- [ ] 1.1 Create `MonthLocksService` (`server/src/services/monthLocksService.ts`)
+- [x] 1.1 Create `MonthLocksService` (`server/src/services/monthLocksService.ts`)
   - Method: `getLocksForYear(year: number): Promise<MonthLock[]>` - Returns active locks (unlocked_at is null)
   - Method: `batchUpdate(actorId: string, year: number, toLock: number[], toUnlock: number[])` - Batch lock/unlock
 
-- [ ] 1.2 Add `findByYear(year: number)` method to `MonthLockRepository` for efficient year queries
+- [x] 1.2 Add `findByYear(year: number)` method to `MonthLockRepository` for efficient year queries
 
 ## 2. Backend - Month Locks Controller
 
