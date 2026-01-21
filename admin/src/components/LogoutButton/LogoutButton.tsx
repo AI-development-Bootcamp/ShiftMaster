@@ -36,7 +36,7 @@ export function LogoutButton({
       // Call optional success callback
       onLogoutSuccess?.();
 
-      // Navigate to login after successful logout
+      // Navigate to root after successful logout
       navigate('/');
     } catch (error) {
       // Call optional error callback
