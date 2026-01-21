@@ -18,11 +18,11 @@
 
 ## 3. Backend - Month Locks Routes
 
-- [ ] 3.1 Create `monthLocks.ts` route file (`server/src/routes/monthLocks.ts`)
+- [x] 3.1 Create `monthLocks.ts` route file (`server/src/routes/monthLocks.ts`)
   - GET / - List locks for year (admin-only)
   - PUT /batch - Batch update locks (admin-only)
 
-- [ ] 3.2 Register monthLocks router in `routes/index.ts`
+- [x] 3.2 Register monthLocks router in `routes/index.ts`
 
 ## 4. Backend - Tests
 
