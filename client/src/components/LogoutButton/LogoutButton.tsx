@@ -4,11 +4,7 @@ import { logoutUser } from '../../store/slices/authSlice';
 import '../../styles/LogoutButton.css';
 import { useTranslation } from 'react-i18next';
 
-interface LogoutButtonProps {
-  className?: string;
-}
-
-function LogoutButton({ className = 'logout-btn' }: LogoutButtonProps) {
+function LogoutButton() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
