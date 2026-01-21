@@ -150,6 +150,7 @@ describe('useProjectEntries', () => {
       });
 
       const firstProjectId = result.current.projectEntries[0].id;
+      const secondProjectId = result.current.projectEntries[1].id;
 
       act(() => {
         result.current.updateProjectDescription(
@@ -158,10 +159,12 @@ describe('useProjectEntries', () => {
         );
       });
 
-      expect(result.current.projectEntries[0].description).toBe(
-        'First project'
-      );
-      expect(result.current.projectEntries[1].description).toBe('');
+      // Use find() to locate projects by ID rather than relying on index order
+      const firstProject = result.current.projectEntries.find(p => p.id === firstProjectId);
+      const secondProject = result.current.projectEntries.find(p => p.id === secondProjectId);
+
+      expect(firstProject?.description).toBe('First project');
+      expect(secondProject?.description).toBe('');
     });
   });
 

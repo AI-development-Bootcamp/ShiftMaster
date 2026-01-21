@@ -44,6 +44,7 @@ export interface ActionOption<T> {
     label: string;
     onClick: (row: T) => void;
     variant?: 'danger' | 'default';
+    isVisible?: (row: T) => boolean;
 }
 
 export interface RowActionsConfig<T> {

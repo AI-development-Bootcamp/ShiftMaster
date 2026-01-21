@@ -1,50 +1,51 @@
 import { FormFieldSchema } from '../FormShell';
+import { TFunction } from 'i18next';
 
+interface Option {
+    value: string;
+    label: string;
+}
 
-export const taskFields: FormFieldSchema[] = [
-    {
-        id: 'taskTitle',
-        type: 'textBox',
-        label: 'כותרת המשימה',
-        placeholder: 'מה צריך לעשות?',
-        required: true,
-    },
-    {
-        id: 'projectId',
-        type: 'dropdownBox',
-        label: 'פרויקט משוייך',
-        placeholder: 'בחר פרויקט',
-        options: [
-            { value: 'p1', label: 'פיתוח אתר אינטרנט' },
-            { value: 'p2', label: 'תחזוקת שרתים' },
-        ],
-        required: true,
-    },
-    {
-        id: 'dueDate',
-        type: 'dateBox',
-        label: 'תאריך יעד',
-        required: true,
-    },
-    {
-        id: 'description',
-        type: 'largeTextBox',
-        label: 'תיאור המשימה',
-        placeholder: 'הוראות ביצוע...',
-        rows: 4,
-    },
-];
+export const getTaskForm = (
+    t: TFunction,
+    mode: 'create' | 'edit' = 'create',
+    projects: Option[] = []
+) => {
+    const fields: FormFieldSchema[] = [
+        {
+            id: 'taskTitle',
+            type: 'textBox',
+            label: t('taskForm.fields.taskTitle'),
+            placeholder: t('taskForm.fields.taskTitlePlaceholder'),
+            required: true,
+        },
+        {
+            id: 'projectId',
+            type: 'dropdownBox',
+            label: t('taskForm.fields.project'),
+            placeholder: t('taskForm.fields.projectPlaceholder'),
+            options: projects,
+            required: true,
+        },
+        {
+            id: 'dueDate',
+            type: 'dateBox',
+            label: t('taskForm.fields.dueDate'),
+            required: true,
+        },
+        {
+            id: 'description',
+            type: 'largeTextBox',
+            label: t('taskForm.fields.description'),
+            placeholder: t('taskForm.fields.descriptionPlaceholder'),
+            rows: 4,
+        },
+    ];
 
-export const createTaskForm = {
-    title: 'יצירת משימה חדשה',
-    subtitle: 'הקצה משימה לעובד',
-    primaryActionLabel: 'צור משימה',
-    fields: taskFields,
-};
-
-export const editTaskForm = {
-    title: 'עריכת משימה',
-    subtitle: 'עדכן את פרטי המשימה',
-    primaryActionLabel: 'שמור שינויים',
-    fields: taskFields,
+    return {
+        title: mode === 'create' ? t('taskForm.createTitle') : t('taskForm.editTitle'),
+        subtitle: mode === 'create' ? t('taskForm.createSubtitle') : t('taskForm.editSubtitle'),
+        primaryActionLabel: mode === 'create' ? t('taskForm.createButton') : t('taskForm.editButton'),
+        fields,
+    };
 };
