@@ -4,7 +4,7 @@
  */
 
 import { Response } from 'express';
-import { env } from '../config/env.js';
+// import { env } from '../config/env.js';
 
 /**
  * Cookie configuration options
@@ -26,12 +26,12 @@ interface CookieOptions {
  * @returns {CookieOptions} Cookie configuration
  */
 function getCookieOptions(maxAge: number): CookieOptions {
-  const isProduction = env.nodeEnv === 'production';
+  // const isProduction = env.nodeEnv === 'production';
 
   const options: CookieOptions = {
     httpOnly: true, // Prevents JavaScript access (XSS protection)
-    secure: isProduction, // Only send over HTTPS in production
-    sameSite: isProduction ? 'none' : 'lax', // 'none' required for cross-domain in production
+    secure: true, // Only send over HTTPS in production
+    sameSite: 'none', // 'none' required for cross-domain in production
     maxAge, // Cookie expiration in milliseconds
     path: '/', // Must be '/' to work across domains
   };
