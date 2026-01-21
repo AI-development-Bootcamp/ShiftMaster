@@ -18,10 +18,11 @@ const createMockService = () => ({
 
 import { Response } from 'express';
 
-const mockResponse = () => {
-    const res = {} as unknown as Response;
-    res.status = vi.fn().mockReturnValue(res);
-    res.json = vi.fn().mockReturnValue(res);
+const mockResponse = (): Partial<Response> & { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> } => {
+    const res: Partial<Response> & { status: ReturnType<typeof vi.fn>; json: ReturnType<typeof vi.fn> } = {
+        status: vi.fn().mockReturnThis(),
+        json: vi.fn().mockReturnThis(),
+    };
     return res;
 };
 

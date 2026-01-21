@@ -176,7 +176,7 @@ export function AssignmentPage() {
                     name: values.taskTitle as string,
                     description: values.description as string,
                     start_date: new Date().toISOString().split('T')[0], // Extract YYYY-MM-DD
-                    end_date: (values.dueDate as string)?.split('T')[0],
+                    ...(values.dueDate ? { end_date: (values.dueDate as string).split('T')[0] } : {}),
                 };
                 await assignmentService.createTask(dto);
                 showSuccess(t('common.success') || 'Task created successfully');
@@ -185,7 +185,7 @@ export function AssignmentPage() {
                     project_id: values.projectId as string,
                     name: values.taskTitle as string,
                     description: values.description as string,
-                    end_date: (values.dueDate as string)?.split('T')[0],
+                    ...(values.dueDate ? { end_date: (values.dueDate as string).split('T')[0] } : {}),
                 };
                 await assignmentService.updateTask(editingEntityId, dto);
                 showSuccess(t('common.success') || 'Task updated successfully');

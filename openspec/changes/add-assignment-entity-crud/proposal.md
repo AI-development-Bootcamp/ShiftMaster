@@ -4,6 +4,54 @@
 
 Implement full create, update, and soft-delete functionality for **Clients**, **Projects**, and **Tasks** in the Assignment Page of the admin panel. This enables admins to manage the complete assignment hierarchy directly from the UI.
 
+## Why
+
+Admins currently cannot create or modify clients, projects, or tasks through the admin interface. They must access the database directly, which is error-prone and not scalable. This change enables self-service management of the assignment hierarchy.
+
+## What Changes
+
+### Backend
+- Add `POST`, `PATCH`, `DELETE` routes for `/clients`, `/projects`, `/tasks`
+- Add Zod validation schemas for CRUD operations
+- Implement service-layer cascade soft-delete (client → projects → tasks)
+- **BREAKING**: `manager_user_id` is now optional in project creation
+
+### Frontend
+- Convert form configs to factory functions with i18n support
+- Wire `AssignmentPage` handlers to new API endpoints
+- Pass dynamic dropdown options (clients, projects, users) to forms
+- Add Hebrew/English translations for form labels
+
+### Validation Changes
+- Task name uses `z.preprocess` to trim before validation
+- Project `time_format_type` defaults to `'sum'` without `.optional()`
+
+## Impact
+
+### Affected Specs/Code
+
+**Frontend Form Configs:**
+- `createClient.ts` — i18n conversion
+- `createProject.ts` — i18n + dynamic manager dropdown
+- `createTask.ts` — i18n + dynamic project dropdown
+
+**Frontend Services:**
+- `assignmentService.ts` — CRUD methods with typed `ApiError`
+
+**Backend Endpoints (new routes):**
+- `GET /clients`, `POST /clients`, `PATCH /clients/:id`, `DELETE /clients/:id`
+- `GET /projects`, `POST /projects`, `PATCH /projects/:id`, `DELETE /projects/:id`  
+- `GET /tasks`, `POST /tasks`, `PATCH /tasks/:id`, `DELETE /tasks/:id`
+
+**Cascade Soft-Delete Behavior:**
+> [!WARNING]
+> When a client is soft-deleted, all related projects will be soft-deleted. When a project is soft-deleted, all related tasks will be soft-deleted. This is **not** atomic due to Supabase limitations but is logged for observability.
+
+**Translations:**
+- `he.json`, `en.json` — form field labels and placeholders
+
+---
+
 ## Background
 
 The Assignment Page currently displays tasks grouped by client and project with "Edit" and "Delete" dropdown menus, but these operations are not yet wired to backend APIs. The frontend form configurations exist (`createClient.ts`, `createProject.ts`, `createTask.ts`) but contain hardcoded dropdown options and Hebrew labels instead of i18n keys.

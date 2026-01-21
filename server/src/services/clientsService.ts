@@ -52,6 +52,8 @@ export class ClientsService {
     }
 
     // Soft delete a client
+    // Note: Supabase JS client doesn't support client-side transactions.
+    // We wrap in try-catch and propagate errors with context.
     async deleteClient(actor: Actor, id: string): Promise<void> {
         if (actor.role !== 'admin') {
             throw new AuthorizationError('Access denied: Only admins can delete clients');
@@ -62,10 +64,16 @@ export class ClientsService {
             throw new ClientNotFoundError(id);
         }
 
-        // Cascade delete projects
-        await this.projectsService.deleteProjectsByClientId(id);
+        try {
+            // Cascade delete projects (and their tasks)
+            await this.projectsService.deleteProjectsByClientId(id);
 
-        // Delete client
-        await this.clientRepo.delete(id);
+            // Delete client
+            await this.clientRepo.delete(id);
+        } catch (error) {
+            // Log and rethrow with context for callers to handle
+            console.error(`[ClientsService.deleteClient] Cascade delete failed for client ${id}:`, error);
+            throw error;
+        }
     }
 }
