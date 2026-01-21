@@ -56,7 +56,7 @@ export async function fetchClients(params: FetchClientsParams = {}): Promise<Cli
     if (params.include_inactive) queryParams.set('include_inactive', 'true');
 
     const queryString = queryParams.toString();
-    const url = queryString ? `/api/v1/clients?${queryString}` : '/api/v1/clients';
+    const url = queryString ? `/clients?${queryString}` : '/clients';
 
     return apiClient.get<ClientsListResponse>(url);
 }
@@ -65,7 +65,7 @@ export async function fetchClients(params: FetchClientsParams = {}): Promise<Cli
  * Create a new client
  */
 export async function createClient(data: CreateClientInput): Promise<{ client: Client }> {
-    return apiClient.post<{ client: Client }>('/api/v1/clients', data);
+    return apiClient.post<{ client: Client }>('/clients', data);
 }
 
 /**
@@ -75,19 +75,19 @@ export async function updateClient(
     clientId: string,
     data: UpdateClientInput
 ): Promise<{ client: Client }> {
-    return apiClient.patch<{ client: Client }>(`/api/v1/clients/${clientId}`, data);
+    return apiClient.patch<{ client: Client }>(`/clients/${clientId}`, data);
 }
 
 /**
  * Soft delete a client (sets active = false)
  */
 export async function deleteClient(clientId: string): Promise<{ success: boolean; message: string }> {
-    return apiClient.delete<{ success: boolean; message: string }>(`/api/v1/clients/${clientId}`);
+    return apiClient.delete<{ success: boolean; message: string }>(`/clients/${clientId}`);
 }
 
 /**
  * Get a single client by ID
  */
 export async function getClient(clientId: string): Promise<{ client: Client }> {
-    return apiClient.get<{ client: Client }>(`/api/v1/clients/${clientId}`);
+    return apiClient.get<{ client: Client }>(`/clients/${clientId}`);
 }
