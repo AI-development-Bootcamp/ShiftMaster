@@ -29,7 +29,7 @@ function ManualReportModal({
   const taskGroups: SelectionGroup[] = [
     {
       title: 'משימות',
-      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review'],
+      items: ['UI UX Design', 'Marketing', 'Consulting', 'Design System', 'Branding'],
     },
   ];
 
