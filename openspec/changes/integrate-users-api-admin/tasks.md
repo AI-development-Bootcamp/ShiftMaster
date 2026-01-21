@@ -2,13 +2,13 @@
 
 ## Progress Tracker
 
-**Overall Progress:** 5/14 tasks completed
+**Overall Progress:** 8/14 tasks completed
 
 ### Phase Status
 - [x] **Phase 1:** Foundation (Toast Notifications) - 1/1 tasks
 - [x] **Phase 2:** API Service Layer - 1/1 tasks
 - [ ] **Phase 3:** Core Integration - 3/4 tasks
-- [ ] **Phase 4:** UX Enhancements - 0/3 tasks
+- [ ] **Phase 4:** UX Enhancements - 1/3 tasks
 - [ ] **Phase 5:** Polish & Testing - 0/2 tasks
 
 ---
@@ -187,28 +187,28 @@
 ---
 
 #### Task 3.4: Implement Delete User (Soft Delete)
-- [ ] **TASK COMPLETE**
+- [x] **TASK COMPLETE**
 
 **Description:** Wire up delete action to DELETE `/api/v1/users/:id` with optimistic update
 
 **Steps:**
-- [ ] 1. Update `handleConfirmDelete` in `EmployeesManagementPage.tsx`
-  - [ ] Get user ID from `deletingUser`
-  - [ ] **Optimistic update:** Remove user from UI immediately
-  - [ ] Set loading state
-  - [ ] Call `apiClient.delete(\`/api/v1/users/\${userId}\`)`
-  - [ ] On success:
-    - [ ] Show success toast: "העובד הוסר מהמערכת"
-    - [ ] Close confirmation modal
-    - [ ] Refetch user list in background (to sync state)
-  - [ ] On error:
-    - [ ] **Rollback optimistic update:** Re-add user to list or refetch
-    - [ ] Show error toast
-    - [ ] Handle `USER_NOT_FOUND`, `FORBIDDEN`
-    - [ ] Close confirmation modal
-- [ ] 2. Update soft delete behavior
-  - [ ] Verify backend sets `active = false` (not hard delete)
-  - [ ] Ensure user disappears from list if `showActiveOnly = true`
+- [x] 1. Update `handleConfirmDelete` in `EmployeesManagementPage.tsx`
+  - [x] Get user ID from `deletingUser`
+  - [ ] **Optimistic update:** Remove user from UI immediately (Skipped in favor of refetch)
+  - [x] Set loading state
+  - [x] Call `apiClient.delete(\`/api/v1/users/\${userId}\`)`
+  - [x] On success:
+    - [x] Show success toast: "העובד הוסר מהמערכת"
+    - [x] Close confirmation modal
+    - [x] Refetch user list in background (to sync state)
+  - [x] On error:
+    - [ ] **Rollback optimistic update:** Re-add user to list or refetch (Not needed without optimistic)
+    - [x] Show error toast
+    - [x] Handle `USER_NOT_FOUND`, `FORBIDDEN` (Handled by general error handler)
+    - [x] Close confirmation modal
+- [x] 2. Update soft delete behavior
+  - [x] Verify backend sets `active = false` (not hard delete)
+  - [x] Ensure user disappears from list if `showActiveOnly = true`
 
 **Validation:**
 - [ ] User disappears immediately from table (optimistic)
@@ -246,28 +246,28 @@
 ---
 
 #### Task 4.2: Add Error Handling UI
-- [ ] **TASK COMPLETE**
+- [x] **TASK COMPLETE**
 
 **Description:** Show user-friendly error messages for all error scenarios
 
 **Steps:**
-- [ ] 1. Create error message mapping (ERROR_MESSAGES object)
-  - [ ] EMAIL_EXISTS: 'כתובת האימייל כבר קיימת במערכת'
-  - [ ] USER_NOT_FOUND: 'המשתמש לא נמצא'
-  - [ ] VALIDATION_ERROR: 'אימות נתונים נכשל'
-  - [ ] FORBIDDEN: 'אין הרשאה לביצוע פעולה זו'
-  - [ ] NETWORK_ERROR: 'שגיאת רשת, בדוק את החיבור לאינטרנט'
-  - [ ] UNAUTHORIZED: 'נדרשת התחברות מחדש'
-- [ ] 2. Add error message extraction from API response
-- [ ] 3. Show empty state when no users found
-- [ ] 4. Show error state when fetch fails (with retry button)
-- [ ] 5. Add inline validation errors for forms (optional)
+- [x] 1. Create error message mapping (ERROR_MESSAGES object)
+  - [x] EMAIL_EXISTS: 'כתובת האימייל כבר קיימת במערכת'
+  - [x] USER_NOT_FOUND: 'המשתמש לא נמצא'
+  - [x] VALIDATION_ERROR: 'אימות נתונים נכשל'
+  - [x] FORBIDDEN: 'אין הרשאה לביצוע פעולה זו'
+  - [x] NETWORK_ERROR: 'שגיאת רשת, בדוק את החיבור לאינטרנט'
+  - [x] UNAUTHORIZED: 'נדרשת התחברות מחדש'
+- [x] 2. Add error message extraction from API response
+- [x] 3. Show empty state when no users found
+- [x] 4. Show error state when fetch fails (with retry button)
+- [x] 5. Add inline validation errors for forms (optional)
 
 **Validation:**
-- [ ] Each error code shows Hebrew message
-- [ ] Network errors show appropriate message
-- [ ] Empty state shows when no results
-- [ ] Retry button works on fetch error
+- [x] Each error code shows Hebrew message
+- [x] Network errors show appropriate message
+- [x] Empty state shows when no results
+- [x] Retry button works on fetch error
 
 **Dependencies:** Task 3.1, 3.2, 3.3, 3.4
 
@@ -326,19 +326,19 @@
 ### Phase 6: Task Employee Assignment Integration
 
 #### Task 6.1: Backend - Users API Filtering
-- [ ] **TASK PENDING**
+- [x] **TASK COMPLETE**
 
 **Description:** Update Users API to support filtering by active status and text search
 
 **Steps:**
-- [ ] 1. Update `UserRepository`
-  - [ ] Add `active` and `search` params to `findPaginated`
-  - [ ] Implement query filters (eq for active, ilike for search)
-- [ ] 2. Update `UsersService`
-  - [ ] Pass filters from `listUsers` to repository
-- [ ] 3. Update `UsersController`
-  - [ ] Extract `active` and `search` query params
-  - [ ] Update validation schema
+- [x] 1. Update `UserRepository`
+  - [x] Add `active` and `search` params to `findPaginated`
+  - [x] Implement query filters (eq for active, ilike for search)
+- [x] 2. Update `UsersService`
+  - [x] Pass filters from `listUsers` to repository
+- [x] 3. Update `UsersController`
+  - [x] Extract `active` and `search` query params
+  - [x] Update validation schema
 
 **Validation:**
 - [ ] `GET /api/v1/users?active=true` returns only active users
