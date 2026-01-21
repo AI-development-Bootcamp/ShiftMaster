@@ -94,6 +94,11 @@
   padding: 8px 0;
 }
 
+/* Time blocks list */
+.time-blocks-list {
+  margin-bottom: 12px;
+}
+
 /* Add report link */
 .add-report-link {
   display: flex;
@@ -110,7 +115,6 @@
   font-weight: 500;
   color: #3b82f6;
   width: 100%;
-  margin-top: 8px;
   transition: all 0.2s ease;
   direction: rtl;
 }

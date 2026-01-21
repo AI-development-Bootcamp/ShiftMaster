@@ -1,0 +1,84 @@
+@import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;500;600;700&display=swap');
+
+.time-block {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.time-block:last-child {
+  border-bottom: none;
+}
+
+.time-block-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.time-block-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #4a90e2;
+  transition: color 0.2s ease;
+}
+
+.time-block-edit-btn:hover:not(:disabled) {
+  color: #357abd;
+}
+
+.time-block-edit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.time-block-edit-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.time-block-range {
+  font-family: 'Assistant', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  color: #4a90e2;
+  direction: ltr;
+}
+
+.time-block-projects {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-allocation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+}
+
+.project-hours {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  direction: ltr;
+}
+
+.project-name {
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #141e3e;
+}

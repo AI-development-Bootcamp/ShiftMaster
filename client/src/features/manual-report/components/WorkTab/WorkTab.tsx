@@ -21,6 +21,19 @@ interface WorkTabProps {
     actualDeleteFn: (projectId: string) => void
   ) => void;
   onUpdateTotalHours: (hours: number) => void;
+  initialTimeBlock?: {
+    entryTime: string;
+    exitTime: string;
+    projects: Array<{
+      id: string;
+      project: string;
+      task: string;
+      location: string;
+      startTime: string;
+      endTime: string;
+      description?: string;
+    }>;
+  } | null;
 }
 
 function WorkTab({
@@ -30,20 +43,38 @@ function WorkTab({
   locationGroups,
   onRequestDeleteProject,
   onUpdateTotalHours,
+  initialTimeBlock,
 }: WorkTabProps) {
+  // Helper to parse time string to TimeValue
+  const parseTimeString = (timeStr: string): TimeValue => {
+    const [hoursStr, minutesStr] = timeStr.split(':');
+    let hours = parseInt(hoursStr, 10);
+    const minutes = parseInt(minutesStr, 10);
+    const period: 'AM' | 'PM' = hours >= 12 ? 'PM' : 'AM';
+
+    // Convert to 12-hour format
+    if (hours > 12) {
+      hours -= 12;
+    } else if (hours === 0) {
+      hours = 12;
+    }
+
+    return { hours, minutes, period };
+  };
+
   const [editingField, setEditingField] = useState<
     'entry' | 'exit' | string | null
   >(null);
-  const [entryTime, setEntryTime] = useState<TimeValue>({
-    hours: 9,
-    minutes: 41,
-    period: 'AM',
-  });
-  const [exitTime, setExitTime] = useState<TimeValue>({
-    hours: 9,
-    minutes: 4,
-    period: 'AM',
-  });
+  const [entryTime, setEntryTime] = useState<TimeValue>(
+    initialTimeBlock?.entryTime
+      ? parseTimeString(initialTimeBlock.entryTime)
+      : { hours: 9, minutes: 0, period: 'AM' }
+  );
+  const [exitTime, setExitTime] = useState<TimeValue>(
+    initialTimeBlock?.exitTime
+      ? parseTimeString(initialTimeBlock.exitTime)
+      : { hours: 5, minutes: 0, period: 'PM' }
+  );
   const [selectionModal, setSelectionModal] = useState<{
     isOpen: boolean;
     type: SelectionType | null;
@@ -69,37 +100,22 @@ function WorkTab({
     updateProjectField,
     updateProjectTime,
     deleteProject,
-  } = useProjectEntries();
+  } = useProjectEntries({
+    initialProjects: initialTimeBlock?.projects || null
+  });
 
-  // Calculate total hours whenever times change
+  // Calculate total hours based on entry/exit time
   useEffect(() => {
     try {
       const entryMinutes = timeToMinutes(entryTime);
       const exitMinutes = timeToMinutes(exitTime);
-      const mainHours = (exitMinutes - entryMinutes) / 60;
-
-      // Calculate project hours
-      let projectHours = 0;
-      projectEntries.forEach((project) => {
-        try {
-          const startMinutes = timeToMinutes(project.startTime);
-          const endMinutes = timeToMinutes(project.endTime);
-          const duration = (endMinutes - startMinutes) / 60;
-          if (duration > 0) {
-            projectHours += duration;
-          }
-        } catch {
-          // Skip invalid project times
-        }
-      });
-
-      const totalHours = Math.max(mainHours, projectHours);
-      onUpdateTotalHours(totalHours);
+      const totalHours = (exitMinutes - entryMinutes) / 60;
+      onUpdateTotalHours(Math.max(0, totalHours));
     } catch {
       // If times are invalid, set to 0
       onUpdateTotalHours(0);
     }
-  }, [entryTime, exitTime, projectEntries, onUpdateTotalHours]);
+  }, [entryTime, exitTime, onUpdateTotalHours]);
 
   const handleDeleteProject = (projectId: string) => {
     onRequestDeleteProject(projectId, deleteProject);

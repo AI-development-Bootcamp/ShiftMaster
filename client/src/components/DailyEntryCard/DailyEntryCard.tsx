@@ -1,14 +1,10 @@
 import { useState, useEffect } from 'react';
 import StatusBadge, { EntryStatus } from '../StatusBadge/StatusBadge';
-import TimeEntryItem, { TimeEntry } from '../TimeEntryItem/TimeEntryItem';
+import TimeBlock from '../TimeBlock/TimeBlock';
 import '../../styles/DailyEntryCard.css';
 
-export type AbsenceType =
-  | 'vacation-half'
-  | 'vacation-full'
-  | 'sick'
-  | 'reserves'
-  | null;
+// Import types from mocks
+import type { TimeBlock as TimeBlockType, AbsenceType } from '../../mocks/dailyEntries';
 
 export interface DailyEntry {
   id: string;
@@ -16,7 +12,7 @@ export interface DailyEntry {
   dayName: string;
   status: EntryStatus;
   hours?: number;
-  timeEntries: TimeEntry[];
+  timeBlocks: TimeBlockType[];
   absenceType?: AbsenceType;
 }
 
@@ -24,7 +20,7 @@ interface DailyEntryCardProps {
   entry: DailyEntry;
   isExpanded?: boolean;
   onToggle?: (id: string) => void;
-  onEditEntry?: (entryId: string) => void;
+  onEditTimeBlock?: (timeBlockId: string) => void;
   onAddReport?: (dayId: string) => void;
 }
 
@@ -32,7 +28,7 @@ function DailyEntryCard({
   entry,
   isExpanded = false,
   onToggle,
-  onEditEntry,
+  onEditTimeBlock,
   onAddReport,
 }: DailyEntryCardProps) {
   const [expanded, setExpanded] = useState(isExpanded);
@@ -113,39 +109,20 @@ function DailyEntryCard({
         </span>
       </button>
 
-      {expanded && entry.timeEntries.length > 0 && (
+      {expanded && (
         <div id={panelId} className="entry-content">
-          <div className="time-entries-list">
-            {entry.timeEntries.map((timeEntry) => (
-              <TimeEntryItem
-                key={timeEntry.id}
-                entry={timeEntry}
-                onEdit={onEditEntry}
-              />
-            ))}
-          </div>
-          <button
-            className="add-report-link"
-            onClick={handleAddReport}
-            disabled={!onAddReport}
-            aria-disabled={!onAddReport}
-            title={!onAddReport ? 'תכונה זו תהיה זמינה בקרוב' : undefined}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-              <path
-                d="M7 1V13M1 7H13"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span>הוספת דיווח</span>
-          </button>
-        </div>
-      )}
+          {entry.timeBlocks.length > 0 && (
+            <div className="time-blocks-list">
+              {entry.timeBlocks.map((timeBlock) => (
+                <TimeBlock
+                  key={timeBlock.id}
+                  timeBlock={timeBlock}
+                  onEdit={onEditTimeBlock}
+                />
+              ))}
+            </div>
+          )}
 
-      {expanded && entry.timeEntries.length === 0 && (
-        <div id={panelId} className="entry-content entry-content--empty">
           <button
             className="add-report-link"
             onClick={handleAddReport}

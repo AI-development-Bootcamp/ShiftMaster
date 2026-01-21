@@ -10,11 +10,15 @@ import { SelectionGroup } from '../../../../components/SelectionModal/SelectionM
 import { DAILY_QUOTA_HOURS } from '../../constants/time';
 import '../../styles/manualReportModal.css';
 
+// TODO: Replace with real API call before production
+import { getProjectGroups } from '../../../../mocks';
+
 function ManualReportModal({
   isOpen,
   onClose,
   currentDayAbsenceType: _currentDayAbsenceType = null,
   selectedDate = new Date(),
+  initialTimeBlock = null,
 }: ManualReportModalProps) {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
@@ -24,19 +28,26 @@ function ManualReportModal({
   const [showMissingHoursDialog, setShowMissingHoursDialog] = useState(false);
   const deleteProjectRef = useRef<((projectId: string) => void) | null>(null);
 
-  const projectGroups: SelectionGroup[] = [];
+  // TODO: Replace with real API call before production
+  const projectGroups: SelectionGroup[] = getProjectGroups();
 
   const taskGroups: SelectionGroup[] = [
     {
       title: 'משימות',
-      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review'],
+      items: [
+        'UI UX Design',
+        'Marketing',
+        'Consulting',
+        'Design System',
+        'Branding',
+      ],
     },
   ];
 
   const locationGroups: SelectionGroup[] = [
     {
       title: 'מיקום',
-      items: ['משרד', 'עבודה מהבית', 'אצל לקוח', 'בחוץ'],
+      items: ['משרד', 'בית', 'בית לקוח'],
     },
   ];
 
@@ -144,6 +155,7 @@ function ManualReportModal({
               locationGroups={locationGroups}
               onRequestDeleteProject={handleRequestDeleteProject}
               onUpdateTotalHours={handleUpdateTotalHours}
+              initialTimeBlock={initialTimeBlock}
             />
           )}
 

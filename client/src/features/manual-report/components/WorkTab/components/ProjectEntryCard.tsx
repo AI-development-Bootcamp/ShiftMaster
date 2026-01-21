@@ -4,6 +4,9 @@ import { formatTime } from '../../../utils/time';
 import TimePicker from './TimePicker';
 import { SelectionType } from '../../../../../components/SelectionModal/SelectionModal';
 
+// TODO: Replace with real API call before production
+import { getProjectInfo } from '../../../../../mocks';
+
 interface ProjectEntryCardProps {
   project: ProjectEntry;
   editingField: string | null;
@@ -46,17 +49,28 @@ function ProjectEntryCard({
   onWheel,
   onItemClick,
 }: ProjectEntryCardProps) {
+  // TODO: Replace with real API call before production
+  const projectInfo = project.project ? getProjectInfo(project.project) : null;
+
   return (
     <div className="project-entry">
       <div
         className="project-field"
         onClick={() => onOpenSelection('project', project.id)}
       >
-        <span
-          className={`field-label ${!project.project ? 'placeholder' : ''}`}
-        >
-          {project.project || 'בחר פרויקט'}
-        </span>
+        {projectInfo ? (
+          <div className="project-pills">
+            <span className="project-pill project-pill--gray">
+              {projectInfo.company}
+            </span>
+            <span className="project-arrow">←</span>
+            <span className="project-pill project-pill--blue">
+              {projectInfo.project}
+            </span>
+          </div>
+        ) : (
+          <span className="field-label placeholder">בחר פרויקט</span>
+        )}
         <span className="field-chevron">›</span>
       </div>
 

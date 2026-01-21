@@ -340,6 +340,36 @@
   color: #999;
 }
 
+/* Project pills (company + project display) */
+.project-pills {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.project-pill {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-family: 'Assistant', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.project-pill--blue {
+  background-color: #4a90e2;
+  color: #ffffff;
+}
+
+.project-pill--gray {
+  background-color: #e9ecef;
+  color: #141e3e;
+}
+
+.project-arrow {
+  font-size: 16px;
+  color: #999;
+}
+
 .project-time-row {
   display: flex;
   justify-content: space-between;

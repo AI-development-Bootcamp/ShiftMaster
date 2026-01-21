@@ -48,6 +48,19 @@ export interface ManualReportModalProps {
     | 'reserves'
     | null;
   selectedDate?: Date;
+  initialTimeBlock?: {
+    entryTime: string;
+    exitTime: string;
+    projects: Array<{
+      id: string;
+      project: string;
+      task: string;
+      location: string;
+      startTime: string;
+      endTime: string;
+      description?: string;
+    }>;
+  } | null;
 }
 
 export interface TimePickerRefs {

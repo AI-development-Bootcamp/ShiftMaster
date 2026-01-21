@@ -8,9 +8,18 @@ import ManualReportModal from '../../components/ManualReportModal/ManualReportMo
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
+
+// TODO: Replace with actual API call to backend - this is mock data for development only
+import { mockDailyEntries } from '../../mocks';
+
 // Function to load entries for a specific month/year
 // TODO: Replace with actual API call to backend
-const loadEntriesForMonth = (_month: number, _year: number): DailyEntry[] => {
+const loadEntriesForMonth = (month: number, year: number): DailyEntry[] => {
+  // TODO: Replace this mock data logic with real API call
+  // October 2025 is month index 9 (0-indexed: 0=Jan, 9=Oct)
+  if (month === 9 && year === 2025) {
+    return mockDailyEntries;
+  }
   return [];
 };
 
@@ -27,9 +36,10 @@ const isFutureMonth = (month: number, year: number): boolean => {
 
 function HomePage() {
   const { t } = useTranslation();
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
+  // TODO: Replace hardcoded month with current month after integrating real API
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(9); // October (for mock data)
   const [currentYear, setCurrentYear] = useState(2025);
-  const [prevMonthIndex, setPrevMonthIndex] = useState(10);
+  const [prevMonthIndex, setPrevMonthIndex] = useState(9);
   const [prevYear, setPrevYear] = useState(2025);
   const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(
     null
@@ -40,6 +50,19 @@ function HomePage() {
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
+  const [selectedDayDate, setSelectedDayDate] = useState<Date | null>(null);
+  const [editingTimeBlock, setEditingTimeBlock] = useState<{
+    entryTime: string;
+    exitTime: string;
+    projects: Array<{
+      id: string;
+      project: string;
+      task: string;
+      location: string;
+      hours: number;
+      description?: string;
+    }>;
+  } | null>(null);
 
   // Helper function to get month name from translation
   const getMonthName = (monthIndex: number): string => {
@@ -147,6 +170,45 @@ function HomePage() {
     }
   };
 
+  const handleEditTimeBlock = (timeBlockId: string) => {
+    // Find the time block across all daily entries
+    // TODO: Replace with real API call to fetch time block details
+    for (const dailyEntry of entries) {
+      const timeBlock = dailyEntry.timeBlocks.find((tb) => tb.id === timeBlockId);
+      if (timeBlock) {
+        // Parse the date from the daily entry (format: "DD/MM/YYYY")
+        const [day, month, year] = dailyEntry.date.split('/').map(Number);
+        const date = new Date(year, month - 1, day);
+
+        setSelectedDayDate(date);
+        setEditingTimeBlock(timeBlock);
+        setIsManualReportModalOpen(true);
+        return;
+      }
+    }
+  };
+
+  const handleAddReport = (dayId: string) => {
+    // Find the daily entry to get the date
+    // TODO: Replace with real API call
+    const dailyEntry = entries.find((entry) => entry.id === dayId);
+    if (dailyEntry) {
+      // Parse the date from the daily entry (format: "DD/MM/YYYY")
+      const [day, month, year] = dailyEntry.date.split('/').map(Number);
+      const date = new Date(year, month - 1, day);
+
+      setSelectedDayDate(date);
+      setEditingTimeBlock(null); // No time block = new report
+      setIsManualReportModalOpen(true);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsManualReportModalOpen(false);
+    setSelectedDayDate(null);
+    setEditingTimeBlock(null);
+  };
+
   return (
     <div className="home-page">
       {/* Header */}
@@ -214,6 +276,8 @@ function HomePage() {
                 entry={entry}
                 isExpanded={expandedEntryId === entry.id}
                 onToggle={handleToggleEntry}
+                onEditTimeBlock={handleEditTimeBlock}
+                onAddReport={handleAddReport}
               />
             ))
           ) : (
@@ -335,9 +399,12 @@ function HomePage() {
       </nav>
 
       {/* Manual Report Modal */}
+      {/* TODO: Replace mock data with real API integration */}
       <ManualReportModal
         isOpen={isManualReportModalOpen}
-        onClose={() => setIsManualReportModalOpen(false)}
+        onClose={handleCloseModal}
+        selectedDate={selectedDayDate || undefined}
+        initialTimeBlock={editingTimeBlock}
       />
     </div>
   );
