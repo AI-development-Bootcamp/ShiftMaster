@@ -23,7 +23,7 @@ describe('validation utilities', () => {
         expect(validateProjectTime(startTime, endTime)).toBeNull();
       });
 
-      it('should return null for overnight shift across midnight', () => {
+      it('should return null for late evening shift (same PM period)', () => {
         const startTime: TimeValue = { hours: 11, minutes: 0, period: 'PM' };
         const endTime: TimeValue = { hours: 11, minutes: 59, period: 'PM' };
         expect(validateProjectTime(startTime, endTime)).toBeNull();

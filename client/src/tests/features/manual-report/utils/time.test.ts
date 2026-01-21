@@ -89,11 +89,16 @@ describe('time utilities', () => {
 
       it('should throw error with code INVALID_TIME_VALUE', () => {
         const time: TimeValue = { hours: 0, minutes: 30, period: 'AM' };
+        let thrownError;
+
         try {
           timeToMinutes(time);
         } catch (error) {
-          expect(error).toHaveProperty('code', 'INVALID_TIME_VALUE');
+          thrownError = error;
         }
+
+        expect(thrownError).toBeDefined();
+        expect(thrownError).toHaveProperty('code', 'INVALID_TIME_VALUE');
       });
     });
   });
@@ -163,6 +168,7 @@ describe('time utilities', () => {
       });
 
       it('should throw error with code INVALID_TIME_VALUE', () => {
+        expect.assertions(1);
         try {
           formatTime(-1, 30);
         } catch (error) {
