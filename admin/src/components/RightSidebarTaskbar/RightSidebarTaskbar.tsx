@@ -1,10 +1,10 @@
 import React from 'react';
-import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { User } from '@abra-shift-master/shared';
+import { LogoutButton } from '../LogoutButton';
 import abraLogo from '../../assets/abra_logo.svg';
 import abraLogoTextWhite from '../../assets/abra_logo_text_white.svg';
 import '../../styles/RightSidebarTaskbar.css';
-import { LogoutIcon } from '../../constants/icons';
 
 export interface NavItemConfig {
   id: string;
@@ -39,13 +39,6 @@ function NavItem({ item }: { item: NavItemConfig }) {
 
 
 export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps) {
-  const navigate = useNavigate(); // Now using useNavigate
-
-  const handleLogout = () => {
-    // In a real app, this would clear auth state
-    navigate('/');
-  };
-
   return (
     <aside className="sidebar" aria-label="תפריט ראשי">
       {/* Header section */}
@@ -62,16 +55,7 @@ export function RightSidebarTaskbar({ navItems, user }: RightSidebarTaskbarProps
 
       {/* Logout functionality */}
       <div className="sidebar-actions">
-        <button
-          onClick={handleLogout}
-          className="nav-item logout-button"
-          aria-label="התנתקות"
-        >
-          {/* Spacer to align with NavItems */}
-          <span className="nav-item-indicator" aria-hidden="true" />
-          <span className="nav-item-icon" aria-hidden="true"><LogoutIcon /></span>
-          <span className="nav-item-label">התנתקות</span>
-        </button>
+        <LogoutButton />
       </div>
 
       {/* Footer section */}

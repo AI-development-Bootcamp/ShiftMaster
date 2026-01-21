@@ -179,5 +179,15 @@
         },
         "confirmLabel": "מחק",
         "cancelLabel": "ביטול"
+    },
+    "errors": {
+        "INVALID_CREDENTIALS": "אימייל או סיסמה שגויים",
+        "ACCESS_DENIED": "אין לך הרשאה להתחבר לאפליקציה זו",
+        "VALIDATION_ERROR": "שגיאה בנתונים שהוזנו",
+        "INTERNAL_SERVER_ERROR": "שגיאת שרת פנימית",
+        "NETWORK_ERROR": "שגיאת תקשורת, אנא נסה שנית",
+        "auth": {
+            "invalidCredentials": "אימייל או סיסמה שגויים"
+        }
     }
 }

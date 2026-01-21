@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import StatusBadge, { EntryStatus } from '../StatusBadge/StatusBadge';
 import TimeEntryItem, { TimeEntry } from '../TimeEntryItem/TimeEntryItem';
-import './DailyEntryCard.css';
+import '../../styles/DailyEntryCard.css';
 
 export type AbsenceType =
   | 'vacation-half'

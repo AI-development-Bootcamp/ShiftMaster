@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 // Import slices here as they are created
-// import authReducer from './slices/authSlice';
+import authReducer from './slices/authSlice';
 
 // Placeholder reducer until actual slices are created
 // This prevents Redux from throwing an error about empty reducers
@@ -13,7 +13,7 @@ export const store = configureStore({
     // Temporary placeholder - remove this when you add your first real reducer
     _placeholder: placeholderReducer,
     // Add reducers here
-    // auth: authReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
