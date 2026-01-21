@@ -15,20 +15,16 @@ import { useTranslation } from 'react-i18next';
 import { UserRole, Project } from '@abra-shift-master/shared';
 import { fetchProjects, createProject, updateProject, deleteProject, CreateProjectInput, UpdateProjectInput } from '../../api/projectsApi';
 
-import { mockTasks } from '../../mocks/projects';
 import { mockClients } from '../../mocks/clients';
 import { mockUsers, mockCurrentUser } from '../../mocks/users';
-import { mockAdminTaskAssignments } from '../../mocks/adminTaskAssignments';
 import '../../styles/AssignmentPage.css';
 
 interface AssignmentTableRow {
-    id: string;
-    task_id: string;
-    client_id: string;
+    id: string; // project_id
     project_id: string;
+    client_id: string;
     client_name: string;
     project_name: string;
-    task_name: string;
     assignees: PersonChip[];
 }
 
@@ -142,19 +138,7 @@ export function AssignmentPage() {
         }
     };
 
-    const handleEditTask = (row: AssignmentTableRow) => {
-        const task = mockTasks.find(t => t.task_id === row.task_id);
-        if (task) {
-            setFormInitialValues({
-                taskTitle: task.name,
-                projectId: String(task.project_id),
-                assignedTo: '',
-                dueDate: '',
-                description: task.description || '',
-            });
-            setActiveForm('task');
-        }
-    };
+
 
     const handleDeleteClick = (type: 'client' | 'project' | 'task', id: string, name: string) => {
         setDeletingItem({ type, id, name });
@@ -182,39 +166,25 @@ export function AssignmentPage() {
 
     // --- Data Aggregation (Raw Rows) ---
     const rawRows = useMemo(() => {
-        return mockTasks.map(task => {
-            const project = projects.find(p => p.project_id === task.project_id);
-            const client = project ? mockClients.find(c => c.client_id === project.client_id) : null;
+        return projects.map(project => {
+            const client = mockClients.find(c => c.client_id === project.client_id);
 
-            // Find active assignments for this task
-            const taskAssignments = mockAdminTaskAssignments.filter(
-                a => a.task_id === task.task_id && a.active
-            );
-
-            // Map assignments to PersonChip
-            const assignees: PersonChip[] = taskAssignments.map(assignment => {
-                const user = mockUsers.find(u => u.user_id === assignment.user_id);
-                return {
-                    id: String(assignment.user_id),
-                    name: user ? user.full_name : t('common.unknownUser')
-                };
-            });
+            // Assignees currently mocked as empty since we don't have task/project assignment API
+            const assignees: PersonChip[] = [];
 
             return {
-                id: String(task.task_id),
-                task_id: task.task_id,
-                client_id: client ? client.client_id : '',
-                project_id: project ? project.project_id : '',
+                id: project.project_id,
+                project_id: project.project_id,
+                client_id: project.client_id,
                 client_name: client ? client.name : t('common.unknown'),
-                project_name: project ? project.name : t('common.unknown'),
-                task_name: task.name,
+                project_name: project.name,
                 assignees
             };
         });
     }, [t, projects]);
 
     // --- Search Logic (Reusable) ---
-    const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
+    const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name']);
 
     // Reset pagination when search/data changes
     useEffect(() => {
@@ -262,7 +232,7 @@ export function AssignmentPage() {
     }, [t]);
 
     const handleAssignmentSubmit = async (selectedRows: EmployeeRow[]) => {
-        console.log('Updated assignments for task', editingAssignment?.task_name, ':', selectedRows);
+        console.log('Updated assignments for project', editingAssignment?.project_name, ':', selectedRows);
         setEditingAssignment(null);
     };
 
@@ -274,7 +244,7 @@ export function AssignmentPage() {
             type: 'text',
             sortable: true,
             disableSortClearing: true,
-            width: '20%',
+            width: '30%',
         },
         {
             key: 'project_name',
@@ -282,27 +252,20 @@ export function AssignmentPage() {
             type: 'text',
             sortable: true,
             disableSortClearing: true,
-            width: '20%',
-        },
-        {
-            key: 'task_name',
-            header: t('assignmentPage.tableHeaders.taskName'),
-            type: 'text',
-            sortable: true,
-            width: '20%',
+            width: '40%',
         },
         {
             key: 'assignees',
             header: t('assignmentPage.tableHeaders.assignees'),
             type: 'tags',
-            width: '25%',
+            width: '30%',
             accessor: (row) => row.assignees
         },
         {
             key: 'actions',
             header: t('common.actions'),
             type: 'actions',
-            width: '15%',
+            width: '100px',
         }
     ];
 
@@ -387,16 +350,10 @@ export function AssignmentPage() {
                     editOptions: [
                         { label: t('assignmentPage.actions.editClient'), onClick: (row) => handleEditClient(row) },
                         { label: t('assignmentPage.actions.editProject'), onClick: (row) => handleEditProject(row) },
-                        { label: t('assignmentPage.actions.editTask'), onClick: (row) => handleEditTask(row) },
-                        {
-                            label: t('assignmentPage.actions.editAssignment'),
-                            onClick: (row) => setEditingAssignment(row)
-                        },
                     ],
                     deleteOptions: [
                         { label: t('assignmentPage.actions.deleteClient'), onClick: (row) => handleDeleteClick('client', String(row.client_id), row.client_name) },
                         { label: t('assignmentPage.actions.deleteProject'), onClick: (row) => handleDeleteClick('project', String(row.project_id), row.project_name) },
-                        { label: t('assignmentPage.actions.deleteTask'), onClick: (row) => handleDeleteClick('task', String(row.task_id), row.task_name) },
                     ]
                 }}
             />
@@ -407,7 +364,7 @@ export function AssignmentPage() {
                         contextPath={{
                             client: { id: String(editingAssignment.client_id), name: editingAssignment.client_name },
                             project: { id: String(editingAssignment.project_id), name: editingAssignment.project_name },
-                            task: { id: String(editingAssignment.task_id), name: editingAssignment.task_name }
+                            task: { id: 'general', name: 'General' } // Dummy task context
                         }}
                         rows={potentialEmployees}
                         initialSelectedIds={editingAssignment.assignees.map(a => a.id)}
