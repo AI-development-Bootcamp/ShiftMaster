@@ -26,8 +26,8 @@
 
 ## 4. Backend - Tests
 
-- [ ] 4.1 Add unit tests for `MonthLocksService` (`server/src/tests/monthLocksService.test.ts`)
-- [ ] 4.2 Add controller tests for `monthLocksController` (`server/src/tests/monthLocksController.test.ts`)
+- [x] 4.1 Add unit tests for `MonthLocksService` (`server/src/tests/services/monthLocksService.test.ts`)
+- [x] 4.2 Add controller tests for `monthLocksController` (`server/src/tests/controllers/monthLocksController.test.ts`)
 
 ## 5. Frontend - Month Locks Service
 
