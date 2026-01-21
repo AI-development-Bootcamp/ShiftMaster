@@ -50,6 +50,10 @@ function AppContent() {
     dispatch(initializeAuth())
       .unwrap()
       .catch((error) => {
+        // Ignore ConditionError - it's expected when preventing concurrent refresh calls
+        if (error?.name === 'ConditionError') {
+          return;
+        }
         const errorCode =
           (error as { code?: string })?.code ?? 'AUTH_INIT_FAILED';
         console.error('Auth init error:', { code: errorCode, error });
