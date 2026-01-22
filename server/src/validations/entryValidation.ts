@@ -12,3 +12,9 @@ export const clockOutSchema = z.object({
     errorMap: () => ({ message: 'Location must be Office, Client, or Home' }),
   }),
 });
+
+export const timelineQuerySchema = z.object({
+  user_id: z.string().optional(),
+  start_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
+  end_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format (YYYY-MM-DD)').optional(),
+});

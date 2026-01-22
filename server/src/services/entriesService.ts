@@ -296,4 +296,174 @@ export class EntriesService {
     const [hours, minutes] = time.split(':').map(Number);
     return hours * 60 + minutes;
   }
+
+  /**
+   * Get timeline - unified view of work entries and absences grouped by date
+   *
+   * Performance: Uses database index idx_entries_user_date_range on (user_id, work_date)
+   * for efficient querying across date ranges
+   */
+  async getTimeline(userId: string, startDate: string, endDate: string): Promise<any[]> {
+    // Fetch all entries in date range (optimized by idx_entries_user_date_range index)
+    const entries = await this.entryRepo.findByUserIdAndDateRange(userId, startDate, endDate);
+
+    // Get all entry_assignment IDs for fetching related data
+    const entryIds = entries.map((e) => e.entry_id);
+
+    // Fetch assignments with task and project details
+    const assignmentsWithDetails = await this.fetchAssignmentsWithDetails(entryIds);
+
+    // Check which months are locked
+    const lockedMonths = await this.getLockedMonths(startDate, endDate);
+
+    // Group entries by date
+    const timelineMap = new Map<string, any>();
+
+    for (const entry of entries) {
+      const workDate = entry.work_date;
+
+      if (!timelineMap.has(workDate)) {
+        timelineMap.set(workDate, {
+          work_date: workDate,
+          total_work_minutes: 0,
+          entries: [],
+          absences: [],
+        });
+      }
+
+      const dayData = timelineMap.get(workDate)!;
+      const isLocked = this.isDateLocked(workDate, lockedMonths);
+
+      if (entry.entry_kind === 'work') {
+        // Get assignments for this entry
+        const entryAssignments = assignmentsWithDetails.filter((a) => a.entry_id === entry.entry_id);
+
+        // Calculate total work minutes for the day
+        if (entry.start_time && entry.end_time) {
+          const duration = this.calculateDurationMinutes(entry.start_time, entry.end_time);
+          dayData.total_work_minutes += duration;
+        }
+
+        dayData.entries.push({
+          entry_id: entry.entry_id,
+          entry_kind: entry.entry_kind,
+          start_time: entry.start_time,
+          end_time: entry.end_time,
+          is_active: entry.start_time && !entry.end_time,
+          is_locked: isLocked,
+          assignments: entryAssignments.map((a) => ({
+            entry_assignment_id: a.entry_assignment_id,
+            task_id: a.task_id,
+            task_name: a.task_name,
+            project_name: a.project_name,
+            location: a.location,
+            duration_minutes: a.duration_minutes,
+          })),
+        });
+      } else if (entry.entry_kind === 'absence') {
+        dayData.absences.push({
+          entry_id: entry.entry_id,
+          entry_kind: entry.entry_kind,
+          absence_type: entry.absence_type,
+          description: entry.description,
+          is_locked: isLocked,
+        });
+      }
+    }
+
+    // Convert map to sorted array
+    return Array.from(timelineMap.values()).sort((a, b) => b.work_date.localeCompare(a.work_date));
+  }
+
+  /**
+   * Fetch assignments with task and project details
+   */
+  private async fetchAssignmentsWithDetails(entryIds: string[]): Promise<any[]> {
+    if (entryIds.length === 0) {
+      return [];
+    }
+
+    // Use Supabase query to join entry_assignments with tasks and projects
+    const { data, error } = await this.entryRepo['dbConnection']
+      .from('entry_assignments')
+      .select(
+        `
+        entry_assignment_id,
+        entry_id,
+        task_id,
+        location,
+        start_time,
+        end_time,
+        duration_minutes,
+        tasks!inner(
+          task_name,
+          projects!inner(
+            project_name
+          )
+        )
+      `
+      )
+      .in('entry_id', entryIds);
+
+    if (error) {
+      console.error('Error fetching assignments with details:', error);
+      throw error;
+    }
+
+    // Flatten the nested structure
+    return (
+      data?.map((a: any) => ({
+        entry_assignment_id: a.entry_assignment_id,
+        entry_id: a.entry_id,
+        task_id: a.task_id,
+        location: a.location,
+        start_time: a.start_time,
+        end_time: a.end_time,
+        duration_minutes: a.duration_minutes,
+        task_name: a.tasks?.task_name || null,
+        project_name: a.tasks?.projects?.project_name || null,
+      })) || []
+    );
+  }
+
+  /**
+   * Get locked months in date range
+   */
+  private async getLockedMonths(startDate: string, endDate: string): Promise<Set<string>> {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const lockedMonths = new Set<string>();
+
+    // Get all unique year-month combinations in range
+    const monthsToCheck = new Set<string>();
+    const current = new Date(start);
+
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = current.getMonth() + 1;
+      monthsToCheck.add(`${year}-${month}`);
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    // Check each month
+    for (const yearMonth of monthsToCheck) {
+      const [year, month] = yearMonth.split('-').map(Number);
+      const isLocked = await this.monthLockRepo.isMonthLocked(year, month);
+      if (isLocked) {
+        lockedMonths.add(`${year}-${month}`);
+      }
+    }
+
+    return lockedMonths;
+  }
+
+  /**
+   * Check if a date is in a locked month
+   */
+  private isDateLocked(workDate: string, lockedMonths: Set<string>): boolean {
+    const date = new Date(workDate);
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    return lockedMonths.has(`${year}-${month}`);
+  }
 }

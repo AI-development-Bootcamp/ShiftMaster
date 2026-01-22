@@ -10,7 +10,7 @@ import {
   TaskNotAssignedError,
   InvalidEntryStateError,
 } from '../services/entriesService.js';
-import { clockInSchema, clockOutSchema } from '../validations/entryValidation.js';
+import { clockInSchema, clockOutSchema, timelineQuerySchema } from '../validations/entryValidation.js';
 
 export async function clockIn(req: Request, res: Response): Promise<void> {
   try {
@@ -169,6 +169,85 @@ export async function clockOut(req: Request, res: Response): Promise<void> {
       });
       return;
     }
+
+    res.status(500).json({
+      success: false,
+      error: {
+        message: 'Internal server error',
+        code: 'INTERNAL_SERVER_ERROR',
+      },
+    });
+  }
+}
+
+export async function getTimeline(req: Request, res: Response): Promise<void> {
+  try {
+    const validation = timelineQuerySchema.safeParse(req.query);
+
+    if (!validation.success) {
+      res.status(400).json({
+        success: false,
+        error: {
+          message: 'Validation failed',
+          code: 'VALIDATION_ERROR',
+          details: validation.error.errors,
+        },
+      });
+      return;
+    }
+
+    const currentUser = req.user!;
+    const { user_id, start_date, end_date } = validation.data;
+
+    // Determine target user ID
+    let targetUserId: string;
+
+    if (user_id) {
+      // If requesting another user's timeline, check admin access
+      if (currentUser.role !== 'admin') {
+        res.status(403).json({
+          success: false,
+          error: {
+            message: "Forbidden: Admin access required to view other user's timeline",
+            code: 'FORBIDDEN',
+          },
+        });
+        return;
+      }
+      targetUserId = user_id;
+    } else {
+      // No user_id provided, use authenticated user
+      targetUserId = currentUser.userId;
+    }
+
+    // Default to current month if no dates provided
+    let startDate = start_date;
+    let endDate = end_date;
+
+    if (!startDate || !endDate) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+
+      if (!startDate) {
+        startDate = new Date(year, month, 1).toISOString().split('T')[0];
+      }
+      if (!endDate) {
+        endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+      }
+    }
+
+    const entriesService = new EntriesService(supabaseAdmin);
+    const timeline = await entriesService.getTimeline(targetUserId, startDate, endDate);
+
+    res.status(200).json({
+      success: true,
+      data: {
+        timeline,
+      },
+    });
+  } catch (error) {
+    console.error('Get timeline error:', error);
 
     res.status(500).json({
       success: false,
