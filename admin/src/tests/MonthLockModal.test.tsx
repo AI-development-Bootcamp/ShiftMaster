@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom/vitest';
+import { Provider } from 'react-redux';
+import { store } from '../store';
 import { MonthLockModal } from '../components/MonthLocks/MonthLockModal';
 
 // Mock useTranslation
@@ -35,18 +37,21 @@ vi.mock('react-i18next', () => ({
 describe('MonthLockModal', () => {
   const mockOnClose = vi.fn();
 
+  const renderWithProvider = (ui: React.ReactElement) =>
+    render(<Provider store={store}>{ui}</Provider>);
+
   beforeEach(() => {
     mockOnClose.mockClear();
   });
 
   it('does not render when isOpen is false', () => {
-    render(<MonthLockModal isOpen={false} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={false} onClose={mockOnClose} />);
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('renders modal when isOpen is true', async () => {
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -56,7 +61,7 @@ describe('MonthLockModal', () => {
   });
 
   it('displays year navigator', async () => {
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       const currentYear = new Date().getFullYear().toString();
@@ -65,7 +70,7 @@ describe('MonthLockModal', () => {
   });
 
   it('displays 12 month tiles after loading', async () => {
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     // Wait for loading to complete
     await waitFor(() => {
@@ -90,7 +95,7 @@ describe('MonthLockModal', () => {
   it('closes modal when X button is clicked', async () => {
     const user = userEvent.setup();
 
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -105,7 +110,7 @@ describe('MonthLockModal', () => {
   it('closes modal when overlay is clicked', async () => {
     const user = userEvent.setup();
 
-    const { container } = render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    const { container } = renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -122,7 +127,7 @@ describe('MonthLockModal', () => {
   it('closes modal when ESC key is pressed', async () => {
     const user = userEvent.setup();
 
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -136,7 +141,7 @@ describe('MonthLockModal', () => {
   it('navigates to previous year', async () => {
     const user = userEvent.setup();
 
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -156,7 +161,7 @@ describe('MonthLockModal', () => {
   it('navigates to next year', async () => {
     const user = userEvent.setup();
 
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
@@ -174,7 +179,7 @@ describe('MonthLockModal', () => {
   });
 
   it('has proper accessibility attributes', async () => {
-    render(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
+    renderWithProvider(<MonthLockModal isOpen={true} onClose={mockOnClose} />);
 
     await waitFor(() => {
       const dialog = screen.getByRole('dialog');
