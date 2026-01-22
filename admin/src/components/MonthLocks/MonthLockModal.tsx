@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { YearNavigator } from './YearNavigator';
 import { MonthGrid } from './MonthGrid';
 import { useMonthLocks } from '../../hooks/useMonthLocks';
+import { useAppSelector } from '../../store';
 import '../../styles/MonthLocks.css';
 
 /**
@@ -34,7 +35,11 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
   const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const [year, setYear] = useState(currentYear);
-  const { locks, isLoading, toggleLock, saveChanges } = useMonthLocks(year);
+
+  // Get admin user ID from Redux auth state
+  const userId = useAppSelector((state) => state.auth.user?.user_id ?? '');
+
+  const { locks, isLoading, toggleLock, saveChanges, hasChanges } = useMonthLocks(year, userId);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const [saveError, setSaveError] = useState<string | null>(null);
 
@@ -146,6 +151,7 @@ export function MonthLockModal({ isOpen, onClose, buttonRef }: MonthLockModalPro
           <button
             type="button"
             className="month-lock-save-button"
+            disabled={!hasChanges}
             onClick={async () => {
               try {
                 setSaveError(null);

@@ -15,7 +15,6 @@ export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock,
             .select('*')
             .eq('year', year)
             .eq('month', month)
-            .is('unlocked_at', null) // Only consider currently active locks
             .single();
 
         if (error) {
@@ -30,5 +29,20 @@ export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock,
     async isMonthLocked(year: number, month: number): Promise<boolean> {
         const lock = await this.findByYearAndMonth(year, month);
         return !!lock;
+    }
+
+    async findByYear(year: number): Promise<MonthLock[]> {
+        const { data, error } = await this.dbConnection
+            .from(this.table)
+            .select('*')
+            .eq('year', year)
+            .order('month', { ascending: true });
+
+        if (error) {
+            logDbError('MonthLockRepository.findByYear', error);
+            throw error;
+        }
+
+        return data as MonthLock[];
     }
 }

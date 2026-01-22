@@ -1,129 +1,222 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { MonthLock } from '@abra-shift-master/shared';
-import { mockMonthLocks } from '../mocks/monthLocks';
-import { apiClient as api } from '../api';
+import { monthLocksService } from '../services/monthLocksService';
 
 /**
- * Hook for managing month locks data and operations.
+ * Hook for managing month locks data and operations across multiple years.
  *
  * This hook provides a batch-update interface for month lock management.
- * Users can toggle locks locally (pending state) and then save all changes
- * in a single operation.
+ * Users can toggle locks locally (pending state) across multiple years
+ * and then save all changes in a single operation.
  *
- * @param year - The year to load month locks for
+ * Changes persist when navigating between years - they are only lost
+ * when the modal is closed or changes are explicitly discarded.
+ *
+ * @param year - The currently viewed year (for display)
+ * @param userId - The admin user ID (from Redux auth state) for creating new locks
  * @returns Object containing locks, pending state, operations, and status
  */
-export function useMonthLocks(year: number) {
-  // serverLocks reflects the true state from the API/Mock
-  const [serverLocks, setServerLocks] = useState<MonthLock[]>([]);
-  // pendingLocks reflects the local state in the UI before saving
-  const [pendingLocks, setPendingLocks] = useState<MonthLock[]>([]);
+export function useMonthLocks(year: number, userId: string) {
+  // serverLocksByYear: Map of year -> locks from the API
+  const [serverLocksByYear, setServerLocksByYear] = useState<Map<number, MonthLock[]>>(new Map());
+  // pendingLocksByYear: Map of year -> locks including user changes
+  const [pendingLocksByYear, setPendingLocksByYear] = useState<Map<number, MonthLock[]>>(new Map());
+  // Track which years have been loaded from API
+  const loadedYearsRef = useRef<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load locks for the specified year
+  // Load locks for the specified year from the API (only if not already loaded)
   useEffect(() => {
+    // Skip if already loaded
+    if (loadedYearsRef.current.has(year)) {
+      setIsLoading(false);
+      return;
+    }
+
+    let cancelled = false;
     setIsLoading(true);
 
-    // Simulate async data fetch (mock data)
-    const timer = setTimeout(() => {
-      const yearLocks = mockMonthLocks.filter(lock => lock.year === year);
-      setServerLocks(yearLocks);
-      setPendingLocks(yearLocks); // Pending starts synced with server
-      setIsLoading(false);
-    }, 150); // Small delay to show loading state
+    monthLocksService.fetchLocksForYear(year)
+      .then((yearLocks) => {
+        if (!cancelled) {
+          loadedYearsRef.current.add(year);
 
-    return () => clearTimeout(timer);
+          // Update server state for this year
+          setServerLocksByYear(prev => {
+            const next = new Map(prev);
+            next.set(year, yearLocks);
+            return next;
+          });
+
+          // Update pending state for this year ONLY if no pending changes exist
+          setPendingLocksByYear(prev => {
+            const next = new Map(prev);
+            // Only set if not already modified by user
+            if (!next.has(year)) {
+              next.set(year, yearLocks);
+            }
+            return next;
+          });
+
+          setIsLoading(false);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error('Failed to fetch month locks:', error);
+          loadedYearsRef.current.add(year);
+
+          setServerLocksByYear(prev => {
+            const next = new Map(prev);
+            next.set(year, []);
+            return next;
+          });
+
+          setPendingLocksByYear(prev => {
+            const next = new Map(prev);
+            if (!next.has(year)) {
+              next.set(year, []);
+            }
+            return next;
+          });
+
+          setIsLoading(false);
+        }
+      });
+
+    return () => { cancelled = true; };
   }, [year]);
 
   /**
-   * Toggles a month lock in the local pending state.
+   * Toggles a month lock in the local pending state for any year.
    * Does NOT trigger an API call.
    */
-  const toggleLock = useCallback((year: number, month: number) => {
-    setPendingLocks(currentLocks => {
-      const existingTx = currentLocks.find(lock => lock.year === year && lock.month === month);
+  const toggleLock = useCallback((toggleYear: number, month: number) => {
+    setPendingLocksByYear(currentMap => {
+      const next = new Map(currentMap);
+      const currentLocks = next.get(toggleYear) ?? [];
+      const existingLock = currentLocks.find(lock => lock.year === toggleYear && lock.month === month);
 
-      if (existingTx) {
+      if (existingLock) {
         // Unlock: remove from pending
-        return currentLocks.filter(lock => lock.lock_id !== existingTx.lock_id);
+        next.set(toggleYear, currentLocks.filter(lock => lock.lock_id !== existingLock.lock_id));
       } else {
-        // Lock: add to pending
-        const mockAdminUserId = '550e8400-e29b-41d4-a716-446655440000'; // TODO: Replace with actual admin user ID
+        // Lock: add to pending with actual admin user ID
         const newLock: MonthLock = {
-          lock_id: crypto.randomUUID(), // Generate UUID
-          year,
+          lock_id: crypto.randomUUID(),
+          year: toggleYear,
           month,
           locked_at: new Date().toISOString(),
-          locked_by: mockAdminUserId
+          locked_by: userId
         };
-        return [...currentLocks, newLock];
+        next.set(toggleYear, [...currentLocks, newLock]);
       }
+      return next;
     });
-  }, []);
+  }, [userId]);
 
   /**
-   * Checks if there are uncommitted changes.
+   * Checks if there are uncommitted changes across ALL years.
    */
   const hasChanges = useMemo(() => {
-    if (serverLocks.length !== pendingLocks.length) return true;
+    // Get all years that have either server or pending data
+    const allYears = new Set([
+      ...serverLocksByYear.keys(),
+      ...pendingLocksByYear.keys()
+    ]);
 
-    // Check if every server lock is still in pending (by ID or month match for existing)
-    // Simpler: Check simply by month/year set comparison since we only care about "is locked" status
-    const serverSet = new Set(serverLocks.map(l => `${l.year}-${l.month}`));
-    const pendingSet = new Set(pendingLocks.map(l => `${l.year}-${l.month}`));
+    for (const y of allYears) {
+      const serverLocks = serverLocksByYear.get(y) ?? [];
+      const pendingLocks = pendingLocksByYear.get(y) ?? [];
 
-    if (serverSet.size !== pendingSet.size) return true;
-    for (const key of serverSet) {
-      if (!pendingSet.has(key)) return true;
+      // Quick length check
+      if (serverLocks.length !== pendingLocks.length) return true;
+
+      // Compare by year-month keys
+      const serverSet = new Set(serverLocks.map(l => `${l.year}-${l.month}`));
+      const pendingSet = new Set(pendingLocks.map(l => `${l.year}-${l.month}`));
+
+      if (serverSet.size !== pendingSet.size) return true;
+      for (const key of serverSet) {
+        if (!pendingSet.has(key)) return true;
+      }
     }
     return false;
-  }, [serverLocks, pendingLocks]);
+  }, [serverLocksByYear, pendingLocksByYear]);
 
   /**
-   * Commits all pending changes to the "server".
+   * Commits all pending changes across ALL years to the server.
    */
   const saveChanges = useCallback(async () => {
-    // Calculate delta for API payload
-    const initialMonths = new Set(serverLocks.map(l => l.month));
-    const finalMonths = new Set(pendingLocks.map(l => l.month));
+    // Find all years with changes
+    const yearsWithChanges: number[] = [];
+    const allYears = new Set([
+      ...serverLocksByYear.keys(),
+      ...pendingLocksByYear.keys()
+    ]);
 
-    const toLock = [...finalMonths].filter(m => !initialMonths.has(m)).sort((a, b) => a - b);
-    const toUnlock = [...initialMonths].filter(m => !finalMonths.has(m)).sort((a, b) => a - b);
+    for (const y of allYears) {
+      const serverLocks = serverLocksByYear.get(y) ?? [];
+      const pendingLocks = pendingLocksByYear.get(y) ?? [];
 
-    if (toLock.length === 0 && toUnlock.length === 0) return;
+      const serverSet = new Set(serverLocks.map(l => l.month));
+      const pendingSet = new Set(pendingLocks.map(l => l.month));
 
-    const payload = {
-      year,
-      operations: {
-        lock: toLock,
-        unlock: toUnlock
+      const toLock = [...pendingSet].filter(m => !serverSet.has(m));
+      const toUnlock = [...serverSet].filter(m => !pendingSet.has(m));
+
+      if (toLock.length > 0 || toUnlock.length > 0) {
+        yearsWithChanges.push(y);
       }
-    };
+    }
 
-    // Optimistically update "server" state to match pending
-    const previousServerLocks = serverLocks;
-    setServerLocks(pendingLocks);
+    if (yearsWithChanges.length === 0) return;
+
+    // Save previous state for rollback
+    const previousServerLocksByYear = new Map(serverLocksByYear);
+
+    // Optimistically update server state
+    setServerLocksByYear(new Map(pendingLocksByYear));
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await (api as any).batchUpdateMonthLocks(payload);
+      // Send batch requests for each year with changes
+      for (const y of yearsWithChanges.sort((a, b) => a - b)) {
+        const serverLocks = previousServerLocksByYear.get(y) ?? [];
+        const pendingLocks = pendingLocksByYear.get(y) ?? [];
+
+        const serverSet = new Set(serverLocks.map(l => l.month));
+        const pendingSet = new Set(pendingLocks.map(l => l.month));
+
+        const toLock = [...pendingSet].filter(m => !serverSet.has(m)).sort((a, b) => a - b);
+        const toUnlock = [...serverSet].filter(m => !pendingSet.has(m)).sort((a, b) => a - b);
+
+        await monthLocksService.batchUpdateLocks({
+          year: y,
+          operations: { lock: toLock, unlock: toUnlock }
+        });
+      }
     } catch (error) {
       // Rollback on failure
-      setServerLocks(previousServerLocks);
-      setPendingLocks(previousServerLocks);
+      setServerLocksByYear(previousServerLocksByYear);
+      setPendingLocksByYear(previousServerLocksByYear);
       throw error;
     }
-  }, [pendingLocks, serverLocks, year]);
+  }, [pendingLocksByYear, serverLocksByYear]);
 
   /**
-   * Discards local changes and reverts to server state.
+   * Discards local changes and reverts to server state for ALL years.
    */
   const discardChanges = useCallback(() => {
-    setPendingLocks(serverLocks);
-  }, [serverLocks]);
+    setPendingLocksByYear(new Map(serverLocksByYear));
+  }, [serverLocksByYear]);
+
+  // Return locks for the currently viewed year
+  const locks = useMemo(() => {
+    return pendingLocksByYear.get(year) ?? [];
+  }, [pendingLocksByYear, year]);
 
   return {
-    locks: pendingLocks, // UI should render pending state
+    locks, // Pending locks for the current year (for display)
     isLoading,
     toggleLock,
     saveChanges,
