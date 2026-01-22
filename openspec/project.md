@@ -34,18 +34,40 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 - PostgreSQL via Supabase
 
+**Caching & Session Storage:**
+
+- Redis (via Docker Compose for local development)
+- ioredis client library
+- Refresh token session management
+- 30-day session TTL
+
 **Authentication:**
 
-- JWT (users receive a password without needing to change it)
+- JWT access tokens (15-minute expiry)
+- JWT refresh tokens (stored in Redis with 30-day expiry)
+- HttpOnly cookies for refresh tokens
+- Token rotation on refresh
+- Session revocation support
+- Users receive a password without needing to change it
 
 **Testing:**
 
-- Vitest
-- API Endpoints: Swagger
+- Vitest (unit and integration tests)
+- Testing Library (React component tests)
+- Supertest (API endpoint tests)
+- API Documentation: Swagger UI at `/api-docs`
+
+**Development Tools:**
+
+- Docker Compose (Redis container)
+- Nodemon (server auto-restart)
+- Vite HMR (frontend hot module reload)
+- tsx (TypeScript execution for scripts)
 
 **Deployment:**
 
-- Vercel
+- Render (server production deployment with Redis)
+- Vercel (frontend deployment)
 
 **Version Control:**
 
@@ -76,8 +98,12 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
   - `/shared` - Shared utilities and API client code
 - Separate Redux stores for client and admin (no shared state)
 - RESTful API design
-- JWT-based authentication
-- Layered server architecture: Routes → Controllers → Services → Models → Database
+- JWT-based authentication with refresh token rotation
+- Redis-based session management for refresh tokens
+- Layered server architecture: Routes → Controllers → Services → Repositories → Database
+- Repository pattern with BaseRepository for data access layer
+- Dependency injection for services
+- In-memory token storage on frontend (no localStorage for access tokens)
 
 ### Directory Structure
 
@@ -114,33 +140,139 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 /server/               # Express API
   /src/
-    /routes/
-    /controllers/
+    /routes/          # API route definitions
+    /controllers/     # Request/response handling
     /services/        # Business logic layer
-    /middleware/
-    /models/
-    /db/              # Database access and Supabase client
-    /utils/
-    /tests/
+    /middleware/      # Auth, error handling, etc.
+    /validations/     # Zod validation schemas
+    /db/              # Database layer
+      /repositories/  # Data access layer (Repository pattern)
+      /types/         # Database type definitions
+      /utils/         # DB utilities (migrate, reset, health, logger)
+      redis.ts        # Redis client and session management
+      supabase.ts     # Supabase client initialization
+    /utils/           # General utilities (JWT, password, error codes)
+    /tests/           # Test files
+      /controllers/   # Controller tests
+      /services/      # Service tests
+      /routes/        # Route integration tests
+      /middleware/    # Middleware tests
+      /db/            # Database tests
+      /utils/         # Utility tests
+      /validations/   # Validation tests
+      /integration/   # Integration tests
+      setup.ts        # Test setup and mocks
   package.json
   tsconfig.json
+  vitest.config.ts
 
 /shared/               # Shared code
   /src/
-    /api/             # API client code
-    /utils/           # Utility functions
-    /types/           # Shared TypeScript types
-    /tests/
+    /api/             # Axios-based API client with interceptors
+    /utils/           # Utility functions (date, validation)
+    /types/           # Shared TypeScript types (models, enums, API types)
+    /tests/           # Shared package tests
   package.json
   tsconfig.json
+  vitest.config.ts
+
+/openspec/             # OpenSpec proposals and project docs
+  project.md          # This file - comprehensive project documentation
+  AGENTS.md           # OpenSpec agent instructions
+
+/.github/
+  /workflows/
+    staging.yml       # CI workflow for dev branch
+    production.yml    # CI/CD workflow for production branch
+
+/docker-compose.yml   # Redis container for local development
+/.env.example         # Environment variable template
+/package.json         # Root workspace configuration
+/tsconfig.base.json   # Shared TypeScript configuration
+/.eslintrc.json       # ESLint configuration
+/.prettierrc          # Prettier code formatting rules
+/CLAUDE.md            # AI assistant project instructions
+/DBschema.md          # Database schema documentation
+/README.md            # Main project README
 ```
 
 ### Testing Strategy
 
-- Vitest for unit and integration tests
+**Testing Framework:**
+
+- Vitest for all workspaces (unit and integration tests)
+- Testing Library for React component tests
+- Supertest for API endpoint testing
+- Axios Mock Adapter for API client testing
+
+**Test Organization:**
+
 - Test files colocated with source: `*.test.ts`, `*.test.tsx`
-- Minimum test coverage requirements to be defined
-- API documentation via Swagger
+- Dedicated `/tests/` directories for each workspace
+- Test setup files: `setup.ts` in each workspace
+
+**Server Test Coverage** (`server/src/tests/`):
+
+- **Controllers** (6 test files):
+  - authController.test.ts
+  - usersController.test.ts
+  - clientsController.test.ts
+  - projectsController.test.ts
+  - tasksController.test.ts
+  - monthLocksController.test.ts
+
+- **Services** (4 test files):
+  - authService.test.ts
+  - usersService.test.ts
+  - clientsService.test.ts
+  - monthLocksService.test.ts
+
+- **Routes** (2 test files):
+  - auth.test.ts
+  - users.test.ts
+
+- **Database**:
+  - redis.test.ts (Redis client and session operations)
+
+- **Middleware**:
+  - auth.test.ts (JWT authentication middleware)
+
+- **Utils**:
+  - jwt.test.ts (JWT token generation/verification)
+  - password.test.ts (Password hashing)
+
+- **Validations**:
+  - userValidation.test.ts (Zod schema validation)
+
+- **Integration**:
+  - protectedRoutes.test.ts (End-to-end route testing)
+
+- **Other**:
+  - health.test.ts (Health check endpoints)
+  - logger.test.ts (Logging utilities)
+
+**Frontend Test Coverage:**
+
+- Component tests colocated with components
+- API client tests in shared package
+- Redux store slice tests
+
+**Shared Package Tests** (`shared/src/tests/`):
+
+- api-client.test.ts (API client with interceptors)
+- health.test.ts (Health check utilities)
+
+**Vitest Configuration:**
+
+- **Server**: Node environment, test env vars for Supabase
+- **Client/Admin**: jsdom environment, Testing Library setup
+- **Shared**: Node environment, Axios mocks
+
+**API Documentation:**
+
+- Swagger UI available at `/api-docs` endpoint
+- Generated with swagger-jsdoc and swagger-ui-express
+- OpenAPI 3.0 specification
 
 ### Git Workflow
 
@@ -220,11 +352,332 @@ AbraShiftMaster is a shift management application for Abra Bootcamp. It provides
 
 ### Environment Variables
 
-- `VITE_API_URL` - Backend API URL for frontends
-- `JWT_SECRET` - Secret key for JWT signing
-- `SUPABASE_URL` - Supabase PostgreSQL connection string
+**Server** (`server/.env`):
+
+- `NODE_ENV` - Environment mode (development, production, test)
+- `PORT` - Server port (default: 3000)
+- `JWT_SECRET` - Secret key for JWT access token signing (≥32 chars in production)
+- `JWT_REFRESH_SECRET` - Secret key for JWT refresh token signing
 - `SUPABASE_URL` - Supabase project URL
 - `SUPABASE_ANON_KEY` - Supabase anonymous key
+- `SUPABASE_SECRET_KEY` - Supabase service role key (for admin operations)
+- `SUPABASE_DB_URL` - PostgreSQL connection string (for migrations)
+- `REDIS_URL` - Redis connection URL (default: `redis://localhost:6379`, production: `rediss://...` with TLS)
+
+**Client** (`client/.env`):
+
+- `VITE_API_URL` - Backend API URL (e.g., `http://localhost:3000/api/v1`)
+
+**Admin** (`admin/.env`):
+
+- `VITE_API_URL` - Backend API URL (e.g., `http://localhost:3000/api/v1`)
+
+**Configuration Files:**
+
+- `.env.example` files provided in root and each workspace
+- Environment validation in `server/src/config/env.ts`
+- Validated on server startup (except in test mode)
+
+### npm Scripts
+
+**Root workspace commands:**
+
+```bash
+# Development
+npm run dev              # Start all workspaces in dev mode (concurrent)
+npm run dev:server       # Start server only
+npm run dev:client       # Start client only
+npm run dev:admin        # Start admin only
+
+# Redis management
+npm run redis:start      # Start Redis container (docker-compose up -d redis)
+npm run redis:stop       # Stop Redis container (docker-compose down)
+npm run redis:logs       # View Redis logs (docker-compose logs -f redis)
+
+# Database
+npm run db:migrate       # Run database migrations (server)
+npm run db:reset         # Reset database (development only)
+npm run seed:dev         # Seed test data
+
+# Testing
+npm test                 # Run tests in all workspaces
+npm run test:server      # Run server tests
+npm run test:client      # Run client tests
+npm run test:admin       # Run admin tests
+npm run test:shared      # Run shared tests
+
+# Linting & Formatting
+npm run lint             # Lint all workspaces
+npm run lint:fix         # Fix linting issues
+npm run format           # Format code with Prettier
+npm run type-check       # Type check all workspaces
+
+# Building
+npm run build            # Build all workspaces
+npm run build:server     # Build server
+npm run build:client     # Build client
+npm run build:admin      # Build admin
+```
+
+**Individual workspace scripts:**
+
+Each workspace (server, client, admin, shared) has its own scripts:
+
+```bash
+# In any workspace directory
+npm run dev              # Start development server
+npm test                 # Run tests
+npm run build            # Build for production
+npm run lint             # Run linting
+npm run type-check       # Type check (or tsc --noEmit)
+```
+
+### Key Dependencies
+
+**Server** (`server/package.json`):
+
+- **Core**: express@4.18.2, TypeScript@5.3.3
+- **Database**: @supabase/supabase-js@2.39.3, pg@8.17.1
+- **Caching**: ioredis@5.9.2
+- **Authentication**: jsonwebtoken@9.0.3, bcrypt@6.0.0
+- **Validation**: zod@3.22.4
+- **Security**: helmet@7.1.0, cors@2.8.5
+- **Documentation**: swagger-jsdoc@6.2.8, swagger-ui-express@5.0.0
+- **Utilities**: uuid@13.0.0, morgan@1.10.0, dotenv@16.3.1
+- **Dev/Testing**: vitest@3.2.4, supertest@6.3.4, nodemon@3.0.3, tsx@4.7.0
+
+**Client** (`client/package.json`):
+
+- **Core**: react@18.2.0, react-dom@18.2.0, TypeScript@5.3.3
+- **Build**: vite@7.3.1, @vitejs/plugin-react@4.2.1
+- **State**: @reduxjs/toolkit@2.0.1, react-redux@9.0.4
+- **Routing**: react-router-dom@6.21.3
+- **i18n**: i18next@25.7.4, react-i18next@16.5.3
+- **Testing**: vitest@3.2.4, @testing-library/react@14.1.2
+- **HTTP**: axios@1.6.5
+
+**Admin** (`admin/package.json`):
+
+- Same as client, plus:
+  - date-fns@4.1.0 (date utilities)
+  - react-datepicker@9.1.0 (date picker component)
+
+**Shared** (`shared/package.json`):
+
+- **HTTP**: axios@1.6.5
+- **Testing**: vitest@3.2.4, axios-mock-adapter@1.22.0
+
+**Root** (`package.json`):
+
+- **Dev Tools**: ESLint, Prettier, TypeScript, Concurrently@8.2.2
+- **Workspaces**: client, admin, server, shared
+
+## Redis Infrastructure
+
+### Overview
+
+ShiftMaster uses Redis for managing refresh token sessions, providing:
+
+- Persistent session storage with automatic expiration
+- Fast session lookup and validation
+- Multi-session support per user
+- Session revocation capabilities
+- Token rotation tracking
+
+### Docker Compose Setup
+
+**File**: `docker-compose.yml` (root directory)
+
+```yaml
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: shiftmaster-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --loglevel debug
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+```
+
+**Management Commands**:
+
+```bash
+npm run redis:start      # Start Redis container
+npm run redis:stop       # Stop Redis container
+npm run redis:logs       # View Redis logs
+```
+
+### Redis Client Configuration
+
+**File**: `server/src/db/redis.ts`
+
+**Connection Setup**:
+
+- Library: ioredis@5.9.2 (TypeScript-native)
+- Singleton pattern (one connection per server process)
+- Connection URL: `REDIS_URL` env var (default: `redis://localhost:6379`)
+- Production: `rediss://...` with TLS support
+
+**Connection Features**:
+
+- Immediate connection (lazy connect disabled)
+- Retry strategy with exponential backoff (max 2000ms)
+- Max 3 retries per request
+- Offline queue enabled during reconnection
+- Event listeners: connect, ready, error, close, reconnecting
+
+### Session Data Model
+
+**Refresh Token Sessions**:
+
+```
+Key Format: refresh:{sessionId}
+Value: JSON-serialized RefreshSession object
+TTL: 30 days (2,592,000 seconds)
+```
+
+**RefreshSession Structure**:
+
+```typescript
+{
+  userId: string              // User ID
+  refreshTokenHash: string    // SHA-256 hash of refresh token
+  createdAt: string           // ISO timestamp
+  lastRotatedAt?: string      // Last rotation timestamp
+  userAgent?: string          // Client user agent
+  ipAddress?: string          // Client IP address
+}
+```
+
+**User Session Index**:
+
+```
+Key Format: user_sessions:{userId}
+Type: Set
+Values: Set of session IDs for the user
+TTL: 30 days (synchronized with session TTL)
+```
+
+### Redis Operations
+
+**Helper Functions** (in `server/src/db/redis.ts`):
+
+1. **`getRedisClient()`**
+   - Returns singleton Redis client instance
+   - Creates connection on first call
+
+2. **`isRedisHealthy()`**
+   - Performs PING health check
+   - Returns true if Redis is responsive
+
+3. **`disconnectRedis()`**
+   - Gracefully closes Redis connection
+   - Called during server shutdown
+
+4. **`setRefreshSession(sessionId, data, ttl)`**
+   - Store refresh session data
+   - Add session ID to user's session set
+   - Set TTL on both keys
+
+5. **`getRefreshSession(sessionId)`**
+   - Retrieve session data by ID
+   - Returns parsed RefreshSession object or null
+
+6. **`deleteRefreshSession(sessionId)`**
+   - Delete session data
+   - Remove session ID from user's session set
+   - Used for logout
+
+7. **`updateRefreshSession(sessionId, updates)`**
+   - Update existing session (for token rotation)
+   - Preserves TTL
+
+8. **`revokeAllUserSessions(userId)`**
+   - Delete all sessions for a user
+   - Used for "logout all devices"
+
+9. **`getUserSessionCount(userId)`**
+   - Count active sessions for user
+   - Returns number of concurrent sessions
+
+10. **`getUserSessionIds(userId)`**
+    - List all session IDs for user
+    - Returns array of session IDs
+
+### Authentication Flow with Redis
+
+**Login Flow**:
+
+1. User provides credentials
+2. Server validates credentials
+3. Generate access token (15-minute JWT)
+4. Generate refresh token (30-day JWT)
+5. Create session ID (UUID)
+6. Hash refresh token (SHA-256)
+7. Store session in Redis: `setRefreshSession(sessionId, { userId, refreshTokenHash, ... }, 30 days)`
+8. Set HttpOnly cookie with refresh token
+9. Return access token to client
+
+**Token Refresh Flow**:
+
+1. Client sends refresh token (from HttpOnly cookie)
+2. Server extracts session ID from token
+3. Retrieve session: `getRefreshSession(sessionId)`
+4. Verify token hash matches stored hash
+5. Generate new access token
+6. Generate new refresh token (rotation)
+7. Update session: `updateRefreshSession(sessionId, { refreshTokenHash: newHash, lastRotatedAt: now })`
+8. Set new HttpOnly cookie with new refresh token
+9. Return new access token
+
+**Logout Flow**:
+
+1. Client sends logout request
+2. Server extracts session ID from refresh token
+3. Delete session: `deleteRefreshSession(sessionId)`
+4. Clear HttpOnly cookie
+5. Return success
+
+**Logout All Devices**:
+
+1. Admin or user requests logout all
+2. Server calls: `revokeAllUserSessions(userId)`
+3. All Redis sessions for user are deleted
+4. All refresh tokens become invalid
+
+### Environment Configuration
+
+**Development**:
+
+```env
+REDIS_URL=redis://localhost:6379
+```
+
+**Production (Render)**:
+
+```env
+REDIS_URL=rediss://:password@host:port
+```
+
+- Uses TLS (`rediss://`)
+- Authenticated connection
+- Validated in `server/src/config/env.ts`
+
+### Error Handling
+
+- Connection failures logged with retry attempts
+- Graceful degradation if Redis unavailable (server startup fails)
+- Health check endpoint includes Redis status
+- Automatic reconnection with exponential backoff
 
 ## Domain Context
 
@@ -266,6 +719,135 @@ Time reporting system with the following core concepts:
 - Supabase for PostgreSQL database and authentication
 - Vercel for deployment
 - GitHub for version control and CI/CD
+
+## Repository Pattern (Data Access Layer)
+
+### Overview
+
+The server uses the Repository Pattern to abstract database access and provide a clean separation between business logic (services) and data access (repositories).
+
+### BaseRepository
+
+**File**: `server/src/db/repositories/BaseRepository.ts`
+
+Abstract base class providing common CRUD operations for all repositories:
+
+- `findAll(filters?)` - Get all records with optional filtering
+- `findById(id)` - Get single record by ID
+- `create(data)` - Create new record
+- `update(id, data)` - Update existing record
+- `delete(id)` - Delete record (soft or hard delete depending on entity)
+- `count(filters?)` - Count records with optional filtering
+
+**Benefits**:
+
+- DRY (Don't Repeat Yourself) - common logic in one place
+- Type safety with TypeScript generics
+- Consistent error handling
+- Easy to mock for testing
+- Database-agnostic interface
+
+### Repository Implementations
+
+**File**: `server/src/db/repositories/index.ts`
+
+All repositories extend BaseRepository and add entity-specific methods:
+
+1. **UserRepository.ts**
+   - User CRUD operations
+   - `findByEmail(email)` - Look up user by email
+   - `updatePassword(userId, hashedPassword)` - Update password
+   - Soft delete support (active flag)
+
+2. **ClientRepository.ts**
+   - Client CRUD operations
+   - Soft delete support
+
+3. **ProjectRepository.ts**
+   - Project CRUD operations
+   - `findByClient(clientId)` - Get projects by client
+   - `findByManager(managerId)` - Get projects by manager
+   - Soft delete support
+
+4. **TaskRepository.ts**
+   - Task CRUD operations
+   - `findByProject(projectId)` - Get tasks by project
+
+5. **EntryRepository.ts**
+   - Entry CRUD operations (work and absence)
+   - `findByUser(userId, dateRange?)` - Get entries for user
+   - `findByDateRange(startDate, endDate)` - Get entries in date range
+   - `checkMonthLock(workDate)` - Validate month not locked
+
+6. **EntryAssignmentRepository.ts**
+   - Entry assignment CRUD operations
+   - `findByEntry(entryId)` - Get assignments for entry
+   - `findByTask(taskId)` - Get assignments for task
+
+7. **AdminTaskAssignmentRepository.ts**
+   - Admin task assignment operations
+   - `findByUser(userId)` - Get assignments for user
+   - `findByTask(taskId)` - Get assignments for task
+   - `assignUserToTask(userId, taskId, assignedBy)` - Create assignment
+   - `revokeAssignment(userId, taskId)` - Revoke assignment
+   - Unique constraint enforcement (user_id, task_id)
+
+8. **MonthLockRepository.ts**
+   - Month lock operations
+   - `findByYearMonth(year, month)` - Get lock for specific month
+   - `isMonthLocked(year, month)` - Check if month is locked
+   - `lockMonth(year, month, lockedBy)` - Create lock
+   - `unlockMonth(lockId)` - Set unlocked_at timestamp
+
+### Database Types
+
+**File**: `server/src/db/types/database.types.ts`
+
+- Generated Supabase types
+- Matches PostgreSQL schema exactly
+- Auto-generated from database schema
+
+**File**: `server/src/db/types/entities.ts`
+
+- Domain entity interfaces
+- TypeScript interfaces for business logic
+- Clean separation from database types
+
+**File**: `server/src/db/types/repositories.ts`
+
+- Repository interface definitions
+- Contract for all repository implementations
+- Used for dependency injection and testing
+
+### Usage in Services
+
+Services depend on repositories for data access:
+
+```typescript
+// Example: usersService.ts
+import { UserRepository } from '../db/repositories';
+
+export class UsersService {
+  constructor(private userRepo: UserRepository) {}
+
+  async getUserById(id: number) {
+    return this.userRepo.findById(id);
+  }
+
+  async createUser(data) {
+    // Business logic validation
+    // ...
+    return this.userRepo.create(data);
+  }
+}
+```
+
+**Benefits**:
+
+- Services focus on business logic, not SQL
+- Easy to test with mock repositories
+- Centralized database access
+- Type-safe operations
 
 ## Database Schema
 
@@ -572,7 +1154,7 @@ All API endpoints are prefixed with `/api/v1`
 
 #### POST /api/v1/auth/login — Public
 
-Authenticate user and receive JWT token.
+Authenticate user and receive JWT access token and refresh token.
 
 **Request Body:**
 
@@ -589,7 +1171,7 @@ Authenticate user and receive JWT token.
 {
   "success": true,
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
     "user": {
       "user_id": 1,
       "full_name": "John Doe",
@@ -598,6 +1180,12 @@ Authenticate user and receive JWT token.
     }
   }
 }
+```
+
+**Response Headers:**
+
+```
+Set-Cookie: refreshToken=<jwt_refresh_token>; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000
 ```
 
 **Error Response (401):**
@@ -613,6 +1201,69 @@ Authenticate user and receive JWT token.
 }
 ```
 
+**Notes:**
+
+- Access token expires in 15 minutes
+- Refresh token stored in HttpOnly cookie (30-day expiry)
+- Session created in Redis with session ID
+- User agent and IP address tracked for security
+
+---
+
+#### POST /api/v1/auth/refresh — Authenticated
+
+Refresh access token using refresh token (from HttpOnly cookie).
+
+**Request Headers:**
+
+```
+Cookie: refreshToken=<jwt_refresh_token>
+```
+
+**Success Response (200):**
+
+```json
+{
+  "success": true,
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "user_id": 1,
+      "full_name": "John Doe",
+      "email": "user@example.com",
+      "role": "regular"
+    }
+  }
+}
+```
+
+**Response Headers:**
+
+```
+Set-Cookie: refreshToken=<new_jwt_refresh_token>; HttpOnly; Secure; SameSite=Strict; Max-Age=2592000
+```
+
+**Error Response (401):**
+
+```json
+{
+  "success": false,
+  "error": {
+    "message": "Invalid or expired refresh token",
+    "code": "INVALID_REFRESH_TOKEN",
+    "details": {}
+  }
+}
+```
+
+**Notes:**
+
+- Refresh token is automatically rotated on each refresh
+- New refresh token is set as HttpOnly cookie
+- Old refresh token becomes invalid after rotation
+- Session stored in Redis with 30-day TTL
+- Token reuse detection prevents replay attacks
+
 ---
 
 #### POST /api/v1/auth/logout — Authenticated
@@ -623,6 +1274,7 @@ Invalidate current session token.
 
 ```
 Authorization: Bearer <token>
+Cookie: refreshToken=<jwt_refresh_token>
 ```
 
 **Success Response (200):**
@@ -634,6 +1286,12 @@ Authorization: Bearer <token>
     "message": "Logged out successfully"
   }
 }
+```
+
+**Response Headers:**
+
+```
+Set-Cookie: refreshToken=; HttpOnly; Secure; SameSite=Strict; Max-Age=0
 ```
 
 **Error Response (401):**
@@ -648,6 +1306,12 @@ Authorization: Bearer <token>
   }
 }
 ```
+
+**Notes:**
+
+- Deletes session from Redis
+- Clears refresh token cookie
+- Access token remains valid until expiry (15 minutes)
 
 ---
 
