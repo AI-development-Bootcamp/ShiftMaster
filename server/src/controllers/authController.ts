@@ -96,6 +96,7 @@ export async function login(req: Request, res: Response): Promise<void> {
           full_name: user.full_name,
           email: user.email,
           role: user.role,
+          job_title: user.job_title,
         },
       },
     });
