@@ -35,7 +35,7 @@
     "assignmentPage": {
         "title": "שיוך עובד למשימה",
         "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
-        "searchBarHint": "חיפוש לפי שם עובד",
+        "searchBarHint": "חיפוש...",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -49,7 +49,10 @@
             "editAssignment": "ערוך שיוך עובדים",
             "deleteClient": "מחק לקוח",
             "deleteProject": "מחק פרויקט",
-            "deleteTask": "מחק משימה"
+            "deleteTask": "מחק משימה",
+            "restoreClient": "שחזר לקוח",
+            "restoreProject": "שחזר פרויקט",
+            "restoreTask": "שחזר משימה"
         },
         "success": {
             "assigned": "העובדים שויכו בהצלחה"
@@ -114,7 +117,7 @@
     "entriesPage": {
         "title": "הגדרת דיווחי שעות",
         "subtitle": "כאן תוכל להגדיר את סוג דיווחי השעות של העובדים בפרויקטים השונים.",
-        "searchBarHint": "פרויקט/חיפוש לפי שם לקוח",
+        "searchBarHint": "חיפוש...",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -158,7 +161,7 @@
     "taskEmployeeAssignmentForm": {
         "title": "שייך עובד חדש למשימה",
         "subtitle": "כאן תוכל לשייך עובד חדש מהמאגר לטובת",
-        "searchPlaceholder": "חיפוש לפי שם עובד",
+        "searchPlaceholder": "חיפוש...",
         "columns": {
             "selection": "",
             "employeeName": "שם העובד",
