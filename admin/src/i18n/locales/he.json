@@ -11,7 +11,8 @@
         "selectRow": "בחר שורה",
         "retry": "נסה שוב",
         "notImplemented": "פונקציונליות זו עדיין לא מומשה",
-        "error": "אירעה שגיאה"
+        "error": "אירעה שגיאה",
+        "restore_failed": "שחזור הפריט נכשל"
     },
     "desktopOnlyOverlay": {
         "title": "מערכת למחשב שולחני בלבד",
@@ -34,7 +35,7 @@
     "assignmentPage": {
         "title": "שיוך עובד למשימה",
         "subtitle": "כאן תוכל לשייך עובדים למשימות מתוך פרוייקטים שונים של לקוחות",
-        "searchBarHint": "חיפוש לפי שם עובד",
+        "searchBarHint": "חיפוש...",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -48,11 +49,15 @@
             "editAssignment": "ערוך שיוך עובדים",
             "deleteClient": "מחק לקוח",
             "deleteProject": "מחק פרויקט",
-            "deleteTask": "מחק משימה"
+            "deleteTask": "מחק משימה",
+            "restoreClient": "שחזר לקוח",
+            "restoreProject": "שחזר פרויקט",
+            "restoreTask": "שחזר משימה"
         },
         "success": {
             "assigned": "העובדים שויכו בהצלחה"
         },
+        "showInactive": "הצג לא פעילים",
         "errors": {
             "loadFailed": "טעינת הנתונים נכשלה",
             "assignFailed": "שיוך העובדים נכשל"
@@ -112,7 +117,7 @@
     "entriesPage": {
         "title": "הגדרת דיווחי שעות",
         "subtitle": "כאן תוכל להגדיר את סוג דיווחי השעות של העובדים בפרויקטים השונים.",
-        "searchBarHint": "פרויקט/חיפוש לפי שם לקוח",
+        "searchBarHint": "חיפוש...",
         "tableHeaders": {
             "clientName": "שם לקוח",
             "projectName": "שם הפרויקט",
@@ -156,7 +161,7 @@
     "taskEmployeeAssignmentForm": {
         "title": "שייך עובד חדש למשימה",
         "subtitle": "כאן תוכל לשייך עובד חדש מהמאגר לטובת",
-        "searchPlaceholder": "חיפוש לפי שם עובד",
+        "searchPlaceholder": "חיפוש...",
         "columns": {
             "selection": "",
             "employeeName": "שם העובד",
@@ -169,6 +174,57 @@
         "emptyState": "לא נמצאו עובדים",
         "submitButton": "שייך עובד למשימה",
         "close": "סגור"
+    },
+    "clientForm": {
+        "createTitle": "טופס יצירת לקוח",
+        "createSubtitle": "פה תוכל להוסיף לקוחות למערכת",
+        "editTitle": "עריכת פרטי לקוח",
+        "editSubtitle": "עדכן את פרטי הלקוח",
+        "createButton": "צור לקוח",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "clientName": "שם הלקוח",
+            "clientNamePlaceholder": "הכנס את שם הלקוח",
+            "contactDetails": "פרטי איש קשר",
+            "contactDetailsPlaceholder": "הכנס פרטים מלאים"
+        }
+    },
+    "projectForm": {
+        "createTitle": "הוספת פרויקט חדש",
+        "createSubtitle": "הגדר את פרטי הפרויקט",
+        "editTitle": "עריכת פרויקט",
+        "editSubtitle": "עדכן את פרטי הפרויקט",
+        "createButton": "צור פרויקט",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "projectName": "שם הפרויקט",
+            "projectNamePlaceholder": "הכנס את שם הפרויקט",
+            "client": "לקוח",
+            "clientPlaceholder": "בחר לקוח",
+            "manager": "מנהל פרויקט",
+            "managerPlaceholder": "בחר מנהל",
+            "dates": "תקופת הפרויקט",
+            "description": "תיאור הפרויקט",
+            "descriptionPlaceholder": "פרטים נוספים אודות הפרויקט",
+            "timeFormat": "שיטת דיווח שעות"
+        }
+    },
+    "taskForm": {
+        "createTitle": "יצירת משימה חדשה",
+        "createSubtitle": "הקצה משימה לעובד",
+        "editTitle": "עריכת משימה",
+        "editSubtitle": "עדכן את פרטי המשימה",
+        "createButton": "צור משימה",
+        "editButton": "שמור שינויים",
+        "fields": {
+            "taskTitle": "כותרת המשימה",
+            "taskTitlePlaceholder": "מה צריך לעשות?",
+            "project": "פרויקט משוייך",
+            "projectPlaceholder": "בחר פרויקט",
+            "dueDate": "תאריך יעד",
+            "description": "תיאור המשימה",
+            "descriptionPlaceholder": "הוראות ביצוע..."
+        }
     },
     "confirmDelete": {
         "client": {

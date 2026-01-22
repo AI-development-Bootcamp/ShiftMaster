@@ -39,6 +39,7 @@ describe('AuthService', () => {
         email: 'john@example.com',
         password_hash: passwordHash,
         role: 'regular' as const,
+        job_title: 'Software Engineer',
         active: true,
         created_at: '2024-01-15T10:00:00Z',
       };
@@ -67,7 +68,7 @@ describe('AuthService', () => {
       // Verify Supabase was called correctly
       expect(supabaseAdmin.from).toHaveBeenCalledWith('users');
       expect(mockSelect).toHaveBeenCalledWith(
-        'user_id, full_name, email, password_hash, role, active, created_at'
+        'user_id, full_name, email, password_hash, role, job_title, active, created_at'
       );
       expect(mockEq).toHaveBeenCalledWith('email', 'john@example.com');
       expect(mockSingle).toHaveBeenCalled();
@@ -78,6 +79,7 @@ describe('AuthService', () => {
         full_name: 'John Doe',
         email: 'john@example.com',
         role: 'regular',
+        job_title: 'Software Engineer',
         active: true,
       });
 
@@ -149,6 +151,7 @@ describe('AuthService', () => {
         email: 'john@example.com',
         password_hash: passwordHash,
         role: 'regular' as const,
+        job_title: 'Software Engineer',
         active: true,
         created_at: '2024-01-15T10:00:00Z',
       };
@@ -252,6 +255,7 @@ describe('AuthService', () => {
         email: 'john@example.com',
         password_hash: passwordHash,
         role: 'regular' as const,
+        job_title: 'Software Engineer',
         active: true,
         created_at: '2024-01-15T10:00:00Z',
       };
