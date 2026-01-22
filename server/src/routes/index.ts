@@ -22,7 +22,10 @@ router.use('/clients', clientsRouter);
 router.use('/projects', projectsRouter);
 router.use('/tasks', tasksRouter);
 
-// Add more route modules here
-// etc.
+// Time tracking routes
+router.use('/entries', entriesRouter);
+
+// Month locks routes
+router.use('/month-locks', monthLocksRouter);
 
 export default router;
