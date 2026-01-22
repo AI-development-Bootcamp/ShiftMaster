@@ -7,7 +7,7 @@ import {
   listLocksSchema,
   batchUpdateLocksSchema,
 } from '../validations/monthLockValidation.js';
-import { MonthLocksService } from '../services/monthLocksService.js';
+import { MonthLocksService, AuthorizationError } from '../services/monthLocksService.js';
 import { supabaseAdmin } from '../db/supabase.js';
 
 /**
@@ -113,6 +113,18 @@ export async function batchUpdateLocks(
       data: result,
     });
   } catch (error) {
+    // Handle authorization error
+    if (error instanceof AuthorizationError) {
+      res.status(403).json({
+        success: false,
+        error: {
+          message: error.message,
+          code: error.code,
+        },
+      });
+      return;
+    }
+
     // Handle unexpected errors
     console.error('Batch update locks error:', error);
     res.status(500).json({

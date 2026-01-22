@@ -37,6 +37,13 @@ vi.mock('../../services/monthLocksService.js', () => {
         super(`Month ${month} of year ${year} is not locked`);
       }
     },
+    AuthorizationError: class AuthorizationError extends Error {
+      code = 'FORBIDDEN';
+      constructor(message: string = 'Access denied') {
+        super(message);
+        this.name = 'AuthorizationError';
+      }
+    },
     __mocks: {
       mockGetLocksForYear,
       mockBatchUpdate,
@@ -423,6 +430,35 @@ describe('MonthLocksController', () => {
 
       expect(mockBatchUpdate).not.toHaveBeenCalled();
       expect(statusMock).toHaveBeenCalledWith(401);
+    });
+
+    it('should return 403 for authorization errors', async () => {
+      mockRequest.body = {
+        year: 2026,
+        operations: {
+          lock: [3, 4],
+          unlock: [1, 2],
+        },
+      };
+
+      const { AuthorizationError } = await vi.importMock<
+        typeof import('../../services/monthLocksService.js')
+      >('../../services/monthLocksService.js');
+
+      mockBatchUpdate.mockRejectedValue(
+        new AuthorizationError('Access denied: Only admins can lock/unlock months')
+      );
+
+      await batchUpdateLocks(mockRequest as Request, mockResponse as Response);
+
+      expect(statusMock).toHaveBeenCalledWith(403);
+      expect(jsonMock).toHaveBeenCalledWith({
+        success: false,
+        error: {
+          message: 'Access denied: Only admins can lock/unlock months',
+          code: 'FORBIDDEN',
+        },
+      });
     });
 
     it('should return 500 for unexpected errors', async () => {

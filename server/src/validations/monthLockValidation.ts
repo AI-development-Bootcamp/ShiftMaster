@@ -10,12 +10,10 @@ import { z } from 'zod';
 export const listLocksSchema = z
   .object({
     year: z
-      .union([z.string(), z.number()])
-      .transform((val) => Number(val))
-      .refine((val) => !isNaN(val), { message: 'Year must be a valid number' })
-      .refine((val) => val >= 2000 && val <= 2100, {
-        message: 'Year must be between 2000 and 2100',
-      }),
+      .coerce.number()
+      .int('Year must be an integer')
+      .min(2000, 'Year must be at least 2000')
+      .max(2100, 'Year must not exceed 2100'),
   })
   .strict();
 

@@ -5,6 +5,7 @@
 
 import { SupabaseClient } from '@supabase/supabase-js';
 import { MonthLockRepository } from '../db/repositories/MonthLockRepository.js';
+import { UserRepository } from '../db/repositories/UserRepository.js';
 import { MonthLock, NewMonthLock } from '../db/types/entities.js';
 
 /**
@@ -30,6 +31,17 @@ export class MonthNotLockedError extends Error {
 }
 
 /**
+ * Error thrown when user is not authorized
+ */
+export class AuthorizationError extends Error {
+  code = 'FORBIDDEN';
+  constructor(message: string = 'Access denied') {
+    super(message);
+    this.name = 'AuthorizationError';
+  }
+}
+
+/**
  * Result of batch update operation
  */
 export interface BatchUpdateResult {
@@ -43,12 +55,14 @@ export interface BatchUpdateResult {
  */
 export class MonthLocksService {
   private monthLockRepo: MonthLockRepository;
+  private userRepo: UserRepository;
 
   constructor(dbConnection: SupabaseClient) {
     if (!dbConnection) {
       throw new Error('dbConnection is required for MonthLocksService');
     }
     this.monthLockRepo = new MonthLockRepository(dbConnection);
+    this.userRepo = new UserRepository(dbConnection);
   }
 
   /**
@@ -67,6 +81,7 @@ export class MonthLocksService {
    * @param toLock - Array of month numbers (1-12) to lock
    * @param toUnlock - Array of month numbers (1-12) to unlock
    * @returns Object containing arrays of successfully locked and unlocked months
+   * @throws AuthorizationError if actor is not admin
    */
   async batchUpdate(
     actorId: string,
@@ -74,6 +89,19 @@ export class MonthLocksService {
     toLock: number[],
     toUnlock: number[]
   ): Promise<BatchUpdateResult> {
+    // Enforce admin access - check BEFORE any lock/unlock operations
+    const actor = await this.userRepo.findById(actorId);
+
+    if (!actor) {
+      throw new AuthorizationError('Access denied: User not found');
+    }
+
+    if (actor.role !== 'admin') {
+      throw new AuthorizationError(
+        'Access denied: Only admins can lock/unlock months'
+      );
+    }
+
     const locked: number[] = [];
     const unlocked: number[] = [];
 
