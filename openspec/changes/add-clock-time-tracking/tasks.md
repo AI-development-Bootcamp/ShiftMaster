@@ -80,41 +80,44 @@
 
 ### Frontend: Redux State Management
 
-- [ ] **Create timerSlice**
-  - State: `activeEntry`, `isRunning`, `elapsedSeconds`
-  - Actions: `setActiveEntry`, `clearActiveEntry`, `updateElapsed`
-  - Thunks: `clockIn()`, `clockOut()`, `resumeTimer()`
+> **Note:** All frontend code is in `/client/src/` (not admin).
 
-- [ ] **Create timelineSlice**
+- [x] **Create timerSlice** (`client/src/store/slices/timerSlice.ts`)
+  - State: `activeEntry`, `isRunning`, `elapsedSeconds`, `loading`, `error`
+  - Actions: `updateElapsed`, `tickElapsed`, `clearError`, `clearActiveEntry`
+  - Thunks: `clockIn()`, `clockOut()`, `resumeTimer()`
+  - Includes localStorage persistence for timer recovery
+
+- [x] **Create timelineSlice** (`client/src/store/slices/timelineSlice.ts`)
   - State: `timeline` (array of TimelineDay), `loading`, `error`
-  - Actions: `setTimeline`, `setLoading`, `setError`, `toggleDayExpanded`
+  - Actions: `setTimeline`, `toggleDayExpanded`, `expandDay`, `collapseDay`, `collapseAllDays`, `clearTimeline`, `clearError`
   - Thunks: `fetchTimeline(startDate, endDate)`
 
-- [ ] **Add API client methods**
-  - `apiClient.clockIn(workDate, startTime)`
-  - `apiClient.clockOut(entryId, endTime, taskId, location)`
-  - `apiClient.getTimeline(startDate?, endDate?, userId?)`
-  - `apiClient.getAssignedTasks()`
+- [x] **Add API client methods** (`client/src/api/entriesService.ts`)
+  - `clockIn(workDate, startTime)`
+  - `clockOut(entryId, endTime, taskId, location)`
+  - `getTimeline(startDate?, endDate?, userId?)`
+  - `getEntry(entryId)` - for timer verification
+  - `getAssignedTasks()`
 
 ### Frontend: Timer Display Component
 
-- [ ] **Create TimerDisplay component**
-  - Display "Start Work" button when no active timer
-  - Display running timer with HH:MM:SS when active
-  - Display "Stop Work" button when timer running
-  - Store entry_id in localStorage on clock-in
-  - Clear localStorage on clock-out
+> **Note:** TimerDisplay component already exists. Added Redux integration via useTimer hook.
 
-- [ ] **Implement timer logic**
-  - Use `setInterval` to update elapsed time every second
-  - Calculate elapsed from `start_time` to current time
-  - Format elapsed as HH:MM:SS
-  - Handle app reload: check localStorage and resume timer
+- [x] **TimerDisplay component** (`client/src/components/TimerDisplay/TimerDisplay.tsx`)
+  - ✓ Already displays HH:MM:SS with AnimatedDigit
+  - ✓ "Start Work"/"Stop Work" button in HomePage header
+  - ✓ localStorage persistence via timerSlice
 
-- [ ] **Add timer persistence**
-  - On clock-in: save `{ entry_id, start_time }` to localStorage
-  - On app mount: check localStorage, fetch entry, resume if exists
-  - On clock-out: clear localStorage
+- [x] **Timer logic** (`client/src/hooks/useTimer.ts`)
+  - ✓ Uses Redux timerSlice with setInterval tick
+  - ✓ Calculates elapsed from `start_time` to current time
+  - ✓ Resumes timer on app mount via `resumeTimer()` thunk
+
+- [x] **Timer persistence** (in `timerSlice.ts`)
+  - ✓ On clock-in: saves `{ entry_id, work_date, start_time }` to localStorage
+  - ✓ On app mount: checks localStorage, fetches entry, resumes if exists
+  - ✓ On clock-out: clears localStorage
 
 ### Frontend: Task Selection Modal
 

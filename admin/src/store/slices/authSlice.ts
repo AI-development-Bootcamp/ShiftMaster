@@ -7,6 +7,7 @@ interface User {
   full_name: string;
   email: string;
   role: 'admin' | 'regular';
+  job_title: string;
 }
 
 interface AuthState {
