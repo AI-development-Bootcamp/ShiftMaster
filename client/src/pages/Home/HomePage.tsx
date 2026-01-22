@@ -6,8 +6,10 @@ import DailyEntryCard, {
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
+import { useTimer } from '../../hooks/useTimer';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
+
 // Function to load entries for a specific month/year
 // TODO: Replace with actual API call to backend
 const loadEntriesForMonth = (_month: number, _year: number): DailyEntry[] => {
@@ -27,6 +29,18 @@ const isFutureMonth = (month: number, year: number): boolean => {
 
 function HomePage() {
   const { t } = useTranslation();
+
+  // Timer state from Redux via useTimer hook
+  const {
+    isRunning: isTimerRunning,
+    elapsedSeconds,
+    loading: _timerLoading, // TODO: Use for loading state on button
+    handleClockIn,
+  } = useTimer();
+
+  // TODO: Add TaskSelectionModal component to show on clock-out
+  const [_isTaskSelectionOpen, setIsTaskSelectionOpen] = useState(false);
+
   const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
   const [currentYear, setCurrentYear] = useState(2025);
   const [prevMonthIndex, setPrevMonthIndex] = useState(10);
@@ -35,8 +49,6 @@ function HomePage() {
     null
   );
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
-  const [isTimerRunning, setIsTimerRunning] = useState(false);
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
@@ -73,21 +85,7 @@ function HomePage() {
     return () => clearTimeout(timeoutId);
   }, [currentMonthIndex, currentYear]);
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (isTimerRunning) {
-      interval = setInterval(() => {
-        setElapsedSeconds((prev) => prev + 1);
-      }, 1000);
-    }
-
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isTimerRunning]);
+  // Timer interval is now handled by useTimer hook
 
   useEffect(() => {
     if (monthDirection) {
@@ -138,12 +136,11 @@ function HomePage() {
 
   const handleToggleTimer = () => {
     if (isTimerRunning) {
-      // Stop the timer and reset
-      setIsTimerRunning(false);
-      setElapsedSeconds(0);
+      // Open task selection modal for clock-out
+      setIsTaskSelectionOpen(true);
     } else {
-      // Start the timer
-      setIsTimerRunning(true);
+      // Clock in via Redux
+      handleClockIn();
     }
   };
 
@@ -166,24 +163,22 @@ function HomePage() {
           </button>
           <div className="month-label-container">
             <span
-              className={`month-label month-label-old ${
-                monthDirection === 'left'
-                  ? 'month-slide-out-left'
-                  : monthDirection === 'right'
-                    ? 'month-slide-out-right'
-                    : 'month-hidden'
-              }`}
+              className={`month-label month-label-old ${monthDirection === 'left'
+                ? 'month-slide-out-left'
+                : monthDirection === 'right'
+                  ? 'month-slide-out-right'
+                  : 'month-hidden'
+                }`}
             >
               {getMonthName(prevMonthIndex)} {prevYear}
             </span>
             <span
-              className={`month-label ${
-                monthDirection === 'left'
-                  ? 'month-slide-in-left'
-                  : monthDirection === 'right'
-                    ? 'month-slide-in-right'
-                    : ''
-              }`}
+              className={`month-label ${monthDirection === 'left'
+                ? 'month-slide-in-left'
+                : monthDirection === 'right'
+                  ? 'month-slide-in-right'
+                  : ''
+                }`}
             >
               {getMonthName(currentMonthIndex)} {currentYear}
             </span>
