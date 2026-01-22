@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import DailyEntryCard, {
   DailyEntry,
@@ -6,43 +6,60 @@ import DailyEntryCard, {
 import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
-import { useTimer } from '../../hooks/useTimer';
-import { useAppDispatch, useAppSelector } from '../../store';
-import { fetchTimeline } from '../../store/slices/timelineSlice';
+import { useTimeline } from '../../hooks/useTimeline';
 import { TimelineDay } from '../../store/slices/timelineSlice';
 import { EntryStatus } from '../../components/StatusBadge/StatusBadge';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
 
 // Transform timeline data to DailyEntry format
-const transformTimelineToDailyEntries = (timeline: TimelineDay[], t: (key: string) => string): DailyEntry[] => {
+const transformTimelineToDailyEntries = (
+  timeline: TimelineDay[],
+  t: (key: string) => string
+): DailyEntry[] => {
   return timeline.map((day) => {
     const date = new Date(day.work_date);
-    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayNames = [
+      'sunday',
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+    ];
     const dayName = t(`dayNames.${dayNames[date.getDay()]}`);
 
     // Calculate hours from total minutes
-    const hours = day.total_work_minutes > 0 ? day.total_work_minutes / 60 : undefined;
+    const hours =
+      day.total_work_minutes > 0 ? day.total_work_minutes / 60 : undefined;
 
     // Determine status based on entries
-    let status: EntryStatus = 'empty';
+    let status: EntryStatus = 'missing';
     if (day.absences.length > 0) {
-      status = 'absence';
+      const absenceType = day.absences[0].absence_type;
+      if (absenceType === 'sick') {
+        status = 'sick';
+      } else if (absenceType === 'vacation_partial') {
+        status = 'half-vacation';
+      } else {
+        status = 'missing'; // Other absence types
+      }
     } else if (day.entries.length > 0) {
-      const hasActiveTimer = day.entries.some(e => e.is_active);
-      status = hasActiveTimer ? 'in-progress' : 'complete';
+      const hasActiveTimer = day.entries.some((e) => e.is_active);
+      status = hasActiveTimer ? 'partial' : 'complete';
     }
 
     // Transform work entries to TimeEntry format
     const timeEntries = day.entries.flatMap((entry) =>
       entry.assignments.map((assignment) => ({
         id: `${entry.entry_id}-${assignment.entry_assignment_id}`,
-        projectName: assignment.project_name,
-        taskName: assignment.task_name,
-        hours: assignment.duration_minutes ? assignment.duration_minutes / 60 : 0,
-        location: assignment.location as 'Office' | 'Client' | 'Home',
-        startTime: entry.start_time,
-        endTime: entry.end_time || undefined,
+        projectName: assignment.project_name || 'Unknown Project',
+        startTime: entry.start_time || '',
+        endTime: entry.end_time || '',
+        hours: assignment.duration_minutes
+          ? `${Math.floor(assignment.duration_minutes / 60)}.${Math.round((assignment.duration_minutes % 60) / 6)}`
+          : '0',
       }))
     );
 
@@ -53,7 +70,15 @@ const transformTimelineToDailyEntries = (timeline: TimelineDay[], t: (key: strin
       status,
       hours,
       timeEntries,
-      absenceType: day.absences.length > 0 ? (day.absences[0].absence_type as any) : undefined,
+      absenceType:
+        day.absences.length > 0
+          ? (day.absences[0].absence_type as
+            | 'vacation-half'
+            | 'vacation-full'
+            | 'sick'
+            | 'reserves'
+            | null)
+          : undefined,
     };
   });
 };
@@ -72,16 +97,13 @@ const isFutureMonth = (month: number, year: number): boolean => {
 function HomePage() {
   const { t } = useTranslation();
 
-  // Timer state from Redux via useTimer hook
-  const {
-    isRunning: isTimerRunning,
-    elapsedSeconds,
-    loading: _timerLoading, // TODO: Use for loading state on button
-    handleClockIn,
-  } = useTimer();
+  // Local timer state (works without backend)
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [timerStartTime, setTimerStartTime] = useState<Date | null>(null);
 
-  // TODO: Add TaskSelectionModal component to show on clock-out
-  const [_isTaskSelectionOpen, setIsTaskSelectionOpen] = useState(false);
+  // Timeline state from Redux via useTimeline hook
+  const { timeline, loading: isLoadingEntries, error, fetchMonth } = useTimeline();
 
   // Initialize to current month/year
   const now = new Date();
@@ -94,8 +116,9 @@ function HomePage() {
   );
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
-  const [entries, setEntries] = useState<DailyEntry[]>([]);
-  const [isLoadingEntries, setIsLoadingEntries] = useState(false);
+
+  // Transform timeline to entries
+  const entries = transformTimelineToDailyEntries(timeline, t);
 
   // Helper function to get month name from translation
   const getMonthName = (monthIndex: number): string => {
@@ -116,20 +139,50 @@ function HomePage() {
     return t(`monthNames.${monthKeys[monthIndex]}`);
   };
 
-  // Load entries when month/year changes
+  // Fetch entries when month/year changes
   useEffect(() => {
-    setIsLoadingEntries(true);
-    // Simulate loading delay (remove when connecting to API)
-    const timeoutId = setTimeout(() => {
-      const loadedEntries = loadEntriesForMonth(currentMonthIndex, currentYear);
-      setEntries(loadedEntries);
-      setIsLoadingEntries(false);
-    }, 300);
+    fetchMonth(currentYear, currentMonthIndex);
+  }, [currentMonthIndex, currentYear, fetchMonth]);
 
-    return () => clearTimeout(timeoutId);
-  }, [currentMonthIndex, currentYear]);
+  // Timer interval effect
+  useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
 
-  // Timer interval is now handled by useTimer hook
+    if (isTimerRunning && timerStartTime) {
+      interval = setInterval(() => {
+        const now = new Date();
+        const diffMs = now.getTime() - timerStartTime.getTime();
+        setElapsedSeconds(Math.floor(diffMs / 1000));
+      }, 1000);
+    }
+
+    return () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+  }, [isTimerRunning, timerStartTime]);
+
+  // Load timer state from localStorage on mount
+  useEffect(() => {
+    const savedTimer = localStorage.getItem('client_timer_state');
+    if (savedTimer) {
+      try {
+        const { startTime, isRunning } = JSON.parse(savedTimer);
+        if (isRunning && startTime) {
+          const start = new Date(startTime);
+          setTimerStartTime(start);
+          setIsTimerRunning(true);
+          const now = new Date();
+          const diffMs = now.getTime() - start.getTime();
+          setElapsedSeconds(Math.floor(diffMs / 1000));
+        }
+      } catch (e) {
+        console.error('Failed to load timer state:', e);
+        localStorage.removeItem('client_timer_state');
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (monthDirection) {
@@ -178,15 +231,29 @@ function HomePage() {
     setExpandedEntryId(expandedEntryId === id ? null : id);
   };
 
-  const handleToggleTimer = () => {
+  const handleToggleTimer = useCallback(() => {
     if (isTimerRunning) {
-      // Open task selection modal for clock-out
-      setIsTaskSelectionOpen(true);
+      // Stop the timer
+      setIsTimerRunning(false);
+      setElapsedSeconds(0);
+      setTimerStartTime(null);
+      localStorage.removeItem('client_timer_state');
+      // TODO: Open task selection modal and save to backend
     } else {
-      // Clock in via Redux
-      handleClockIn();
+      // Start the timer
+      const startTime = new Date();
+      setTimerStartTime(startTime);
+      setIsTimerRunning(true);
+      setElapsedSeconds(0);
+      localStorage.setItem(
+        'client_timer_state',
+        JSON.stringify({
+          startTime: startTime.toISOString(),
+          isRunning: true,
+        })
+      );
     }
-  };
+  }, [isTimerRunning]);
 
   return (
     <div className="home-page">
@@ -245,6 +312,10 @@ function HomePage() {
             <div className="loading-state">
               <div className="spinner"></div>
               <p className="loading-text">{t('home.loadingReports')}</p>
+            </div>
+          ) : error ? (
+            <div className="error-state">
+              <p className="error-text">{error}</p>
             </div>
           ) : entries.length > 0 ? (
             entries.map((entry) => (
