@@ -6,43 +6,43 @@
 
 ### Backend: Clock-In/Clock-Out API
 
-- [ ] **Create entries routes for clock operations**
+- [x] **Create entries routes for clock operations**
   - Add `POST /api/v1/entries/clock-in` route
   - Add `PATCH /api/v1/entries/:id/clock-out` route
   - Register routes in `server/src/routes/index.ts`
 
-- [ ] **Implement entriesController clock methods**
+- [x] **Implement entriesController clock methods**
   - `clockIn()` - Creates entry with start_time only
   - `clockOut()` - Updates entry with end_time and creates assignment
   - Validate month locks in both methods
   - Return proper error codes (403 for locked, 409 for conflicts)
 
-- [ ] **Create entriesService business logic**
-  - `createClockEntry()` - Insert entry with start_time
-  - `updateClockOutEntry()` - Update entry and create assignment in transaction
-  - `validateNoActiveTimer()` - Check for existing entry without end_time
+- [x] **Create entriesService business logic**
+  - `clockIn()` - Insert entry with start_time
+  - `clockOut()` - Update entry and create assignment in transaction
+  - `findActiveTimer()` - Check for existing entry without end_time
   - `validateTimeOverlap()` - Check new times don't overlap existing entries
   - `validateDailyLimit()` - Check total time doesn't exceed 24 hours
   - `validateTaskAssignment()` - Check user has admin_task_assignment for task
 
-- [ ] **Add database queries in entriesService**
+- [x] **Add database queries in entriesService**
   - Query to find active timer: `SELECT * FROM entries WHERE user_id=? AND end_time IS NULL`
   - Query to find overlapping entries: check time ranges for same user+date
   - Query to calculate daily total: sum durations for user+date
 
 ### Backend: Unified Timeline API
 
-- [ ] **Create timeline endpoint**
+- [x] **Create timeline endpoint**
   - Add `GET /api/v1/entries/timeline` route
   - Register in routes file
 
-- [ ] **Implement timelineController**
+- [x] **Implement timelineController**
   - Parse query params: `user_id`, `start_date`, `end_date`
   - Validate admin access if user_id provided
   - Default to current month if no dates
   - Call service and return formatted response
 
-- [ ] **Create timelineService**
+- [x] **Create timelineService**
   - `getTimeline(userId, startDate?, endDate?)` - Main query function
   - SQL query with LEFT JOINs: `entries → entry_assignments → tasks → projects`
   - Group results by work_date in application code
@@ -50,7 +50,7 @@
   - Mark entries as `is_active` if end_time is null
   - Check month_locks and add `is_locked` flag
 
-- [ ] **Optimize timeline query**
+- [x] **Optimize timeline query**
   - Add database index on `(user_id, work_date)`
   - Ensure query uses LIMIT/OFFSET for large ranges
   - Test performance with mock data (100+ entries)
