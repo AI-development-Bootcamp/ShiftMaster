@@ -6,12 +6,12 @@
 
 ### Backend: Clock-In/Clock-Out API
 
-- [ ] **Create entries routes for clock operations**
+- [x] **Create entries routes for clock operations**
   - Add `POST /api/v1/entries/clock-in` route
   - Add `PATCH /api/v1/entries/:id/clock-out` route
   - Register routes in `server/src/routes/index.ts`
 
-- [ ] **Implement entriesController clock methods**
+- [x] **Implement entriesController clock methods**
   - `clockIn()` - Creates entry with start_time only
   - `clockOut()` - Updates entry with end_time and creates assignment
   - Validate month locks in both methods
