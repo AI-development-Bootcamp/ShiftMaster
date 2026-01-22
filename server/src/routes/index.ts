@@ -5,6 +5,7 @@ import usersRouter from './users.js';
 import clientsRouter from './clients.js';
 import projectsRouter from './projects.js';
 import tasksRouter from './tasks.js';
+import entriesRouter from './entries.js';
 
 const router = Router();
 
@@ -19,6 +20,9 @@ router.use('/users', usersRouter);
 router.use('/clients', clientsRouter);
 router.use('/projects', projectsRouter);
 router.use('/tasks', tasksRouter);
+
+// Time tracking routes
+router.use('/entries', entriesRouter);
 
 // Add more route modules here
 // etc.

@@ -16,6 +16,20 @@ const options: Options = {
         description: 'Development server',
       },
     ],
+    tags: [
+      {
+        name: 'Authentication',
+        description: 'User authentication and session management',
+      },
+      {
+        name: 'Time Tracking',
+        description: 'Clock-in/clock-out and time entry management',
+      },
+      {
+        name: 'Users',
+        description: 'User management operations',
+      },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
