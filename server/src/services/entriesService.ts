@@ -3,7 +3,70 @@ import { EntryRepository } from '../db/repositories/EntryRepository.js';
 import { EntryAssignmentRepository } from '../db/repositories/EntryAssignmentRepository.js';
 import { MonthLockRepository } from '../db/repositories/MonthLockRepository.js';
 import { AdminTaskAssignmentRepository } from '../db/repositories/AdminTaskAssignmentRepository.js';
-import { Entry, NewEntry, NewEntryAssignment, WorkLocation } from '../db/types/entities.js';
+import { Entry, NewEntry, NewEntryAssignment, WorkLocation, AbsenceType } from '../db/types/entities.js';
+
+// Timeline types
+interface RawAssignmentData {
+  entry_assignment_id: string;
+  entry_id: string;
+  task_id: string;
+  location: WorkLocation;
+  start_time: string | null;
+  end_time: string | null;
+  duration_minutes: number | null;
+  tasks: {
+    task_name: string;
+    projects: {
+      project_name: string;
+    }[];
+  }[];
+}
+
+interface AssignmentWithDetails {
+  entry_assignment_id: string;
+  entry_id: string;
+  task_id: string;
+  location: WorkLocation;
+  start_time: string | null;
+  end_time: string | null;
+  duration_minutes: number | null;
+  task_name: string | null;
+  project_name: string | null;
+}
+
+interface TimelineAssignment {
+  entry_assignment_id: string;
+  task_id: string;
+  task_name: string | null;
+  project_name: string | null;
+  location: WorkLocation;
+  duration_minutes: number | null;
+}
+
+interface TimelineEntry {
+  entry_id: string;
+  entry_kind: 'work';
+  start_time: string | null;
+  end_time: string | null;
+  is_active: boolean;
+  is_locked: boolean;
+  assignments: TimelineAssignment[];
+}
+
+interface TimelineAbsence {
+  entry_id: string;
+  entry_kind: 'absence';
+  absence_type: AbsenceType | null;
+  description: string | null;
+  is_locked: boolean;
+}
+
+interface TimelineDay {
+  work_date: string;
+  total_work_minutes: number;
+  entries: TimelineEntry[];
+  absences: TimelineAbsence[];
+}
 
 export class EntryNotFoundError extends Error {
   code = 'ENTRY_NOT_FOUND';
@@ -303,7 +366,7 @@ export class EntriesService {
    * Performance: Uses database index idx_entries_user_date_range on (user_id, work_date)
    * for efficient querying across date ranges
    */
-  async getTimeline(userId: string, startDate: string, endDate: string): Promise<any[]> {
+  async getTimeline(userId: string, startDate: string, endDate: string): Promise<TimelineDay[]> {
     // Fetch all entries in date range (optimized by idx_entries_user_date_range index)
     const entries = await this.entryRepo.findByUserIdAndDateRange(userId, startDate, endDate);
 
@@ -317,7 +380,7 @@ export class EntriesService {
     const lockedMonths = await this.getLockedMonths(startDate, endDate);
 
     // Group entries by date
-    const timelineMap = new Map<string, any>();
+    const timelineMap = new Map<string, TimelineDay>();
 
     for (const entry of entries) {
       const workDate = entry.work_date;
@@ -349,7 +412,7 @@ export class EntriesService {
           entry_kind: entry.entry_kind,
           start_time: entry.start_time,
           end_time: entry.end_time,
-          is_active: entry.start_time && !entry.end_time,
+          is_active: !!entry.start_time && !entry.end_time,
           is_locked: isLocked,
           assignments: entryAssignments.map((a) => ({
             entry_assignment_id: a.entry_assignment_id,
@@ -378,7 +441,7 @@ export class EntriesService {
   /**
    * Fetch assignments with task and project details
    */
-  private async fetchAssignmentsWithDetails(entryIds: string[]): Promise<any[]> {
+  private async fetchAssignmentsWithDetails(entryIds: string[]): Promise<AssignmentWithDetails[]> {
     if (entryIds.length === 0) {
       return [];
     }
@@ -412,7 +475,7 @@ export class EntriesService {
 
     // Flatten the nested structure
     return (
-      data?.map((a: any) => ({
+      data?.map((a: RawAssignmentData) => ({
         entry_assignment_id: a.entry_assignment_id,
         entry_id: a.entry_id,
         task_id: a.task_id,
@@ -420,8 +483,8 @@ export class EntriesService {
         start_time: a.start_time,
         end_time: a.end_time,
         duration_minutes: a.duration_minutes,
-        task_name: a.tasks?.task_name || null,
-        project_name: a.tasks?.projects?.project_name || null,
+        task_name: a.tasks?.[0]?.task_name || null,
+        project_name: a.tasks?.[0]?.projects?.[0]?.project_name || null,
       })) || []
     );
   }
