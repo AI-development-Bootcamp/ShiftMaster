@@ -1,24 +1,36 @@
-import { useState, useMemo, useEffect } from 'react';
+
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { TableShell } from '../../components/TableShell';
 import { TableSearch } from '../../components/TableShell/TableSearch';
 import { useTableSearch } from '../../hooks/useTableSearch';
 import { TableColumnDef, SortState, PersonChip } from '../../components/TableShell/types';
 import { TaskEmployeeAssignmentForm, EmployeeRow } from '../../components/task/TaskEmployeeAssignmentForm';
 import { FormShell, FormValues } from '../../components/FormShell';
-import { editClientForm, createClientForm } from '../../components/forms/createClient';
-import { editProjectForm, createProjectForm } from '../../components/forms/createProject';
-import { editTaskForm, createTaskForm } from '../../components/forms/createTask';
+// Import factory functions
+import { getClientForm } from '../../components/forms/createClient';
+import { getProjectForm } from '../../components/forms/createProject';
+import { getTaskForm } from '../../components/forms/createTask';
 import { CreateDropdownMenu } from '../../components/CreateDropdownMenu/CreateDropdownMenu';
 import { ConfirmActionModal } from '../../components/ConfirmActionModal/ConfirmActionModal';
 import { CONFIRM_VARIANTS } from '../../constants/ui';
 import { useTranslation } from 'react-i18next';
-import { UserRole } from '@abra-shift-master/shared';
+import { UserRole, User } from '@abra-shift-master/shared';
+// Import services and types
+import { assignmentService, Client, Project, Task, CreateClientDTO, UpdateClientDTO, CreateProjectDTO, UpdateProjectDTO, CreateTaskDTO, UpdateTaskDTO } from '../../services/assignmentService';
+import { AdminTaskAssignment } from '@abra-shift-master/shared';
+import { useToast, ToastContainer } from '../../components/Toast';
 
-import { mockProjects, mockTasks } from '../../mocks/projects';
-import { mockClients } from '../../mocks/clients';
-import { mockUsers } from '../../mocks/users';
-import { mockAdminTaskAssignments } from '../../mocks/adminTaskAssignments';
 import '../../styles/AssignmentPage.css';
+
+// Stable error codes for traceable logging
+export const ERROR_CODES = {
+    ASSIGNMENT_LOAD_FAILED: 'ASSIGNMENT_LOAD_FAILED',
+    FORM_SUBMIT_FAILED: 'FORM_SUBMIT_FAILED',
+    DELETE_FAILED: 'DELETE_FAILED',
+    ASSIGNMENT_FAILED: 'ASSIGNMENT_FAILED',
+} as const;
+
+export type ErrorCode = typeof ERROR_CODES[keyof typeof ERROR_CODES];
 
 interface AssignmentTableRow {
     id: string;
@@ -29,10 +41,15 @@ interface AssignmentTableRow {
     project_name: string;
     task_name: string;
     assignees: PersonChip[];
+    // Active status
+    client_active: boolean;
+    project_active: boolean;
+    task_active: boolean;
 }
 
 export function AssignmentPage() {
     const { t } = useTranslation();
+    const { toasts, showError, showSuccess, removeToast } = useToast();
     const [page, setPage] = useState(1);
     const [sort, setSort] = useState<SortState | null>([
         { key: 'client_name', direction: 'asc' },
@@ -40,21 +57,154 @@ export function AssignmentPage() {
     ]);
     const [editingAssignment, setEditingAssignment] = useState<AssignmentTableRow | null>(null);
 
+    // --- Data State ---
+    const [clients, setClients] = useState<Client[]>([]);
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [assignments, setAssignments] = useState<AdminTaskAssignment[]>([]);
+    const [users, setUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     // --- Edit/Create Form State ---
+    // 'client' | 'project' | 'task' -> Edit mode
+    // 'createClient' etc. -> Create mode
     const [activeForm, setActiveForm] = useState<'client' | 'project' | 'task' | 'createClient' | 'createProject' | 'createTask' | null>(null);
     const [formInitialValues, setFormInitialValues] = useState<FormValues>({});
+    // Store the ID of the entity being edited (for Update operations)
+    const [editingEntityId, setEditingEntityId] = useState<string | null>(null);
 
     // --- Delete Confirmation State ---
     const [deletingItem, setDeletingItem] = useState<{ type: 'client' | 'project' | 'task', id: string, name: string } | null>(null);
 
+    const [showActiveOnly, setShowActiveOnly] = useState(true);
+
+    // --- Fetch Data ---
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            const [
+                fetchedClients,
+                fetchedProjects,
+                fetchedTasks,
+                fetchedAssignments,
+                fetchedUsers
+            ] = await Promise.all([
+                assignmentService.fetchClients(showActiveOnly),
+                assignmentService.fetchProjects(showActiveOnly),
+                assignmentService.fetchTasks(showActiveOnly),
+                assignmentService.fetchAllAssignments(),
+                assignmentService.fetchPotentialEmployees()
+            ]);
+
+            setClients(fetchedClients);
+            setProjects(fetchedProjects);
+            setTasks(fetchedTasks);
+            setAssignments(fetchedAssignments);
+            setUsers(fetchedUsers);
+        } catch (err) {
+            const code = ERROR_CODES.ASSIGNMENT_LOAD_FAILED;
+            console.error(`[${code}] Failed to fetch assignment data:`, err);
+            setError(t('assignmentPage.errors.loadFailed'));
+            showError({ message: t('assignmentPage.errors.loadFailed'), code });
+        } finally {
+            setIsLoading(false);
+        }
+    }, [t, showError, showActiveOnly]);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+    // --- Derived Options for Forms ---
+    const clientOptions = useMemo(() => clients.map(c => ({ value: c.client_id, label: c.name })), [clients]);
+
+    // For tasks, we show all projects. Ideally we might filter by client if client is selected, but form logic is simple for now.
+    const projectOptions = useMemo(() => projects.map(p => ({ value: p.project_id, label: p.name })), [projects]);
+
+    const managerOptions = useMemo(() => {
+        return users.map(u => ({ value: String(u.user_id), label: u.full_name }));
+    }, [users]);
+
     const handleFormSubmit = async (values: FormValues) => {
-        console.log(`Submitted ${activeForm} form:`, values);
-        setActiveForm(null);
+        try {
+            console.log(`Submitted ${activeForm} form:`, values);
+
+            if (activeForm === 'createClient') {
+                const dto: CreateClientDTO = {
+                    name: values.clientName as string,
+                    contact_info: values.contactDetails as string
+                };
+                await assignmentService.createClient(dto);
+                showSuccess(t('common.success') || 'Client created successfully');
+            } else if (activeForm === 'client' && editingEntityId) {
+                const dto: UpdateClientDTO = {
+                    name: values.clientName as string,
+                    contact_info: values.contactDetails as string
+                };
+                await assignmentService.updateClient(editingEntityId, dto);
+                showSuccess(t('common.success') || 'Client updated successfully');
+            } else if (activeForm === 'createProject') {
+                const duration = values.projectDuration as { start: string; end: string } | undefined;
+                const dto: CreateProjectDTO = {
+                    client_id: values.clientId as string,
+                    name: values.projectName as string,
+                    manager_user_id: values.managerUserId ? (values.managerUserId as string) : undefined,
+                    description: values.description as string,
+                    start_date: (duration?.start || new Date().toISOString()).split('T')[0],
+                    end_date: duration?.end ? duration.end.split('T')[0] : undefined,
+                    time_format_type: 'sum', // Default as per requirements
+                };
+                await assignmentService.createProject(dto);
+                showSuccess(t('common.success') || 'Project created successfully');
+            } else if (activeForm === 'project' && editingEntityId) {
+                const duration = values.projectDuration as { start: string; end: string } | undefined;
+                const dto: UpdateProjectDTO = {
+                    client_id: values.clientId as string,
+                    name: values.projectName as string,
+                    manager_user_id: values.managerUserId ? (values.managerUserId as string) : undefined,
+                    description: values.description as string,
+                    start_date: duration?.start ? duration.start.split('T')[0] : undefined,
+                    end_date: duration?.end ? duration.end.split('T')[0] : undefined,
+                };
+                await assignmentService.updateProject(editingEntityId, dto);
+                showSuccess(t('common.success') || 'Project updated successfully');
+            } else if (activeForm === 'createTask') {
+                const dto: CreateTaskDTO = {
+                    project_id: values.projectId as string,
+                    name: values.taskTitle as string,
+                    description: values.description as string,
+                    start_date: new Date().toISOString().split('T')[0], // Extract YYYY-MM-DD
+                    ...(values.dueDate ? { end_date: (values.dueDate as string).split('T')[0] } : {}),
+                };
+                await assignmentService.createTask(dto);
+                showSuccess(t('common.success') || 'Task created successfully');
+            } else if (activeForm === 'task' && editingEntityId) {
+                const dto: UpdateTaskDTO = {
+                    project_id: values.projectId as string,
+                    name: values.taskTitle as string,
+                    description: values.description as string,
+                    ...(values.dueDate ? { end_date: (values.dueDate as string).split('T')[0] } : {}),
+                };
+                await assignmentService.updateTask(editingEntityId, dto);
+                showSuccess(t('common.success') || 'Task updated successfully');
+            }
+
+            setActiveForm(null);
+            setEditingEntityId(null);
+            fetchData(); // Refresh data
+        } catch (formError) {
+            const code = ERROR_CODES.FORM_SUBMIT_FAILED;
+            console.error(`[${code}] Form submission failed:`, formError);
+            showError({ message: t('common.error') || 'An error occurred', code });
+        }
     };
 
     const handleEditClient = (row: AssignmentTableRow) => {
-        const client = mockClients.find(c => c.client_id === row.client_id);
+        const client = clients.find(c => c.client_id === row.client_id);
         if (client) {
+            setEditingEntityId(client.client_id);
             setFormInitialValues({
                 clientName: client.name,
                 contactDetails: client.contact_info || '',
@@ -64,12 +214,14 @@ export function AssignmentPage() {
     };
 
     const handleEditProject = (row: AssignmentTableRow) => {
-        const project = mockProjects.find(p => p.project_id === row.project_id);
+        const project = projects.find(p => p.project_id === row.project_id);
         if (project) {
+            setEditingEntityId(project.project_id);
             setFormInitialValues({
                 projectName: project.name,
                 clientId: String(project.client_id),
-                projectDuration: { start: project.start_date || '', end: '' }, // End date missing in mock
+                managerUserId: project.manager_user_id ? String(project.manager_user_id) : '',
+                projectDuration: { start: project.start_date || '', end: project.end_date || '' },
                 description: project.description || '',
             });
             setActiveForm('project');
@@ -77,13 +229,13 @@ export function AssignmentPage() {
     };
 
     const handleEditTask = (row: AssignmentTableRow) => {
-        const task = mockTasks.find(t => t.task_id === row.task_id);
+        const task = tasks.find(t => t.task_id === row.task_id);
         if (task) {
+            setEditingEntityId(task.task_id);
             setFormInitialValues({
                 taskTitle: task.name,
                 projectId: String(task.project_id),
-                assignedTo: '',
-                dueDate: '',
+                dueDate: task.end_date || '',
                 description: task.description || '',
             });
             setActiveForm('task');
@@ -94,26 +246,61 @@ export function AssignmentPage() {
         setDeletingItem({ type, id, name });
     };
 
-    const handleConfirmDelete = () => {
-        if (!deletingItem) return;
-        console.log(`Deleted ${deletingItem.type} with id: ${deletingItem.id}`);
-        setDeletingItem(null);
+    const handleConfirmDelete = async () => {
+        try {
+            if (!deletingItem) return;
+
+            if (deletingItem.type === 'client') {
+                await assignmentService.deleteClient(deletingItem.id);
+            } else if (deletingItem.type === 'project') {
+                await assignmentService.deleteProject(deletingItem.id);
+            } else if (deletingItem.type === 'task') {
+                await assignmentService.deleteTask(deletingItem.id);
+            }
+
+            showSuccess(t('common.success') || 'Deleted successfully');
+            setDeletingItem(null);
+            fetchData();
+        } catch (deleteError) {
+            const code = ERROR_CODES.DELETE_FAILED;
+            console.error(`[${code}] Delete failed:`, deleteError);
+            showError({ message: t('common.error') || 'An error occurred', code });
+        }
+    };
+
+    const handleRestore = async (type: 'client' | 'project' | 'task', id: string) => {
+        try {
+            if (type === 'client') {
+                await assignmentService.updateClient(id, { active: true });
+            } else if (type === 'project') {
+                await assignmentService.updateProject(id, { active: true });
+            } else if (type === 'task') {
+                await assignmentService.updateTask(id, { active: true });
+            }
+            showSuccess(t('common.success') || 'Restored successfully');
+            fetchData();
+        } catch (restoreError) {
+            console.error('Restore failed:', restoreError);
+            showError({ message: t('common.restore_failed') || 'Failed to restore item', code: 'ASSIGNMENT_RESTORE_FAILED' });
+        }
     };
 
     // --- Data Aggregation (Raw Rows) ---
     const rawRows = useMemo(() => {
-        return mockTasks.map(task => {
-            const project = mockProjects.find(p => p.project_id === task.project_id);
-            const client = project ? mockClients.find(c => c.client_id === project.client_id) : null;
+        if (!tasks) return [];
+        return tasks.map(task => {
+            const project = projects.find(p => p.project_id === task.project_id);
+            const client = project ? clients.find(c => c.client_id === project.client_id) : null;
 
             // Find active assignments for this task
-            const taskAssignments = mockAdminTaskAssignments.filter(
+            // Assignments from backend are AdminTaskAssignment[]
+            const taskAssignments = (assignments || []).filter(
                 a => a.task_id === task.task_id && a.active
             );
 
             // Map assignments to PersonChip
             const assignees: PersonChip[] = taskAssignments.map(assignment => {
-                const user = mockUsers.find(u => u.user_id === assignment.user_id);
+                const user = (users || []).find(u => u.user_id === assignment.user_id);
                 return {
                     id: String(assignment.user_id),
                     name: user ? user.full_name : t('common.unknownUser')
@@ -128,10 +315,13 @@ export function AssignmentPage() {
                 client_name: client ? client.name : t('common.unknown'),
                 project_name: project ? project.name : t('common.unknown'),
                 task_name: task.name,
-                assignees
+                assignees,
+                client_active: client?.active ?? false,
+                project_active: project?.active ?? false,
+                task_active: task.active
             };
         });
-    }, [t]);
+    }, [tasks, projects, clients, assignments, users, t]);
 
     // --- Search Logic (Reusable) ---
     const { searchQuery, setSearchQuery, filteredData } = useTableSearch(rawRows, ['client_name', 'project_name', 'task_name']);
@@ -173,17 +363,27 @@ export function AssignmentPage() {
 
     // Data for the form: All potential available employees
     const potentialEmployees: EmployeeRow[] = useMemo(() => {
-        return mockUsers.map(user => ({
+        return (users || []).map(user => ({
             id: String(user.user_id),
             fullName: user.full_name,
             type: user.role === UserRole.ADMIN ? t('employeesPage.roles.admin') : t('employeesPage.roles.employee'),
             role: user.job_title || ''
         }));
-    }, [t]);
+    }, [users, t]);
 
     const handleAssignmentSubmit = async (selectedRows: EmployeeRow[]) => {
-        console.log('Updated assignments for task', editingAssignment?.task_name, ':', selectedRows);
-        setEditingAssignment(null);
+        if (!editingAssignment) return;
+        try {
+            const employeeIds = selectedRows.map(r => r.id);
+            await assignmentService.assignEmployees(editingAssignment.task_id, employeeIds);
+            showSuccess(t('assignmentPage.success.assigned'));
+            setEditingAssignment(null);
+            fetchData(); // Refresh data to show updates
+        } catch (assignError) {
+            const code = ERROR_CODES.ASSIGNMENT_FAILED;
+            console.error(`[${code}] Assignment failed:`, assignError);
+            showError({ message: t('assignmentPage.errors.assignFailed'), code });
+        }
     };
 
     // Columns definition
@@ -232,6 +432,10 @@ export function AssignmentPage() {
         { id: 'task', label: t('createMenu.options.addTask'), onSelect: () => { setFormInitialValues({}); setActiveForm('createTask'); } },
     ], [t]);
 
+    if (error && !data.length) {
+        return <div className="assignment-page-error">{error} <button onClick={fetchData}>{t('common.retry')}</button></div>;
+    }
+
     return (
         <div className="assignment-page">
             <div className="assignment-page-header">
@@ -248,6 +452,17 @@ export function AssignmentPage() {
                         onChange={setSearchQuery}
                         placeholder={t('assignmentPage.searchBarHint')}
                     />
+
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', cursor: 'pointer' }}>
+                        <input
+                            type="checkbox"
+                            checked={!showActiveOnly}
+                            onChange={(e) => setShowActiveOnly(!e.target.checked)}
+                            style={{ cursor: 'pointer' }}
+                        />
+                        <span>{t('assignmentPage.showInactive')}</span>
+                    </label>
+
                     <CreateDropdownMenu
                         label={t('createMenu.title')}
                         options={createDropdownOptions}
@@ -269,23 +484,30 @@ export function AssignmentPage() {
                 onPageChange={setPage}
                 sort={sort}
                 onSortChange={setSort}
-                isLoading={false}
+                isLoading={isLoading}
                 rowActions={{
                     showEdit: true,
                     showDelete: true,
                     editOptions: [
-                        { label: t('assignmentPage.actions.editClient'), onClick: (row) => handleEditClient(row) },
-                        { label: t('assignmentPage.actions.editProject'), onClick: (row) => handleEditProject(row) },
-                        { label: t('assignmentPage.actions.editTask'), onClick: (row) => handleEditTask(row) },
+                        { label: t('assignmentPage.actions.editClient'), onClick: (row) => handleEditClient(row), isVisible: (row) => row.client_active },
+                        { label: t('assignmentPage.actions.restoreClient', 'Restore Client'), onClick: (row) => handleRestore('client', row.client_id), isVisible: (row) => !row.client_active },
+
+                        { label: t('assignmentPage.actions.editProject'), onClick: (row) => handleEditProject(row), isVisible: (row) => row.project_active },
+                        { label: t('assignmentPage.actions.restoreProject', 'Restore Project'), onClick: (row) => handleRestore('project', row.project_id), isVisible: (row) => !row.project_active },
+
+                        { label: t('assignmentPage.actions.editTask'), onClick: (row) => handleEditTask(row), isVisible: (row) => row.task_active },
+                        { label: t('assignmentPage.actions.restoreTask', 'Restore Task'), onClick: (row) => handleRestore('task', row.task_id), isVisible: (row) => !row.task_active },
+
                         {
                             label: t('assignmentPage.actions.editAssignment'),
-                            onClick: (row) => setEditingAssignment(row)
+                            onClick: (row) => setEditingAssignment(row),
+                            isVisible: (row) => row.task_active
                         },
                     ],
                     deleteOptions: [
-                        { label: t('assignmentPage.actions.deleteClient'), onClick: (row) => handleDeleteClick('client', String(row.client_id), row.client_name) },
-                        { label: t('assignmentPage.actions.deleteProject'), onClick: (row) => handleDeleteClick('project', String(row.project_id), row.project_name) },
-                        { label: t('assignmentPage.actions.deleteTask'), onClick: (row) => handleDeleteClick('task', String(row.task_id), row.task_name) },
+                        { label: t('assignmentPage.actions.deleteClient'), onClick: (row) => handleDeleteClick('client', String(row.client_id), row.client_name), isVisible: (row) => row.client_active },
+                        { label: t('assignmentPage.actions.deleteProject'), onClick: (row) => handleDeleteClick('project', String(row.project_id), row.project_name), isVisible: (row) => row.project_active },
+                        { label: t('assignmentPage.actions.deleteTask'), onClick: (row) => handleDeleteClick('task', String(row.task_id), row.task_name), isVisible: (row) => row.task_active },
                     ]
                 }}
             />
@@ -304,38 +526,38 @@ export function AssignmentPage() {
                 />
             )}
 
-            {/* Edit Forms */}
+            {/* Edit Forms - Using Factory Functions */}
             {activeForm === 'client' && (
                 <FormShell
-                    {...editClientForm}
+                    {...getClientForm(t, 'edit')}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveForm(null)}
+                    onClose={() => { setActiveForm(null); setEditingEntityId(null); }}
                     onSubmit={handleFormSubmit}
                 />
             )}
 
             {activeForm === 'project' && (
                 <FormShell
-                    {...editProjectForm}
+                    {...getProjectForm(t, 'edit', clientOptions, managerOptions)}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveForm(null)}
+                    onClose={() => { setActiveForm(null); setEditingEntityId(null); }}
                     onSubmit={handleFormSubmit}
                 />
             )}
 
             {activeForm === 'task' && (
                 <FormShell
-                    {...editTaskForm}
+                    {...getTaskForm(t, 'edit', projectOptions)}
                     initialValues={formInitialValues}
-                    onClose={() => setActiveForm(null)}
+                    onClose={() => { setActiveForm(null); setEditingEntityId(null); }}
                     onSubmit={handleFormSubmit}
                 />
             )}
 
-            {/* Create Forms */}
+            {/* Create Forms - Using Factory Functions */}
             {activeForm === 'createClient' && (
                 <FormShell
-                    {...createClientForm}
+                    {...getClientForm(t, 'create')}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
@@ -344,7 +566,7 @@ export function AssignmentPage() {
 
             {activeForm === 'createProject' && (
                 <FormShell
-                    {...createProjectForm}
+                    {...getProjectForm(t, 'create', clientOptions, managerOptions)}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
@@ -353,7 +575,7 @@ export function AssignmentPage() {
 
             {activeForm === 'createTask' && (
                 <FormShell
-                    {...createTaskForm}
+                    {...getTaskForm(t, 'create', projectOptions)}
                     initialValues={{}}
                     onClose={() => setActiveForm(null)}
                     onSubmit={handleFormSubmit}
@@ -370,6 +592,8 @@ export function AssignmentPage() {
                 onConfirm={handleConfirmDelete}
                 onCancel={() => setDeletingItem(null)}
             />
+
+            <ToastContainer toasts={toasts} onDismiss={removeToast} />
         </div>
     );
 }

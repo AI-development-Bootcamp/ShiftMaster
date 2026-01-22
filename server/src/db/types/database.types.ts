@@ -83,7 +83,7 @@ export interface Database {
                 Insert: {
                     project_id?: string
                     client_id: string
-                    manager_user_id: string
+                    manager_user_id?: string
                     name: string
                     description?: string | null
                     start_date: string

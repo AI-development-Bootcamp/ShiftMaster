@@ -116,6 +116,7 @@ export interface EntryAssignment {
 // Month Lock model
 /**
  * Represents a lock on a specific month to prevent further edits.
+ * A row exists only for locked months; unlocking deletes the row.
  */
 export interface MonthLock {
   lock_id: string; // UUID
@@ -123,5 +124,6 @@ export interface MonthLock {
   month: number;
   locked_at: string;
   locked_by: string; // UUID - admin user
-  unlocked_at?: string;
 }
+
+export { UserRole };

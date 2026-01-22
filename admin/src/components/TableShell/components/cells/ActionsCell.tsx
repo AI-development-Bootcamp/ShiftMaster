@@ -103,6 +103,10 @@ export function ActionsCell<T>({ row, config }: ActionsCellProps<T>) {
         onAdd, addOptions
     } = config;
 
+    const visibleEditOptions = editOptions?.filter(opt => !opt.isVisible || opt.isVisible(row));
+    const visibleDeleteOptions = deleteOptions?.filter(opt => !opt.isVisible || opt.isVisible(row));
+    const visibleAddOptions = addOptions?.filter(opt => !opt.isVisible || opt.isVisible(row));
+
     const handleDelete = () => {
         if (onDelete) {
             // Delete requires confirmation
@@ -116,9 +120,9 @@ export function ActionsCell<T>({ row, config }: ActionsCellProps<T>) {
     return (
         <div className="table-shell__actions">
             {showEdit && (
-                editOptions && editOptions.length > 0 ? (
+                visibleEditOptions && visibleEditOptions.length > 0 ? (
                     <ActionDropdown
-                        options={editOptions}
+                        options={visibleEditOptions}
                         row={row}
                         trigger={
                             <button
@@ -143,9 +147,9 @@ export function ActionsCell<T>({ row, config }: ActionsCellProps<T>) {
             )}
 
             {showAdd && (
-                addOptions && addOptions.length > 0 ? (
+                visibleAddOptions && visibleAddOptions.length > 0 ? (
                     <ActionDropdown
-                        options={addOptions}
+                        options={visibleAddOptions}
                         row={row}
                         trigger={
                             <button
@@ -170,9 +174,9 @@ export function ActionsCell<T>({ row, config }: ActionsCellProps<T>) {
             )}
 
             {showDelete && (
-                deleteOptions && deleteOptions.length > 0 ? (
+                visibleDeleteOptions && visibleDeleteOptions.length > 0 ? (
                     <ActionDropdown
-                        options={deleteOptions}
+                        options={visibleDeleteOptions}
                         row={row}
                         trigger={
                             <button

@@ -26,6 +26,7 @@ interface UserFromDB {
   email: string;
   password_hash: string;
   role: 'admin' | 'regular';
+  job_title: string;
   active: boolean;
   created_at: string;
 }
@@ -38,6 +39,7 @@ export interface AuthenticatedUser {
   full_name: string;
   email: string;
   role: 'admin' | 'regular';
+  job_title: string;
   active: boolean;
 }
 
@@ -116,7 +118,7 @@ export async function authenticateUser(
   const { data: user, error } = await supabaseAdmin
     .from('users')
     .select(
-      'user_id, full_name, email, password_hash, role, active, created_at'
+      'user_id, full_name, email, password_hash, role, job_title, active, created_at'
     )
     .eq('email', email)
     .single();
@@ -151,6 +153,7 @@ export async function authenticateUser(
     full_name: userFromDB.full_name,
     email: userFromDB.email,
     role: userFromDB.role,
+    job_title: userFromDB.job_title,
     active: userFromDB.active,
   };
 }
@@ -219,26 +222,51 @@ export async function validateRefreshSession(
 /**
  * Rotate refresh token (generate new token, update session)
  * Used during token refresh to invalidate old token
+ * Includes grace period to prevent rapid rotation during concurrent requests
  *
  * @param {string} sessionId - Session ID to rotate token for
- * @returns {Promise<{refreshToken: string}>} New refresh token
+ * @param {number} gracePeriodSeconds - Minimum seconds between rotations (default: 60)
+ * @returns {Promise<{refreshToken: string | null, rotated: boolean}>} New refresh token and rotation status
  * @throws {RefreshSessionNotFoundError} If session doesn't exist
  */
 export async function rotateRefreshToken(
-  sessionId: string
-): Promise<{ refreshToken: string }> {
+  sessionId: string,
+  gracePeriodSeconds: number = 60
+): Promise<{ refreshToken: string | null; rotated: boolean }> {
+  // Get current session to check last rotation time
+  const session = await getRefreshSession(sessionId);
+
+  if (!session) {
+    throw new RefreshSessionNotFoundError();
+  }
+
+  // Check if we're within grace period
+  const now = new Date().getTime();
+  const lastRotated = session.lastRotatedAt
+    ? new Date(session.lastRotatedAt).getTime()
+    : new Date(session.createdAt).getTime();
+
+  const timeSinceLastRotation = (now - lastRotated) / 1000; // seconds
+
+  // If within grace period, don't rotate - return null to signal no rotation
+  if (timeSinceLastRotation < gracePeriodSeconds) {
+    return { refreshToken: null, rotated: false };
+  }
+
+  // Grace period passed, safe to rotate
   const newRefreshToken = generateRefreshToken(32);
   const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
 
   const updated = await updateRefreshSession(sessionId, {
     refreshTokenHash: newRefreshTokenHash,
+    lastRotatedAt: new Date().toISOString(),
   });
 
   if (!updated) {
     throw new RefreshSessionNotFoundError();
   }
 
-  return { refreshToken: newRefreshToken };
+  return { refreshToken: newRefreshToken, rotated: true };
 }
 
 /**
