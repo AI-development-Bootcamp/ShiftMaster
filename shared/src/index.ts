@@ -1,8 +1,8 @@
 // Export all types
-export * from './types';
+export * from './types/index.js';
 
 // Export API client
-export * from './api';
+export * from './api/index.js';
 
 // Export utilities
-export * from './utils';
+export * from './utils/index.js';

@@ -3,17 +3,14 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 // Import slices here as they are created
 import authReducer from './slices/authSlice';
-
-// Placeholder reducer until actual slices are created
-// This prevents Redux from throwing an error about empty reducers
-const placeholderReducer = (state = {}) => state;
+import entriesReducer from './slices/entriesSlice';
+import tasksReducer from './slices/tasksSlice';
 
 export const store = configureStore({
   reducer: {
-    // Temporary placeholder - remove this when you add your first real reducer
-    _placeholder: placeholderReducer,
-    // Add reducers here
     auth: authReducer,
+    entries: entriesReducer,
+    tasks: tasksReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

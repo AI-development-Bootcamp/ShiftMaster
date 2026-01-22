@@ -1,11 +1,11 @@
 // Export all enums
-export * from './enums';
+export * from './enums.js';
 
 // Export all models
-export * from './models';
+export * from './models.js';
 
 // Export all API types
-export * from './api';
+export * from './api/index.js';
 
 // Common API response types
 export interface ApiResponse<T> {

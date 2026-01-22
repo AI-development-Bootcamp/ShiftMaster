@@ -154,5 +154,27 @@
     "october": "אוקטובר",
     "november": "נובמבר",
     "december": "דצמבר"
-  }
+  },
+  "errors": {
+    "monthLocked": "לא ניתן לשמור דיווח - {{month}}/{{year}} נעול",
+    "monthLockedGeneric": "לא ניתן לשמור דיווח - החודש נעול",
+    "taskNotAssigned": "אינך משובץ למשימה: {{taskName}}",
+    "taskNotAssignedGeneric": "אינך משובץ למשימה הזו",
+    "timeFormatMismatch": "פורמט שעות שגוי - פרויקט זה דורש {{format}}",
+    "timeFormatMismatchGeneric": "פורמט שעות שגוי",
+    "invalidTimeRange": "שעת סיום חייבת להיות אחרי שעת התחלה",
+    "missingTimeData": "חסרים נתוני זמן",
+    "missingDuration": "חסר משך זמן",
+    "networkError": "שגיאת רשת - נסה שנית",
+    "validationError": "שגיאה בנתונים שהוזנו",
+    "invalidAbsenceType": "סוג היעדרות לא תקין",
+    "taskNotFound": "המשימה לא נמצאה",
+    "taskInactive": "המשימה לא פעילה",
+    "unknownError": "שגיאה לא צפויה - נסה שנית",
+    "formats": {
+      "startEnd": "שעת התחלה וסיום",
+      "sum": "סה\"כ שעות"
+    }
+  },
+  "saving": "שומר..."
 }

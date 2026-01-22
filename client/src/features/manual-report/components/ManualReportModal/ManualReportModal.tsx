@@ -1,5 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '../../../../store';
+import {
+  fetchTaskTree,
+  selectTaskTree,
+} from '../../../../store/slices/tasksSlice';
 import { ManualReportModalProps } from '../../types/manualReport';
 import { CloseIcon } from '../icons';
 import { WorkTab } from '../WorkTab';
@@ -17,6 +22,8 @@ function ManualReportModal({
   selectedDate = new Date(),
 }: ManualReportModalProps) {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
+
   const [activeTab, setActiveTab] = useState<'work' | 'absence'>('work');
   const [totalHours, setTotalHours] = useState(0);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -24,14 +31,36 @@ function ManualReportModal({
   const [showMissingHoursDialog, setShowMissingHoursDialog] = useState(false);
   const deleteProjectRef = useRef<((projectId: string) => void) | null>(null);
 
-  const projectGroups: SelectionGroup[] = [];
+  // Redux state
+  const taskTree = useAppSelector(selectTaskTree);
 
-  const taskGroups: SelectionGroup[] = [
-    {
-      title: 'משימות',
-      items: ['פיתוח', 'בדיקות', 'תיעוד', 'ישיבות', 'תכנון', 'Code Review'],
-    },
-  ];
+
+  // Fetch task tree when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      dispatch(fetchTaskTree());
+    }
+  }, [dispatch, isOpen]);
+
+  // Transform task tree to SelectionGroup format for projects
+  const projectGroups: SelectionGroup[] = useMemo(() => {
+    if (taskTree.length === 0) return [];
+
+    return [{
+      title: 'פרויקטים',
+      items: taskTree.map((project) => project.project_name),
+    }];
+  }, [taskTree]);
+
+  // Transform task tree to SelectionGroup format for tasks (grouped by project)
+  const taskGroups: SelectionGroup[] = useMemo(() => {
+    if (taskTree.length === 0) return [];
+
+    return taskTree.map((project) => ({
+      title: project.project_name,
+      items: project.tasks.map((task) => task.task_name),
+    }));
+  }, [taskTree]);
 
   const locationGroups: SelectionGroup[] = [
     {

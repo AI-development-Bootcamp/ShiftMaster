@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '../../store';
+import {
+  fetchEntriesByMonth,
+  selectEntriesLoading,
+} from '../../store/slices/entriesSlice';
+import { combineAndSortEntries } from '../../utils/entryTransformers';
 import DailyEntryCard, {
   DailyEntry,
 } from '../../components/DailyEntryCard/DailyEntryCard';
@@ -8,11 +14,6 @@ import ManualReportModal from '../../components/ManualReportModal/ManualReportMo
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
-// Function to load entries for a specific month/year
-// TODO: Replace with actual API call to backend
-const loadEntriesForMonth = (_month: number, _year: number): DailyEntry[] => {
-  return [];
-};
 
 // Helper function to check if a month/year is in the future
 const isFutureMonth = (month: number, year: number): boolean => {
@@ -27,10 +28,14 @@ const isFutureMonth = (month: number, year: number): boolean => {
 
 function HomePage() {
   const { t } = useTranslation();
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
-  const [currentYear, setCurrentYear] = useState(2025);
-  const [prevMonthIndex, setPrevMonthIndex] = useState(10);
-  const [prevYear, setPrevYear] = useState(2025);
+  const dispatch = useAppDispatch();
+
+  // Get current date for initial month
+  const now = new Date();
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(now.getMonth());
+  const [currentYear, setCurrentYear] = useState(now.getFullYear());
+  const [prevMonthIndex, setPrevMonthIndex] = useState(now.getMonth());
+  const [prevYear, setPrevYear] = useState(now.getFullYear());
   const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(
     null
   );
@@ -39,7 +44,11 @@ function HomePage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
-  const [isLoadingEntries, setIsLoadingEntries] = useState(false);
+
+  // Redux selectors
+  const isLoadingEntries = useAppSelector(selectEntriesLoading);
+  const workEntries = useAppSelector((state) => Object.values(state.entries.workEntries));
+  const absenceEntries = useAppSelector((state) => Object.values(state.entries.absenceEntries));
 
   // Helper function to get month name from translation
   const getMonthName = (monthIndex: number): string => {
@@ -62,16 +71,14 @@ function HomePage() {
 
   // Load entries when month/year changes
   useEffect(() => {
-    setIsLoadingEntries(true);
-    // Simulate loading delay (remove when connecting to API)
-    const timeoutId = setTimeout(() => {
-      const loadedEntries = loadEntriesForMonth(currentMonthIndex, currentYear);
-      setEntries(loadedEntries);
-      setIsLoadingEntries(false);
-    }, 300);
+    dispatch(fetchEntriesByMonth({ year: currentYear, month: currentMonthIndex + 1 }));
+  }, [dispatch, currentMonthIndex, currentYear]);
 
-    return () => clearTimeout(timeoutId);
-  }, [currentMonthIndex, currentYear]);
+  // Transform entries when Redux state changes
+  useEffect(() => {
+    const transformed = combineAndSortEntries(workEntries, absenceEntries);
+    setEntries(transformed);
+  }, [workEntries, absenceEntries]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
@@ -166,24 +173,22 @@ function HomePage() {
           </button>
           <div className="month-label-container">
             <span
-              className={`month-label month-label-old ${
-                monthDirection === 'left'
+              className={`month-label month-label-old ${monthDirection === 'left'
                   ? 'month-slide-out-left'
                   : monthDirection === 'right'
                     ? 'month-slide-out-right'
                     : 'month-hidden'
-              }`}
+                }`}
             >
               {getMonthName(prevMonthIndex)} {prevYear}
             </span>
             <span
-              className={`month-label ${
-                monthDirection === 'left'
+              className={`month-label ${monthDirection === 'left'
                   ? 'month-slide-in-left'
                   : monthDirection === 'right'
                     ? 'month-slide-in-right'
                     : ''
-              }`}
+                }`}
             >
               {getMonthName(currentMonthIndex)} {currentYear}
             </span>
