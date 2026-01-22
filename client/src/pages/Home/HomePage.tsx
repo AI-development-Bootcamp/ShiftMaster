@@ -7,13 +7,55 @@ import TimerDisplay from '../../components/TimerDisplay/TimerDisplay';
 import ManualReportModal from '../../components/ManualReportModal/ManualReportModal';
 import LogoutButton from '../../components/LogoutButton/LogoutButton';
 import { useTimer } from '../../hooks/useTimer';
+import { useAppDispatch, useAppSelector } from '../../store';
+import { fetchTimeline } from '../../store/slices/timelineSlice';
+import { TimelineDay } from '../../store/slices/timelineSlice';
+import { EntryStatus } from '../../components/StatusBadge/StatusBadge';
 import WelcomeIllustration from '../../assets/images/welcome-illustration.svg';
 import '../../styles/HomePage.css';
 
-// Function to load entries for a specific month/year
-// TODO: Replace with actual API call to backend
-const loadEntriesForMonth = (_month: number, _year: number): DailyEntry[] => {
-  return [];
+// Transform timeline data to DailyEntry format
+const transformTimelineToDailyEntries = (timeline: TimelineDay[], t: (key: string) => string): DailyEntry[] => {
+  return timeline.map((day) => {
+    const date = new Date(day.work_date);
+    const dayNames = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const dayName = t(`dayNames.${dayNames[date.getDay()]}`);
+
+    // Calculate hours from total minutes
+    const hours = day.total_work_minutes > 0 ? day.total_work_minutes / 60 : undefined;
+
+    // Determine status based on entries
+    let status: EntryStatus = 'empty';
+    if (day.absences.length > 0) {
+      status = 'absence';
+    } else if (day.entries.length > 0) {
+      const hasActiveTimer = day.entries.some(e => e.is_active);
+      status = hasActiveTimer ? 'in-progress' : 'complete';
+    }
+
+    // Transform work entries to TimeEntry format
+    const timeEntries = day.entries.flatMap((entry) =>
+      entry.assignments.map((assignment) => ({
+        id: `${entry.entry_id}-${assignment.entry_assignment_id}`,
+        projectName: assignment.project_name,
+        taskName: assignment.task_name,
+        hours: assignment.duration_minutes ? assignment.duration_minutes / 60 : 0,
+        location: assignment.location as 'Office' | 'Client' | 'Home',
+        startTime: entry.start_time,
+        endTime: entry.end_time || undefined,
+      }))
+    );
+
+    return {
+      id: day.work_date,
+      date: day.work_date,
+      dayName,
+      status,
+      hours,
+      timeEntries,
+      absenceType: day.absences.length > 0 ? (day.absences[0].absence_type as any) : undefined,
+    };
+  });
 };
 
 // Helper function to check if a month/year is in the future
@@ -41,10 +83,12 @@ function HomePage() {
   // TODO: Add TaskSelectionModal component to show on clock-out
   const [_isTaskSelectionOpen, setIsTaskSelectionOpen] = useState(false);
 
-  const [currentMonthIndex, setCurrentMonthIndex] = useState(10); // November
-  const [currentYear, setCurrentYear] = useState(2025);
-  const [prevMonthIndex, setPrevMonthIndex] = useState(10);
-  const [prevYear, setPrevYear] = useState(2025);
+  // Initialize to current month/year
+  const now = new Date();
+  const [currentMonthIndex, setCurrentMonthIndex] = useState(now.getMonth());
+  const [currentYear, setCurrentYear] = useState(now.getFullYear());
+  const [prevMonthIndex, setPrevMonthIndex] = useState(now.getMonth());
+  const [prevYear, setPrevYear] = useState(now.getFullYear());
   const [monthDirection, setMonthDirection] = useState<'left' | 'right' | null>(
     null
   );
