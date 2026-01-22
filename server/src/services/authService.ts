@@ -26,6 +26,7 @@ interface UserFromDB {
   email: string;
   password_hash: string;
   role: 'admin' | 'regular';
+  job_title: string;
   active: boolean;
   created_at: string;
 }
@@ -38,6 +39,7 @@ export interface AuthenticatedUser {
   full_name: string;
   email: string;
   role: 'admin' | 'regular';
+  job_title: string;
   active: boolean;
 }
 
@@ -116,7 +118,7 @@ export async function authenticateUser(
   const { data: user, error } = await supabaseAdmin
     .from('users')
     .select(
-      'user_id, full_name, email, password_hash, role, active, created_at'
+      'user_id, full_name, email, password_hash, role, job_title, active, created_at'
     )
     .eq('email', email)
     .single();
@@ -151,6 +153,7 @@ export async function authenticateUser(
     full_name: userFromDB.full_name,
     email: userFromDB.email,
     role: userFromDB.role,
+    job_title: userFromDB.job_title,
     active: userFromDB.active,
   };
 }

@@ -14,7 +14,7 @@ vi.mock('../../db/repositories/MonthLockRepository.js', () => {
       findByYear: vi.fn(),
       findByYearAndMonth: vi.fn(),
       create: vi.fn(),
-      update: vi.fn(),
+      delete: vi.fn(),
     })),
   };
 });
@@ -25,7 +25,7 @@ describe('MonthLocksService', () => {
     findByYear: ReturnType<typeof vi.fn>;
     findByYearAndMonth: ReturnType<typeof vi.fn>;
     create: ReturnType<typeof vi.fn>;
-    update: ReturnType<typeof vi.fn>;
+    delete: ReturnType<typeof vi.fn>;
   };
 
   const mockLock: MonthLock = {
@@ -34,7 +34,6 @@ describe('MonthLocksService', () => {
     month: 1,
     locked_at: '2026-02-05T09:00:00Z',
     locked_by: 'admin-user-id',
-    unlocked_at: null,
   };
 
   beforeEach(() => {
@@ -101,14 +100,14 @@ describe('MonthLocksService', () => {
       expect(result.unlocked).toEqual([]);
     });
 
-    it('should unlock months that are locked', async () => {
+    it('should unlock months that are locked by deleting the row', async () => {
       const lockedMonth1 = { ...mockLock, month: 1 };
       const lockedMonth2 = { ...mockLock, month: 2 };
 
       mockMonthLockRepo.findByYearAndMonth
         .mockResolvedValueOnce(lockedMonth1)
         .mockResolvedValueOnce(lockedMonth2);
-      mockMonthLockRepo.update.mockResolvedValue(undefined);
+      mockMonthLockRepo.delete.mockResolvedValue(true);
 
       const result = await monthLocksService.batchUpdate(
         actorId,
@@ -118,13 +117,9 @@ describe('MonthLocksService', () => {
       );
 
       expect(mockMonthLockRepo.findByYearAndMonth).toHaveBeenCalledTimes(2);
-      expect(mockMonthLockRepo.update).toHaveBeenCalledTimes(2);
-      expect(mockMonthLockRepo.update).toHaveBeenCalledWith(
-        lockedMonth1.lock_id,
-        expect.objectContaining({
-          unlocked_at: expect.any(String),
-        })
-      );
+      expect(mockMonthLockRepo.delete).toHaveBeenCalledTimes(2);
+      expect(mockMonthLockRepo.delete).toHaveBeenCalledWith(lockedMonth1.lock_id);
+      expect(mockMonthLockRepo.delete).toHaveBeenCalledWith(lockedMonth2.lock_id);
       expect(result.locked).toEqual([]);
       expect(result.unlocked).toEqual([1, 2]);
     });
@@ -137,7 +132,7 @@ describe('MonthLocksService', () => {
         .mockResolvedValueOnce({ ...mockLock, month: 6 });
 
       mockMonthLockRepo.create.mockResolvedValue(mockLock);
-      mockMonthLockRepo.update.mockResolvedValue(undefined);
+      mockMonthLockRepo.delete.mockResolvedValue(true);
 
       const result = await monthLocksService.batchUpdate(
         actorId,
@@ -147,7 +142,7 @@ describe('MonthLocksService', () => {
       );
 
       expect(mockMonthLockRepo.create).toHaveBeenCalledTimes(2);
-      expect(mockMonthLockRepo.update).toHaveBeenCalledTimes(2);
+      expect(mockMonthLockRepo.delete).toHaveBeenCalledTimes(2);
       expect(result.locked).toEqual([3, 4]);
       expect(result.unlocked).toEqual([5, 6]);
     });
@@ -183,7 +178,7 @@ describe('MonthLocksService', () => {
         .mockResolvedValueOnce(null)
         .mockResolvedValueOnce({ ...mockLock, month: 2 });
 
-      mockMonthLockRepo.update.mockResolvedValue(undefined);
+      mockMonthLockRepo.delete.mockResolvedValue(true);
 
       const result = await monthLocksService.batchUpdate(
         actorId,
@@ -193,7 +188,7 @@ describe('MonthLocksService', () => {
       );
 
       expect(mockMonthLockRepo.findByYearAndMonth).toHaveBeenCalledTimes(2);
-      expect(mockMonthLockRepo.update).toHaveBeenCalledTimes(1);
+      expect(mockMonthLockRepo.delete).toHaveBeenCalledTimes(1);
       expect(result.locked).toEqual([]);
       expect(result.unlocked).toEqual([2]);
     });
@@ -203,7 +198,7 @@ describe('MonthLocksService', () => {
 
       expect(mockMonthLockRepo.findByYearAndMonth).not.toHaveBeenCalled();
       expect(mockMonthLockRepo.create).not.toHaveBeenCalled();
-      expect(mockMonthLockRepo.update).not.toHaveBeenCalled();
+      expect(mockMonthLockRepo.delete).not.toHaveBeenCalled();
       expect(result.locked).toEqual([]);
       expect(result.unlocked).toEqual([]);
     });

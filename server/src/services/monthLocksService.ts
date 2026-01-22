@@ -54,7 +54,7 @@ export class MonthLocksService {
   /**
    * Get all active locks for a specific year
    * @param year - The year to query
-   * @returns Array of active month locks (where unlocked_at is null)
+   * @returns Array of month locks for the year
    */
   async getLocksForYear(year: number): Promise<MonthLock[]> {
     return this.monthLockRepo.findByYear(year);
@@ -100,17 +100,15 @@ export class MonthLocksService {
 
     // Process unlocks
     for (const month of toUnlock) {
-      // Find the active lock
+      // Find the existing lock
       const existingLock = await this.monthLockRepo.findByYearAndMonth(
         year,
         month
       );
 
       if (existingLock) {
-        // Unlock by setting unlocked_at timestamp
-        await this.monthLockRepo.update(existingLock.lock_id, {
-          unlocked_at: new Date().toISOString(),
-        });
+        // Unlock by deleting the lock row
+        await this.monthLockRepo.delete(existingLock.lock_id);
         unlocked.push(month);
       }
       // If not locked, silently skip (idempotent operation)

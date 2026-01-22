@@ -104,7 +104,6 @@ describe('MonthLocksController', () => {
           month: 1,
           locked_at: '2026-02-05T09:00:00Z',
           locked_by: 'admin-user-id',
-          unlocked_at: null,
         },
         {
           lock_id: '223e4567-e89b-12d3-a456-426614174001',
@@ -112,7 +111,6 @@ describe('MonthLocksController', () => {
           month: 2,
           locked_at: '2026-03-05T09:00:00Z',
           locked_by: 'admin-user-id',
-          unlocked_at: null,
         },
       ];
 
@@ -155,7 +153,6 @@ describe('MonthLocksController', () => {
           month: 1,
           locked_at: '2026-02-05T09:00:00Z',
           locked_by: 'admin-user-id',
-          unlocked_at: null,
         },
       ];
 

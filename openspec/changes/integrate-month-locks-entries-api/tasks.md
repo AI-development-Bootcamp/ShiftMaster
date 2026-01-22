@@ -31,16 +31,16 @@
 
 ## 5. Frontend - Month Locks Service
 
-- [ ] 5.1 Create `monthLocksService.ts` (`admin/src/services/monthLocksService.ts`)
+- [x] 5.1 Create `monthLocksService.ts` (`admin/src/services/monthLocksService.ts`)
   - `fetchLocksForYear(year: number): Promise<MonthLock[]>`
   - `batchUpdateLocks(payload: BatchUpdatePayload): Promise<BatchUpdateResult>`
 
 ## 6. Frontend - Update useMonthLocks Hook
 
-- [ ] 6.1 Replace mock data fetch with `monthLocksService.fetchLocksForYear(year)`
-- [ ] 6.2 Replace console.log API call with `monthLocksService.batchUpdateLocks(payload)`
-- [ ] 6.3 Get actual admin user ID from Redux auth state instead of mock ID
-- [ ] 6.4 Update tests in `useMonthLocks.test.ts` to mock the new service
+- [x] 6.1 Replace mock data fetch with `monthLocksService.fetchLocksForYear(year)`
+- [x] 6.2 Replace console.log API call with `monthLocksService.batchUpdateLocks(payload)`
+- [x] 6.3 Get actual admin user ID from Redux auth state instead of mock ID
+- [x] 6.4 Update tests in `useMonthLocks.test.ts` to mock the new service
 
 ## 7. Frontend - Entries Service
 

@@ -15,7 +15,6 @@ export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock,
             .select('*')
             .eq('year', year)
             .eq('month', month)
-            .is('unlocked_at', null) // Only consider currently active locks
             .single();
 
         if (error) {
@@ -37,7 +36,6 @@ export class MonthLockRepository extends BaseRepository<MonthLock, NewMonthLock,
             .from(this.table)
             .select('*')
             .eq('year', year)
-            .is('unlocked_at', null)
             .order('month', { ascending: true });
 
         if (error) {
