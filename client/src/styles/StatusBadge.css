@@ -69,3 +69,25 @@
   background-color: var(--badge-bg);
   color: #ae0088;
 }
+
+/* Running - Orange with pulse animation */
+.status-badge--running {
+  --badge-bg: #ffedd5;
+  background-color: var(--badge-bg);
+  color: #ea580c;
+}
+
+.status-badge--running .status-dot {
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+}

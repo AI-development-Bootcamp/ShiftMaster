@@ -48,6 +48,8 @@ export interface ManualReportModalProps {
     | 'reserves'
     | null;
   selectedDate?: Date;
+  prefillStartTime?: string;
+  prefillEndTime?: string;
 }
 
 export interface TimePickerRefs {

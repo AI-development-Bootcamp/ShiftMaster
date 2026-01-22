@@ -18,6 +18,8 @@ export interface DailyEntry {
   hours?: number;
   timeEntries: TimeEntry[];
   absenceType?: AbsenceType;
+  isRunning?: boolean;
+  startTime?: string;
 }
 
 interface DailyEntryCardProps {

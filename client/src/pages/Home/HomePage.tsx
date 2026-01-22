@@ -40,6 +40,14 @@ function HomePage() {
   const [isManualReportModalOpen, setIsManualReportModalOpen] = useState(false);
   const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [isLoadingEntries, setIsLoadingEntries] = useState(false);
+  const [runningEntryId, setRunningEntryId] = useState<string | null>(null);
+  const [timerStartTime, setTimerStartTime] = useState<Date | null>(null);
+  const [prefillStartTime, setPrefillStartTime] = useState<string | undefined>(
+    undefined
+  );
+  const [prefillEndTime, setPrefillEndTime] = useState<string | undefined>(
+    undefined
+  );
 
   // Helper function to get month name from translation
   const getMonthName = (monthIndex: number): string => {
@@ -138,11 +146,69 @@ function HomePage() {
 
   const handleToggleTimer = () => {
     if (isTimerRunning) {
-      // Stop the timer and reset
+      // Stop the timer
+      const endTime = new Date();
+      const endTimeStr = endTime.toTimeString().slice(0, 8); // HH:MM:SS format
+
+      // Remove running entry from list
+      if (runningEntryId) {
+        setEntries((prev) => prev.filter((entry) => entry.id !== runningEntryId));
+      }
+
+      // Prepare pre-fill times for modal
+      if (timerStartTime) {
+        const startTimeStr = timerStartTime.toTimeString().slice(0, 8); // HH:MM:SS format
+        setPrefillStartTime(startTimeStr);
+        setPrefillEndTime(endTimeStr);
+      }
+
+      // Reset timer state
       setIsTimerRunning(false);
       setElapsedSeconds(0);
+      setRunningEntryId(null);
+      setTimerStartTime(null);
+
+      // Open modal with pre-filled times
+      setIsManualReportModalOpen(true);
     } else {
       // Start the timer
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+      // Generate unique entry ID
+      const entryId = `running-${Date.now()}`;
+
+      // Get day name in Hebrew
+      const dayNames = [
+        'ראשון',
+        'שני',
+        'שלישי',
+        'רביעי',
+        'חמישי',
+        'שישי',
+        'שבת',
+      ];
+      const dayName = dayNames[today.getDay()];
+
+      // Format date as DD/MM/YYYY
+      const dateStr = `${String(today.getDate()).padStart(2, '0')}/${String(today.getMonth() + 1).padStart(2, '0')}/${today.getFullYear()}`;
+
+      // Create running entry
+      const runningEntry: DailyEntry = {
+        id: entryId,
+        date: dateStr,
+        dayName,
+        status: 'running',
+        hours: 0,
+        timeEntries: [],
+        isRunning: true,
+        startTime: now.toTimeString().slice(0, 8),
+      };
+
+      // Add entry to the top of the list
+      setEntries((prev) => [runningEntry, ...prev]);
+      setRunningEntryId(entryId);
+      setTimerStartTime(now);
       setIsTimerRunning(true);
     }
   };
@@ -337,7 +403,13 @@ function HomePage() {
       {/* Manual Report Modal */}
       <ManualReportModal
         isOpen={isManualReportModalOpen}
-        onClose={() => setIsManualReportModalOpen(false)}
+        onClose={() => {
+          setIsManualReportModalOpen(false);
+          setPrefillStartTime(undefined);
+          setPrefillEndTime(undefined);
+        }}
+        prefillStartTime={prefillStartTime}
+        prefillEndTime={prefillEndTime}
       />
     </div>
   );

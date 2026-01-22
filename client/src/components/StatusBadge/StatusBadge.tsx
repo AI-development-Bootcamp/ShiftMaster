@@ -6,7 +6,8 @@ export type EntryStatus =
   | 'partial'
   | 'sick'
   | 'weekend'
-  | 'half-vacation';
+  | 'half-vacation'
+  | 'running';
 
 interface StatusBadgeProps {
   status: EntryStatus;
@@ -20,6 +21,7 @@ const statusConfig: Record<EntryStatus, { label: string; icon: string }> = {
   sick: { label: 'מחלה', icon: 'dot' },
   weekend: { label: 'סופ"ש', icon: 'dot' },
   'half-vacation': { label: "ש'", icon: 'circle-slash' },
+  running: { label: 'פעיל', icon: 'dot' },
 };
 
 function StatusBadge({ status, hours }: StatusBadgeProps) {
